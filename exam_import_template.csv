@@ -1,0 +1,6 @@
+type,questionText,marks,options,correctAnswer,codeTemplate,testCases
+mcq,"What is the complexity of binary search?",2,O(N)|O(log N)|O(N log N)|O(1),1,,
+tf,Java supports multiple inheritance through classes,1,True|False,false,,
+fib,The keyword used to define a constant in Java is ______,2,,final,,
+coding,"Write a Java method moveZeroes to push all zeros to the end.",15,,,"public class Solution { public void moveZeroes(int[] nums) {} }",[0,1,0,3,12]=>[1,3,12,0,0]|[1,2,3]=>[1,2,3]|[0,0,0]=>[0,0,0]
+practical-html,Create a simple form with username input,10,,form,"<!DOCTYPE html><html><body></body></html>",

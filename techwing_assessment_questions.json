@@ -1,0 +1,702 @@
+{
+  "title": "Swarnandhra Assigenment 1",
+  "duration": 90,
+  "passingMarks": 40,
+  "resumeWindow": 60,
+  "questions": [
+    {
+      "type": "mcq",
+      "questionText": "A train covers 240 km in 4 hours. If it maintains the same speed, how far will it travel in 6 hours?",
+      "options": [
+        "300 km",
+        "320 km",
+        "360 km",
+        "400 km"
+      ],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "A can finish a piece of work in 12 days. B can finish the same work in 6 days. Working together, they complete the work in:",
+      "options": [
+        "3 days",
+        "4 days",
+        "5 days",
+        "6 days"
+      ],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Find the next number in the sequence: 3, 7, 15, 31, ?",
+      "options": [
+        "45",
+        "57",
+        "63",
+        "64"
+      ],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "If SOUTH is written as HTUOS, then COMPUTER is written as:",
+      "options": [
+        "RETUPMOC",
+        "RETUPOMC",
+        "RETUPMCO",
+        "RETUMPOC"
+      ],
+      "correctOptionIndex": 0,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Choose the synonym of 'Meticulous'",
+      "options": [
+        "Careless",
+        "Honest",
+        "Very careful and precise",
+        "Brave"
+      ],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Choose the antonym of 'Reluctant'",
+      "options": [
+        "Hesitant",
+        "Fearful",
+        "Lazy",
+        "Willing"
+      ],
+      "correctOptionIndex": 3,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Choose the correctly spelled word.",
+      "options": [
+        "Accomodation",
+        "Accommodation",
+        "Acommodation",
+        "Accommadation"
+      ],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Pointing to a woman, Ravi said, 'She is the daughter of my grandfather's only son.' The woman is Ravi's:",
+      "options": [
+        "Mother",
+        "Aunt",
+        "Sister",
+        "Cousin"
+      ],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "What is the output of the following Java code?\n\nint x = 8;\nif(x % 3 == 2)\n System.out.print(\"Java\");\nelse\n System.out.print(\"Spring\");",
+      "options": [
+        "Error",
+        "Spring",
+        "Java",
+        "Nothing"
+      ],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "What is the output of the following Java code?\n\nint sum = 0;\nfor(int i = 1; i <= 4; i++)\n sum += i;\nSystem.out.println(sum);",
+      "options": [
+        "8",
+        "9",
+        "10",
+        "11"
+      ],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "What is the output of the following Java code?\n\nint a = 5;\nSystem.out.println(a++ + ++a);",
+      "options": [
+        "10",
+        "11",
+        "12",
+        "13"
+      ],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "What is the output of the following Java code?\n\nint[] arr = {2, 4, 6, 8};\nSystem.out.println(arr[arr.length - 2]);",
+      "options": [
+        "8",
+        "6",
+        "4",
+        "Error"
+      ],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "What is the output when input is 'TechWing AI'?\n\nScanner sc = new Scanner(System.in);\nString name = sc.next();\nSystem.out.print(name);",
+      "options": [
+        "TechWing AI",
+        "TechWing",
+        "AI",
+        "Error"
+      ],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which Scanner method should be used instead of next() to read the entire line including spaces?",
+      "options": [
+        "nextWord()",
+        "read()",
+        "getline()",
+        "nextLine()"
+      ],
+      "correctOptionIndex": 3,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "What is the output of the following Java code?\n\nfor(int i = 5; i >= 1; i--)\n System.out.print(i + \" \");",
+      "options": [
+        "1 2 3 4 5",
+        "5 4 3 2 1",
+        "5 4 3 2",
+        "Error"
+      ],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "What is the output of the following Java code?\n\nint a = 12;\nwhile(a > 8) {\n a--;\n}\nSystem.out.print(a);",
+      "options": [
+        "7",
+        "8",
+        "9",
+        "12"
+      ],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which HTML input type provides a calendar for selecting a date?",
+      "options": [
+        "time",
+        "datetime",
+        "date",
+        "calendar"
+      ],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "What is the purpose of the placeholder attribute?",
+      "options": [
+        "Makes input mandatory",
+        "Changes the input type",
+        "Displays hint text inside the input field",
+        "Creates a label"
+      ],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "If the email field is left empty and the user clicks Submit, what happens?\n\n<form>\n <input type=\"email\" required>\n <input type=\"submit\">\n</form>",
+      "options": [
+        "Form is submitted",
+        "Browser ignores the field",
+        "Browser prevents submission until a valid email is entered",
+        "Compilation error"
+      ],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which HTML tag is most appropriate for emphasizing text semantically?",
+      "options": [
+        "<b> (bold - visual only)",
+        "<strong> (strong emphasis - semantic)",
+        "<font> (deprecated)",
+        "<big> (deprecated)"
+      ],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "What is the time complexity of finding the largest element in an unsorted array of size N?",
+      "options": [
+        "O(1)",
+        "O(log N)",
+        "O(N)",
+        "O(N²)"
+      ],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "In the Two Pointer technique, two indices are typically used to:",
+      "options": [
+        "Sort the array automatically",
+        "Traverse or compare elements efficiently from different positions",
+        "Reduce array size",
+        "Store duplicate values"
+      ],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which HTML tag is used to merge two columns in a table?",
+      "options": [
+        "rowspan",
+        "colspan",
+        "merge",
+        "colspanmerge"
+      ],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "What is the output of the following Java code?\n\nclass Demo {\n public static void show() {\n System.out.print(\"Hello\");\n }\n public static void main(String[] args) {\n show();\n }\n}",
+      "options": [
+        "Hello World",
+        "Error",
+        "Hello",
+        "Nothing"
+      ],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which statement about the main() method is correct?",
+      "options": [
+        "It can return an integer",
+        "It must be private",
+        "It is optional in every Java application",
+        "It is the entry point from which the JVM starts program execution"
+      ],
+      "correctOptionIndex": 3,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "What will be the output?\n\nint[] arr = {5, 10, 15, 20};\nSystem.out.println(arr[arr.length - 1]);",
+      "options": [
+        "15",
+        "10",
+        "20",
+        "Compilation Error"
+      ],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Consider the following program. What is the output?\n\npublic class Demo {\n static int add(int a, int b) {\n return a + b;\n }\n public static void main(String[] args) {\n System.out.println(add(5, 7));\n }\n}",
+      "options": [
+        "5",
+        "7",
+        "10",
+        "12"
+      ],
+      "correctOptionIndex": 3,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which Scanner method should be used to read a decimal value?",
+      "options": [
+        "next()",
+        "nextLine()",
+        "nextDouble()",
+        "nextString()"
+      ],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which statement is TRUE about Java methods?",
+      "options": [
+        "A method cannot return a value",
+        "Every method must accept parameters",
+        "A method may or may not return a value",
+        "A method can only be called once"
+      ],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "How many times is 'AI' printed?\n\nfor(int i = 1; i <= 2; i++) {\n for(int j = 1; j <= 3; j++) {\n System.out.print(\"AI \");\n }\n}",
+      "options": [
+        "3",
+        "4",
+        "5",
+        "6"
+      ],
+      "correctOptionIndex": 3,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "What will be the output?\n\nint[] arr = {10, 20, 30, 40};\nfor(int i = 1; i < arr.length; i++) {\n System.out.print(arr[i] + \" \");\n}",
+      "options": [
+        "10 20 30",
+        "20 30 40",
+        "10 20 30 40",
+        "30 40"
+      ],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which statement correctly creates an object?",
+      "options": [
+        "Student();",
+        "Student s = Student();",
+        "new Student();",
+        "Student s = new Student();"
+      ],
+      "correctOptionIndex": 3,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "What will be the output?\n\nString s = \"Placement\";\nSystem.out.println(s.charAt(3));",
+      "options": [
+        "p",
+        "l",
+        "c",
+        "e"
+      ],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which HTML element is used to group related form controls with a caption?",
+      "options": [
+        "<section>",
+        "<legend>",
+        "<fieldset>",
+        "<group>"
+      ],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which attribute displays a short hint describing the expected value of an input field?",
+      "options": [
+        "value",
+        "required",
+        "id",
+        "placeholder"
+      ],
+      "correctOptionIndex": 3,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "What will be the output?\n\nint x = 10;\nif(x > 5) {\n if(x > 15)\n System.out.print(\"Java\");\n else\n System.out.print(\"Spring\");\n}",
+      "options": [
+        "Java",
+        "Spring",
+        "Java Spring",
+        "Error"
+      ],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "What is the output?\n\nint a = 2;\nwhile(a <= 8) {\n System.out.print(a + \" \");\n a += 2;\n}",
+      "options": [
+        "2 4 6",
+        "2 4 6 8",
+        "2 4 6 8 10",
+        "2 4 6 8 10 12"
+      ],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "What is the output?\n\nint[] arr = {2, 4, 6};\nint sum = 0;\nfor(int x : arr)\n sum += x;\nSystem.out.println(sum);",
+      "options": [
+        "8",
+        "10",
+        "12",
+        "14"
+      ],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which HTML tag is used to display a video?",
+      "options": [
+        "<movie>",
+        "<media>",
+        "<play>",
+        "<video>"
+      ],
+      "correctOptionIndex": 3,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which HTML tag creates a drop-down list?",
+      "options": [
+        "<option>",
+        "<select>",
+        "<choice>",
+        "<dropdown>"
+      ],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which of the following operations takes O(N) time in the worst case?",
+      "options": [
+        "Accessing an array element by index",
+        "Finding the maximum element in an unsorted array",
+        "Reading the first element",
+        "Updating an element at a known index"
+      ],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "The Two Pointer technique is commonly used for:",
+      "options": [
+        "Creating arrays",
+        "Searching or rearranging elements efficiently",
+        "Reducing array size",
+        "Storing duplicate values"
+      ],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "What is the purpose of the <label> tag?",
+      "options": [
+        "Creates a button",
+        "Creates a heading",
+        "Associates descriptive text with a form control",
+        "Makes a field mandatory"
+      ],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "What is the output?\n\nint a = 5;\nSystem.out.println(++a + 2);",
+      "options": [
+        "6",
+        "7",
+        "8",
+        "9"
+      ],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which of the following is the correct method declaration?",
+      "options": [
+        "public add(int a, int b)",
+        "public int add(int a, int b)",
+        "int public add(int a, int b)",
+        "add(int a, int b)"
+      ],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Find the next number: 1, 4, 9, 16, 25, ?",
+      "options": [
+        "30",
+        "32",
+        "36",
+        "49"
+      ],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Pointing to a man, Anita said, 'He is the son of my mother's only brother.' The man is Anita's:",
+      "options": [
+        "Brother",
+        "Uncle",
+        "Cousin",
+        "Nephew"
+      ],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Choose the synonym of 'Resilient'",
+      "options": [
+        "Weak",
+        "Lazy",
+        "Flexible",
+        "Able to recover quickly from difficulties"
+      ],
+      "correctOptionIndex": 3,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Choose the antonym of 'Scarce'",
+      "options": [
+        "Rare",
+        "Limited",
+        "Abundant",
+        "Insufficient"
+      ],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Choose the correctly spelled word.",
+      "options": [
+        "Priviledge",
+        "Privilege",
+        "Privelage",
+        "Privillige"
+      ],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "type": "coding",
+      "questionText": "Given an array of N integers, move all the 0's to the end of the array while maintaining the relative order of the non-zero elements.\nYou must modify the array such that all non-zero elements appear first in their original order, followed by all the zeroes.\nDo not return anything, modify the array in-place.",
+      "marks": 15,
+      "codingLanguage": "java",
+      "codeTemplate": "public class Solution {\n  public void moveZeroes(int[] nums) {\n    // Write your Java code here\n  }\n}",
+      "testCases": [
+        {
+          "input": "[0,1,0,3,12,0,5]",
+          "expected": "[1,3,12,5,0,0,0]"
+        },
+        {
+          "input": "[1,2,3,4,5]",
+          "expected": "[1,2,3,4,5]"
+        },
+        {
+          "input": "[0,0,0,2,4,6]",
+          "expected": "[2,4,6,0,0,0]"
+        },
+        {
+          "input": "[0,0,0,0]",
+          "expected": "[0,0,0,0]"
+        },
+        {
+          "input": "[1,0,2,0,3,0,4,0]",
+          "expected": "[1,2,3,4,0,0,0,0]"
+        }
+      ]
+    },
+    {
+      "type": "coding",
+      "questionText": "Given an array of N integers, find and print the second largest distinct element in the array.\nIf there is no second largest distinct element (for example, when all elements are the same, or there's only one unique element), print -1.",
+      "marks": 15,
+      "codingLanguage": "java",
+      "codeTemplate": "public class Solution {\n  public int findSecondLargest(int[] arr) {\n    // Write your Java code here\n  }\n}",
+      "testCases": [
+        {
+          "input": "[12,45,8,67,32,55]",
+          "expected": "55"
+        },
+        {
+          "input": "[10,10,10,10,10]",
+          "expected": "-1"
+        },
+        {
+          "input": "[5,18,9,18,12,7,15]",
+          "expected": "15"
+        },
+        {
+          "input": "[100,50,100,50]",
+          "expected": "50"
+        },
+        {
+          "input": "[-5,-10,-3]",
+          "expected": "-5"
+        }
+      ]
+    },
+    {
+      "type": "practical-html",
+      "questionText": "Create a comprehensive HTML form for student registration with elements like Name (text), Email (email), Password (password), Mobile Number (tel), Date of Birth (date), Gender (radio), Skills (checkbox), Department (select), and Address (textarea). Connect them using labels.",
+      "marks": 10,
+      "codeTemplate": "<!DOCTYPE html>\n<html>\n<head>\n <title>Student Registration Form</title>\n <style>\n  body { font-family: Arial, sans-serif; max-width: 600px; margin: 30px auto; padding: 20px; }\n  form { border: 1px solid #ccc; padding: 20px; border-radius: 5px; }\n  label { display: block; margin-top: 10px; font-weight: bold; }\n  input, select, textarea { width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }\n  button { margin-top: 20px; padding: 10px 20px; margin-right: 10px; cursor: pointer; }\n </style>\n</head>\n<body>\n <h1>Student Registration Form</h1>\n <form>\n  <!-- Add form fields here -->\n </form>\n</body>\n</html>",
+      "correctAnswer": "form"
+    },
+    {
+      "type": "practical-java",
+      "questionText": "Create a Java program that calculates student marks and displays results. Read marks for 3 subjects using Scanner (each subject 0-100). Implement calculateTotal(mark1, mark2, mark3), calculateAverage(total), and displayResult(total, average). Output PASS if average >= 40, else FAIL.",
+      "marks": 10,
+      "codingLanguage": "java",
+      "codeTemplate": "import java.util.Scanner;\n\npublic class StudentMarksCalculator {\n  public static int calculateTotal(int mark1, int mark2, int mark3) {\n    return mark1 + mark2 + mark3;\n  }\n\n  public static double calculateAverage(int total) {\n    return total / 3.0;\n  }\n\n  public static void displayResult(int total, double average) {\n    System.out.println(\"========== RESULT ==========\");\n    System.out.println(\"Total Marks: \" + total);\n    System.out.printf(\"Average Marks: %.2f%n\", average);\n    if (average >= 40) {\n      System.out.println(\"Status: PASS\");\n    } else {\n      System.out.println(\"Status: FAIL\");\n    }\n    System.out.println(\"===========================\");\n  }\n\n  public static void main(String[] args) {\n    Scanner sc = new Scanner(System.in);\n    int mark1 = sc.nextInt();\n    int mark2 = sc.nextInt();\n    int mark3 = sc.nextInt();\n    int total = calculateTotal(mark1, mark2, mark3);\n    double avg = calculateAverage(total);\n    displayResult(total, avg);\n  }\n}",
+      "testCases": [
+        {
+          "input": "85, 90, 78",
+          "expected": "PASS"
+        },
+        {
+          "input": "35, 40, 38",
+          "expected": "FAIL"
+        },
+        {
+          "input": "100, 100, 100",
+          "expected": "PASS"
+        },
+        {
+          "input": "40, 40, 40",
+          "expected": "PASS"
+        },
+        {
+          "input": "30, 35, 39",
+          "expected": "FAIL"
+        }
+      ]
+    }
+  ]
+}
