@@ -38,9 +38,36 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
   const [showFacePopup, setShowFacePopup] = useState(false);
   const [facePopupType, setFacePopupType] = useState('');
   const soundPopupTimerRef = useRef<any>(null);
+  const faceWarningTimerRef = useRef<any>(null);
 
   // Active question instances
   const [questions, setQuestions] = useState<Question[]>([]);
+  const [visitedQuestions, setVisitedQuestions] = useState<Record<string, boolean>>({});
+  
+  // Fake timer for multiple faces warnings (every exam.duration / 10)
+  useEffect(() => {
+    if (!exam.duration || exam.duration <= 0) return;
+    const intervalMs = (exam.duration * 60 * 1000) / 10;
+    const intervalId = setInterval(() => {
+      setFacePopupType('Multiple Faces Detected');
+      setShowFacePopup(true);
+      if (faceWarningTimerRef.current) clearTimeout(faceWarningTimerRef.current);
+      faceWarningTimerRef.current = setTimeout(() => setShowFacePopup(false), 4000);
+    }, intervalMs);
+    
+    return () => clearInterval(intervalId);
+  }, [exam.duration]);
+
+  // Track visited questions
+  useEffect(() => {
+    if (questions.length > 0 && activeQuestionIdx >= 0 && activeQuestionIdx < questions.length) {
+      const qId = questions[activeQuestionIdx].id;
+      setVisitedQuestions(prev => {
+        if (prev[qId]) return prev;
+        return { ...prev, [qId]: true };
+      });
+    }
+  }, [activeQuestionIdx, questions]);
   
   // Coding Sandbox execution results
   const [sandboxOutputs, setSandboxOutputs] = useState<Record<string, Array<{ input: string; expected: string; actual: string; passed: boolean }>>>({});
@@ -212,6 +239,10 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
           onFaceViolation: (type) => {
             setFacePopupType(type);
             setShowFacePopup(true);
+            if (type === 'Multiple Faces Detected' || type === 'Phone Detected') {
+              if (faceWarningTimerRef.current) clearTimeout(faceWarningTimerRef.current);
+              faceWarningTimerRef.current = setTimeout(() => setShowFacePopup(false), 4000);
+            }
           }
         });
       }
@@ -790,9 +821,17 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
           <div className="nav-grid" style={{ marginBottom: '16px' }}>
             {questions.filter(q => q.type !== 'coding' && !q.type.startsWith('practical')).map((q, idx) => {
               const answered = answers[q.id] !== undefined && String(answers[q.id]).trim() !== '';
+              const isVisited = visitedQuestions[q.id];
               const isCurrent = questions.indexOf(q) === activeQuestionIdx;
+              
               let btnClass = 'nav-item';
-              if (answered) btnClass += ' answered';
+              if (answered) {
+                btnClass += ' answered';
+              } else if (isVisited) {
+                btnClass += ' visited';
+              } else {
+                btnClass += ' not-visited';
+              }
               if (isCurrent) btnClass += ' active';
 
               return (
@@ -811,9 +850,17 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
           <div className="nav-grid">
             {questions.filter(q => q.type === 'coding' || q.type.startsWith('practical')).map((q, idx) => {
               const answered = answers[q.id] !== undefined && String(answers[q.id]).trim() !== '';
+              const isVisited = visitedQuestions[q.id];
               const isCurrent = questions.indexOf(q) === activeQuestionIdx;
+              
               let btnClass = 'nav-item';
-              if (answered) btnClass += ' answered';
+              if (answered) {
+                btnClass += ' answered';
+              } else if (isVisited) {
+                btnClass += ' visited';
+              } else {
+                btnClass += ' not-visited';
+              }
               if (isCurrent) btnClass += ' active';
 
               let label = `P${idx + 1}`;
@@ -824,7 +871,6 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
                   key={q.id}
                   className={btnClass}
                   onClick={() => setActiveQuestionIdx(questions.indexOf(q))}
-                  style={{ borderRadius: '4px', background: isCurrent ? 'var(--dark-blue)' : '#e2e8f0', color: isCurrent ? '#fff' : '#1e293b' }}
                 >
                   {label}
                 </button>
@@ -1408,7 +1454,7 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
       )}
 
       {/* Face Violation Popup - Shows proctoring alert with dismiss */}
-      {showFacePopup && (
+      {showFacePopup && (facePopupType === 'No Face Detected' || facePopupType === 'Excessive Face Movement') && (
         <div style={{
           position: 'fixed',
           top: '50%',
@@ -1446,10 +1492,6 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2">
               {facePopupType === 'No Face Detected' ? (
                 <><circle cx="12" cy="8" r="5"/><path d="M3 21v-2a7 7 0 0 1 7-7h4a7 7 0 0 1 7 7v2"/><line x1="2" y1="2" x2="22" y2="22"/></>
-              ) : facePopupType === 'Phone Detected' ? (
-                <><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></>
-              ) : facePopupType === 'Multiple Faces Detected' ? (
-                <><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></>
               ) : (
                 <><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></>
               )}
@@ -1460,8 +1502,6 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
           </h3>
           <p style={{ margin: '0 0 8px', fontSize: '14px', color: '#cbd5e1', lineHeight: '1.6' }}>
             {facePopupType === 'No Face Detected' && 'Your face is not visible. Please ensure your face is fully visible within the camera frame.'}
-            {facePopupType === 'Phone Detected' && 'A phone or electronic device has been detected in the camera frame. This is a serious violation.'}
-            {facePopupType === 'Multiple Faces Detected' && 'More than one person is visible in the camera. Only the registered student is permitted in the frame.'}
             {facePopupType === 'Excessive Face Movement' && 'Unusual head movement detected. Please remain stationary and face the camera directly.'}
           </p>
           <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '8px', padding: '10px 14px', marginBottom: '22px', fontSize: '12.5px', color: '#f87171', fontWeight: '600' }}>
@@ -1480,6 +1520,59 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
           >
             I Understand — Dismiss
           </button>
+        </div>
+      )}
+
+      {/* Face Warning Popup - Top Right, like Sound */}
+      {showFacePopup && (facePopupType === 'Multiple Faces Detected' || facePopupType === 'Phone Detected') && (
+        <div style={{
+          position: 'fixed',
+          top: showSoundPopup ? '150px' : '80px',
+          right: '24px',
+          zIndex: 99999,
+          background: 'rgba(30, 41, 59, 0.97)',
+          border: '1px solid #f59e0b',
+          borderRadius: '14px',
+          padding: '16px 20px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '14px',
+          boxShadow: '0 8px 32px rgba(245, 158, 11, 0.25), 0 2px 8px rgba(0,0,0,0.4)',
+          backdropFilter: 'blur(12px)',
+          animation: 'toast-slide-in 0.3s ease-out',
+          maxWidth: '320px',
+          color: '#f8fafc',
+          fontFamily: 'system-ui, -apple-system, sans-serif'
+        }}>
+          <div style={{
+            width: '42px', height: '42px',
+            background: 'rgba(245, 158, 11, 0.15)',
+            border: '2px solid #f59e0b',
+            borderRadius: '50%',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            flexShrink: 0,
+            animation: 'sound-pulse 1s infinite'
+          }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2.5">
+              {facePopupType === 'Phone Detected' ? (
+                <><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></>
+              ) : (
+                <><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></>
+              )}
+            </svg>
+          </div>
+          <div>
+            <div style={{ fontWeight: '700', fontSize: '13.5px', color: '#fbbf24', marginBottom: '3px' }}>
+              ⚠️ {facePopupType}
+            </div>
+            <div style={{ fontSize: '12px', color: '#94a3b8', lineHeight: '1.4' }}>
+              {facePopupType === 'Phone Detected' ? 'A phone or device has been detected in the camera frame.' : 'More than one person is visible in the camera frame.'}
+            </div>
+          </div>
+          <button
+            onClick={() => setShowFacePopup(false)}
+            style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', fontSize: '18px', lineHeight: 1, padding: '0 4px', flexShrink: 0 }}
+          >×</button>
         </div>
       )}
 

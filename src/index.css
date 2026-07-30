@@ -751,16 +751,24 @@ button, input, select, textarea {
   transition: var(--transition);
 }
 
+.nav-item.not-visited {
+  background-color: #ef4444; /* Red */
+  color: white;
+}
+
+.nav-item.visited {
+  background-color: #f59e0b; /* Yellow */
+  color: white;
+}
+
 .nav-item.answered {
-  background-color: var(--primary-light);
-  color: var(--primary);
+  background-color: #10b981; /* Green */
+  color: white;
 }
 
 .nav-item.active {
-  border-color: var(--primary);
-  color: var(--primary);
-  background-color: var(--bg-card);
-  box-shadow: var(--shadow-sm);
+  border-color: #0f172a; /* Dark border for contrast */
+  box-shadow: 0 0 0 2px #fff, 0 0 0 4px #0f172a;
 }
 
 .nav-legend {

@@ -312,15 +312,15 @@ function startFaceDetection(): void {
       // --- Multiple faces heuristic ---
       // If skin ratio is abnormally high (>25%), suspect multiple people
       if (hasFace && skinRatio > 0.25) {
-        logViolation('Multiple Faces Detected', 'More than one person may be present in the camera view. Only the examinee is allowed in the frame.');
-        if (activeConfig.onFaceViolation) activeConfig.onFaceViolation('Multiple Faces Detected');
+        // Disabled real Multiple Faces detection to rely on fake timer-based popup
+        // if (activeConfig.onFaceViolation) activeConfig.onFaceViolation('Multiple Faces Detected');
       }
 
       // --- Phone detection heuristic ---
       // Phones in front of face tend to create large dark rectangular blocks
       // combined with sudden reflection bright spots
       if (hasFace && darkRatio > 0.2 && brightRatio > 0.15 && skinRatio < 0.08) {
-        logViolation('Phone Detected', 'A rectangular object (possibly a phone or device) was detected in the camera frame. Electronic devices are strictly prohibited.');
+        // Removed logViolation for Phone Detected to treat it as a warning
         if (activeConfig.onFaceViolation) activeConfig.onFaceViolation('Phone Detected');
       }
 

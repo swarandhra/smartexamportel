@@ -3,6 +3,7 @@ import Auth from './components/Auth';
 import AdminLogin from './components/AdminLogin';
 import StudentDashboard from './components/StudentDashboard';
 import VerificationScreen from './components/VerificationScreen';
+import InstructionsScreen from './components/InstructionsScreen';
 import ExamEngine from './components/ExamEngine';
 import OutcomeScreen from './components/OutcomeScreen';
 import AdminDashboard from './components/AdminDashboard';
@@ -16,8 +17,8 @@ export default function App() {
   const [role, setRole] = useState<'student' | 'admin' | null>(null);
   const [studentSession, setStudentSession] = useState<{ name: string; rollNumber: string } | null>(null);
   
-  // Student exam flows: 'dashboard' | 'verification' | 'exam' | 'outcome'
-  const [examState, setExamState] = useState<'dashboard' | 'verification' | 'exam' | 'outcome'>('dashboard');
+  // Student exam flows: 'dashboard' | 'instructions' | 'verification' | 'exam' | 'outcome'
+  const [examState, setExamState] = useState<'dashboard' | 'instructions' | 'verification' | 'exam' | 'outcome'>('dashboard');
   const [activeExam, setActiveExam] = useState<Exam | null>(null);
   const [activeResult, setActiveResult] = useState<Result | null>(null);
   const [activeDraft, setActiveDraft] = useState<Result | null>(null);
@@ -118,10 +119,22 @@ export default function App() {
               setExamState('exam');
             } else {
               setActiveDraft(null);
-              setExamState('verification');
+              setExamState('instructions');
             }
           }} 
           onLogout={handleLogout} 
+        />
+      );
+
+    case 'instructions':
+      return (
+        <InstructionsScreen
+          exam={activeExam!}
+          onProceed={() => setExamState('verification')}
+          onCancel={() => {
+            setActiveExam(null);
+            setExamState('dashboard');
+          }}
         />
       );
 
@@ -171,7 +184,7 @@ export default function App() {
           student={studentSession!} 
           onStartExam={(exam) => {
             setActiveExam(exam);
-            setExamState('verification');
+            setExamState('instructions');
           }} 
           onLogout={handleLogout} 
         />
