@@ -1,7 +1,5 @@
 import { neon } from '@neondatabase/serverless';
 
-const sql = neon(process.env.DATABASE_URL);
-
 function mapResult(r) {
   return {
     id: r.id, examId: r.exam_id, examName: r.exam_name,
@@ -19,6 +17,10 @@ function mapResult(r) {
 }
 
 export default async function handler(req, res) {
+  if (!process.env.DATABASE_URL) {
+    return res.status(500).json({ success: false, error: 'DATABASE_URL is missing' });
+  }
+  const sql = neon(process.env.DATABASE_URL);
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
