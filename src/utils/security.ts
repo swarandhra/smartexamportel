@@ -114,7 +114,7 @@ export function logViolation(type: string, details = ''): void {
   const lastTime = lastViolationTime[type] || 0;
 
   // Debounce same-type violations except for high-priority ones
-  const highPriority = ['Tab Switch', 'Exit Fullscreen'];
+  const highPriority = ['Tab Switch', 'Exit Fullscreen', 'Screenshot Attempt'];
   if (!highPriority.includes(type) && (now - lastTime) < VIOLATION_COOLDOWN_MS) {
     return;
   }
@@ -122,10 +122,10 @@ export function logViolation(type: string, details = ''): void {
 
   const timestamp = new Date().toLocaleTimeString();
   
-  // ONLY Tab Switch and Exit Fullscreen count as real violations that auto-submit.
+  // ONLY Tab Switch, Exit Fullscreen, and Screenshot Attempt count as real violations that auto-submit.
   // Camera events (Multiple Faces, No Face, Phone, Unfocused Window) are LOGGED ONLY
   // for admin review — they never count toward auto-submit.
-  const realViolationTypes = ['Tab Switch', 'Exit Fullscreen'];
+  const realViolationTypes = ['Tab Switch', 'Exit Fullscreen', 'Screenshot Attempt'];
   let warningNum: number | null = null;
   if (realViolationTypes.includes(type)) {
     warningCount++;
@@ -176,15 +176,28 @@ export function requestFullscreen(): void {
 
 // 1. Camera Monitoring & Captures + Face Detection
 async function initCameraMonitoring(): Promise<boolean> {
-  try {
-    cameraStream = await navigator.mediaDevices.getUserMedia({ 
-      video: { 
-        width: { ideal: 320 }, 
-        height: { ideal: 240 },
-        facingMode: 'user'
-      } 
-    });
+  // Try ideal constraints first, fall back to basic if browser doesn't support
+  const cameraConstraints: MediaStreamConstraints[] = [
+    { video: { width: { ideal: 320 }, height: { ideal: 240 }, facingMode: 'user' } },
+    { video: { facingMode: 'user' } },
+    { video: true }
+  ];
 
+  for (const constraints of cameraConstraints) {
+    try {
+      cameraStream = await navigator.mediaDevices.getUserMedia(constraints);
+      break; // Got a stream, stop trying
+    } catch (err) {
+      cameraStream = null;
+    }
+  }
+
+  if (!cameraStream) {
+    console.warn('Camera not available on this device.');
+    return false;
+  }
+
+  try {
     if (activeConfig.videoElement) {
       activeConfig.videoElement.srcObject = cameraStream;
       activeConfig.videoElement.play().catch(e => console.log('Video play failed:', e));
@@ -212,8 +225,7 @@ async function initCameraMonitoring(): Promise<boolean> {
 
     return true;
   } catch (error: any) {
-    console.error('Camera Access Denied:', error);
-    logViolation('Camera Access Denied', error.message);
+    console.error('Camera setup error:', error);
     return false;
   }
 }
@@ -375,10 +387,26 @@ function captureSnapshot(): void {
 
 // 2. Microphone Monitoring
 async function initMicrophoneMonitoring(): Promise<boolean> {
+  const micConstraints: MediaStreamConstraints[] = [
+    { audio: { echoCancellation: true, noiseSuppression: false } },
+    { audio: true }
+  ];
+
+  for (const constraints of micConstraints) {
+    try {
+      audioStream = await navigator.mediaDevices.getUserMedia(constraints);
+      break;
+    } catch (err) {
+      audioStream = null;
+    }
+  }
+
+  if (!audioStream) {
+    console.warn('Microphone not available on this device.');
+    return false;
+  }
+
   try {
-    audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    
-    // Audio Context & Analyser
     const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
     audioContext = new AudioCtx();
     const source = audioContext.createMediaStreamSource(audioStream);
@@ -391,7 +419,6 @@ async function initMicrophoneMonitoring(): Promise<boolean> {
 
     let highNoiseDuration = 0;
     
-    // Check voice level every 1 second
     audioInterval = setInterval(() => {
       if (!audioAnalyser) return;
       audioAnalyser.getByteFrequencyData(dataArray);
@@ -417,8 +444,7 @@ async function initMicrophoneMonitoring(): Promise<boolean> {
 
     return true;
   } catch (error: any) {
-    console.error('Microphone Access Denied:', error);
-    logViolation('Microphone Access Denied', error.message);
+    console.error('Microphone setup error:', error);
     return false;
   }
 }
@@ -463,6 +489,20 @@ function toggleWindowFocusListeners(enable: boolean): void {
 
 // 4. Keyboard Shortcuts & Copy/Paste/Right-Click Blockers
 function blockShortcuts(e: KeyboardEvent): boolean | void {
+  // Screenshot detection — PrintScreen key
+  if (e.key === 'PrintScreen') {
+    e.preventDefault();
+    logViolation('Screenshot Attempt', 'Student pressed PrintScreen to take a screenshot.');
+    return false;
+  }
+
+  // macOS screenshot shortcuts: Cmd+Shift+3, Cmd+Shift+4, Cmd+Shift+5
+  if ((e.metaKey || e.ctrlKey) && e.shiftKey && ['3', '4', '5', 's'].includes(e.key)) {
+    e.preventDefault();
+    logViolation('Screenshot Attempt', `Student attempted a screenshot shortcut (${e.metaKey ? 'Cmd' : 'Ctrl'}+Shift+${e.key}).`);
+    return false;
+  }
+
   if (e.key === 'F12') {
     e.preventDefault();
     logViolation('Inspect Element Blocked', 'Attempted to open Developer Tools using F12.');

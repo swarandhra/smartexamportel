@@ -3,10 +3,11 @@ interface WarningOverlayProps {
   title: string;
   message: string;
   count: number;
+  maxCount?: number;
   onResume: () => void;
 }
 
-export default function WarningOverlay({ show, title, message, count, onResume }: WarningOverlayProps) {
+export default function WarningOverlay({ show, title, message, count, maxCount = 8, onResume }: WarningOverlayProps) {
   if (!show) return null;
 
   return (
@@ -22,7 +23,10 @@ export default function WarningOverlay({ show, title, message, count, onResume }
         <h3>{title}</h3>
         <p>{message}</p>
         <div className="warning-count-display">
-          Warning <span>{count}</span> of 3
+          Violation <span>{count}</span> of {maxCount}
+        </div>
+        <div style={{ fontSize: '13px', color: '#94a3b8', marginBottom: '12px' }}>
+          {maxCount - count} more violation{maxCount - count === 1 ? '' : 's'} will auto-submit your exam.
         </div>
         <button className="btn btn-danger" onClick={onResume}>
           Resume Exam (Re-enter Fullscreen)
