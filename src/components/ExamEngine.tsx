@@ -3,7 +3,8 @@ import { addResult, updateResultDraft, saveLocalExamState, clearLocalExamState }
 import type { Exam, Question, Result } from '../utils/db';
 import { startSecuritySystem, stopSecuritySystem, requestFullscreen, getViolationLog, getCameraCaptures } from '../utils/security';
 import { saveResultToGoogleSheet, formatDuration } from '../utils/helpers';
-import { transpileJavaToJS } from '../utils/javaTranspiler';
+import { transpileJavaToJS, extractMethodName, runTestCase } from '../utils/javaTranspiler';
+
 import { showModal, showConfirm, showToast } from '../utils/notifications';
 import WarningOverlay from './WarningOverlay';
 
@@ -418,44 +419,15 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
 
     let passCount = 0;
     if (transpiledJS) {
-      const classMatch = transpiledJS.match(/class\s+(\w+)/);
-      const className = classMatch ? classMatch[1] : 'Solution';
-
-      let methodName = 'solution';
-      if (q.id.includes('coding_1') || q.questionText.toLowerCase().includes('zeroes')) {
-        methodName = 'moveZeroes';
-      } else if (q.id.includes('coding_2') || q.questionText.toLowerCase().includes('largest')) {
-        methodName = 'findSecondLargest';
-      } else if (q.id.includes('practical_2') || q.questionText.toLowerCase().includes('calculator')) {
-        methodName = 'calculateTotal';
-        if (transpiledJS.includes('calculateMarks')) {
-          methodName = 'calculateMarks';
-        }
-      } else {
-        const methodMatch = transpiledJS.match(/(\w+)\s*\([^)]*\)\s*\{/);
-        if (methodMatch) methodName = methodMatch[1];
-      }
-
-      const isStatic = transpiledJS.includes(`static ${methodName}`) || transpiledJS.includes(`static  ${methodName}`);
-      
-      q.testCases.forEach(tc => {
-        try {
-          let execTrigger = '';
-          if (isStatic) {
-            execTrigger = `; return JSON.stringify(${className}.${methodName}(${tc.input}));`;
-          } else {
-            execTrigger = `; const _inst = new ${className}();
-            const _res = _inst.${methodName}(${tc.input});
-            return JSON.stringify(_res);`;
-          }
-          const cleanCode = transpiledJS + `\n${execTrigger}`;
-          const runner = new Function(cleanCode);
-          const val = runner();
-          if (String(val).trim().replace(/\s+/g, '') === tc.expected.trim().replace(/\s+/g, '')) {
+      const methodName = extractMethodName(transpiledJS);
+      if (methodName) {
+        q.testCases.forEach(tc => {
+          const { actual, error } = runTestCase(transpiledJS, methodName, tc.input);
+          if (!error && actual.replace(/"/g, '').trim().replace(/\s+/g, '') === tc.expected.trim().replace(/\s+/g, '')) {
             passCount++;
           }
-        } catch (e) {}
-      });
+        });
+      }
     }
 
     const totalCases = q.testCases.length;
@@ -473,10 +445,7 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
     
     updateResultDraft(
       resultIdRef.current,
-      {
-        ...answers,
-        [q.id]: userCode
-      },
+      { ...answers, [q.id]: userCode },
       getViolationLog(),
       getCameraCaptures()
     ).catch(err => console.error("Draft update failed:", err));
@@ -484,6 +453,7 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
 
   // 5. Run local test-case evaluation sandbox
   const handleRunCode = (q: Question) => {
+
     if ((q.type !== 'coding' && q.type !== 'practical-java') || !q.testCases) return;
     const userCode = answers[q.id] || q.codeTemplate || '';
 
@@ -495,80 +465,28 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
       transpileError = e.message;
     }
 
+    const methodName = extractMethodName(transpiledJS);
+
     const results = q.testCases.map((tc) => {
-      let actual = '';
-      let passed = false;
-
       if (transpileError) {
-        return {
-          input: tc.input,
-          expected: tc.expected,
-          actual: 'Compilation Error: ' + transpileError,
-          passed: false
-        };
+        return { input: tc.input, expected: tc.expected, actual: 'Compilation Error: ' + transpileError, passed: false };
       }
-
-      try {
-        const classMatch = transpiledJS.match(/class\s+(\w+)/);
-        const className = classMatch ? classMatch[1] : 'Solution';
-
-        let methodName = 'solution';
-        if (q.id.includes('coding_1') || q.questionText.toLowerCase().includes('zeroes')) {
-          methodName = 'moveZeroes';
-        } else if (q.id.includes('coding_2') || q.questionText.toLowerCase().includes('largest')) {
-          methodName = 'findSecondLargest';
-        } else if (q.id.includes('practical_2') || q.questionText.toLowerCase().includes('calculator')) {
-          methodName = 'calculateTotal';
-          if (transpiledJS.includes('calculateMarks')) {
-            methodName = 'calculateMarks';
-          }
-        } else {
-          const methodMatch = transpiledJS.match(/(\w+)\s*\([^)]*\)\s*\{/);
-          if (methodMatch) methodName = methodMatch[1];
-        }
-
-        const isStatic = transpiledJS.includes(`static ${methodName}`) || transpiledJS.includes(`static  ${methodName}`);
-        
-        let execTrigger = '';
-        if (isStatic) {
-          execTrigger = `; return JSON.stringify(${className}.${methodName}(${tc.input}));`;
-        } else {
-          execTrigger = `; const _inst = new ${className}();
-          const _res = _inst.${methodName}(${tc.input});
-          return JSON.stringify(_res);`;
-        }
-
-        const cleanCode = transpiledJS + `\n${execTrigger}`;
-        const runner = new Function(cleanCode);
-        const val = runner();
-        actual = String(val);
-        passed = actual.trim().replace(/\s+/g, '') === tc.expected.trim().replace(/\s+/g, '');
-      } catch (e: any) {
-        let errorDetails = e.message;
-        if (e.stack) {
-          const lines = e.stack.split('\n');
-          const lineMatch = lines[1]?.match(/<anonymous>:(\d+):(\d+)/);
-          if (lineMatch) {
-            errorDetails += ` at line ${lineMatch[1]}`;
-          }
-        }
-        actual = 'Runtime Error: ' + errorDetails;
-        passed = false;
+      if (!methodName) {
+        return { input: tc.input, expected: tc.expected, actual: 'Error: Could not detect method name. Make sure your class has a public method.', passed: false };
       }
-
-      return {
-        input: tc.input,
-        expected: tc.expected,
-        actual,
-        passed
-      };
+      const { actual, error } = runTestCase(transpiledJS, methodName, tc.input);
+      if (error) {
+        return { input: tc.input, expected: tc.expected, actual: 'Runtime Error: ' + error, passed: false };
+      }
+      // Parse both actual and expected for numeric comparison
+      let actualClean = actual.replace(/"/g, '').trim();
+      const passed = actualClean.replace(/\s+/g, '') === tc.expected.trim().replace(/\s+/g, '');
+      return { input: tc.input, expected: tc.expected, actual: actualClean, passed };
     });
 
-    setSandboxOutputs(prev => ({
-      ...prev,
-      [q.id]: results
-    }));
+    setSandboxOutputs(prev => ({ ...prev, [q.id]: results }));
   };
+
 
   // Handles Tab key inside textarea
   const handleKeyDownTextarea = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {

@@ -1,54 +1,107 @@
 /**
- * javaTranspiler.ts - A lightweight regex-based transpiler to translate
- * Java code classes into browser-executable JavaScript blocks for real-time evaluations.
+ * javaTranspiler.ts - Robust Java-to-JavaScript transpiler for browser sandbox execution.
+ * Handles common patterns in student Java code for coding questions.
  */
 
 export function transpileJavaToJS(javaCode: string): string {
   let js = javaCode;
 
-  // 1. Remove comments
-  js = js.replace(/\/\*[\s\S]*?\*\/|([^\\:]|^)\/\/.*$/gm, '$1');
+  // 1. Remove block comments
+  js = js.replace(/\/\*[\s\S]*?\*\//g, '');
 
-  // 2. Remove access modifiers from classes
-  js = js.replace(/\bpublic\s+class\s+(\w+)/g, 'class $1');
-  js = js.replace(/\bclass\s+(\w+)/g, 'class $1');
+  // 2. Remove line comments (but preserve the line)
+  js = js.replace(/\/\/[^\n]*/g, '');
 
-  // 3. Remove access modifiers on fields / methods (public, private, protected, final)
-  js = js.replace(/\b(public|private|protected|final)\b/g, '');
+  // 3. Remove class wrapper — extract the body content
+  // Handles: public class Solution { ... }
+  js = js.replace(/^\s*(public\s+)?class\s+\w+\s*\{([\s\S]*)\}\s*$/m, (_, __, body) => body);
 
-  // 4. Translate method signatures
-  // Matches "static int calculateTotal(int mark1...)" -> "static calculateTotal(mark1...)"
-  // Matches "int[] moveZeroes(int[] arr)" -> "moveZeroes(arr)"
-  js = js.replace(/\b(static\s+)?(int|double|float|boolean|char|String|void|int\[\]|String\[\])\s+(\w+)\s*\(([^)]*)\)\s*\{/g, (_match, isStatic, _retType, methodName, params) => {
-    // Clean parameter lists: "int mark1, int mark2" -> "mark1, mark2"
-    const cleanedParams = params.replace(/\b(int|double|float|boolean|char|String|int\[\]|String\[\])\s+(\w+)/g, '$2');
-    return `${isStatic || ''}${methodName}(${cleanedParams}) {`;
+  // 4. Remove access modifiers
+  js = js.replace(/\b(public|private|protected|final|static)\s+/g, '');
+
+  // 5. Remove Java type annotations on method parameters
+  // e.g. "int[] arr" -> "arr", "int n" -> "n", "String s" -> "s"
+  js = js.replace(/\b(int|long|double|float|boolean|char|String|Integer|Long|Double|Float|Boolean|void)\s*(?:\[\s*\])?\s+(\w+)/g, '$2');
+
+  // 6. Convert Java method declarations to JS functions
+  // After step 4+5, methods look like: "methodName(params) {"  — wrap in function
+  // Match identifiers followed by ( ... ) { that don't start with "if|for|while|else|switch"
+  js = js.replace(/^(\s*)(\w+)\s*\(([^)]*)\)\s*\{/gm, (match, indent, name, params) => {
+    const controlFlow = ['if', 'for', 'while', 'else', 'switch', 'catch', 'try', 'do'];
+    if (controlFlow.includes(name)) return match; // keep as-is
+    // Clean params: already cleaned in step 5, just trim
+    const cleanParams = params.split(',').map((p: string) => p.trim()).filter(Boolean).join(', ');
+    return `${indent}function ${name}(${cleanParams}) {`;
   });
 
-  // 5. Transpile array variable instantiations
-  // e.g. "int[] arr = {2, 4, 6};" -> "let arr = [2, 4, 6];"
-  js = js.replace(/\b(int|double|float|boolean|char|String)\[\]\s+(\w+)\s*=\s*\{([^}]+)\}/g, 'let $2 = [$3]');
+  // 7. Variable declarations: "int x = 0;" -> "let x = 0;"
+  // Must not match inside words (e.g. "integer")
+  js = js.replace(/\b(int|long|double|float|boolean|char|String|Integer|Long|Double|Float|Boolean)\s*(?:\[\s*\])?\s+(\w+)/g, 'let $2');
 
-  // 6. Transpile regular variable declarations
-  // e.g. "int sum = 0;" -> "let sum = 0;"
-  js = js.replace(/\b(int|double|float|boolean|char|String)\b(?!\s*\()/g, 'let');
+  // 8. Array initializer: "new int[]{1,2,3}" -> "[1,2,3]"
+  js = js.replace(/new\s+\w+\s*\[\s*\]\s*\{([^}]*)\}/g, '[$1]');
 
-  // 7. Transpile enhanced for loops
-  // e.g. "for(int x : arr)" -> "for (let x of arr)"
-  js = js.replace(/for\s*\(\s*let\s+(\w+)\s*:\s*(\w+)\s*\)/g, 'for (let $1 of $2)');
-  js = js.replace(/for\s*\(\s*(\w+)\s*:\s*(\w+)\s*\)/g, 'for (let $1 of $2)');
+  // 9. Array size init: "new int[n]" -> "new Array(n).fill(0)"
+  js = js.replace(/new\s+(?:int|double|float|boolean|char|String)\s*\[([^\]]+)\]/g, 'new Array($1).fill(0)');
 
-  // 8. Transpile arrays inline declarations
-  // e.g. "new int[]{2, 4, 6}" -> "[2, 4, 6]"
-  js = js.replace(/new\s+(int|double|float|boolean|char|String)\[\]\s*\{([^}]+)\}/g, '[$2]');
+  // 10. Enhanced for loop: "for (x : arr)" -> "for (let x of arr)"
+  js = js.replace(/for\s*\(\s*(?:let\s+)?(\w+)\s*:\s*(\w+)\s*\)/g, 'for (let $1 of $2)');
 
-  // 9. Transpile Integer constants
+  // 11. Integer constants
   js = js.replace(/Integer\.MIN_VALUE/g, 'Number.MIN_SAFE_INTEGER');
   js = js.replace(/Integer\.MAX_VALUE/g, 'Number.MAX_SAFE_INTEGER');
+  js = js.replace(/Integer\.parseInt\s*\(/g, 'parseInt(');
+  js = js.replace(/Math\.abs\s*\(/g, 'Math.abs(');
+  js = js.replace(/Math\.max\s*\(/g, 'Math.max(');
+  js = js.replace(/Math\.min\s*\(/g, 'Math.min(');
 
-  // 10. Transpile print outputs
-  js = js.replace(/System\.out\.println/g, 'console.log');
-  js = js.replace(/System\.out\.print/g, 'console.log');
+  // 12. System.out.print
+  js = js.replace(/System\.out\.println\s*\(/g, 'console.log(');
+  js = js.replace(/System\.out\.print\s*\(/g, 'console.log(');
 
-  return js;
+  // 13. String.length() -> .length (JS property not method)
+  js = js.replace(/\.length\(\)/g, '.length');
+
+  // 14. arr.length() -> arr.length
+  // (already handled above)
+
+  // 15. toString() removal
+  js = js.replace(/\.toString\(\)/g, '.toString()'); // keep as-is
+
+  return js.trim();
+}
+
+/**
+ * Extract the first non-control-flow function name from transpiled JS.
+ */
+export function extractMethodName(transpiledCode: string): string {
+  const controlFlow = ['if', 'for', 'while', 'else', 'switch', 'catch', 'try', 'do', 'return'];
+  const matches = [...transpiledCode.matchAll(/function\s+(\w+)\s*\(/g)];
+  for (const m of matches) {
+    if (!controlFlow.includes(m[1])) {
+      return m[1];
+    }
+  }
+  return '';
+}
+
+/**
+ * Run a single test case against the transpiled code.
+ * Uses Function constructor to run in isolated scope.
+ */
+export function runTestCase(transpiledCode: string, methodName: string, input: string): { actual: string; error: string | null } {
+  try {
+    // Wrap everything in a self-contained function scope
+    const wrapper = `
+      "use strict";
+      ${transpiledCode}
+      return JSON.stringify(${methodName}(${input}));
+    `;
+    // eslint-disable-next-line no-new-func
+    const runner = new Function(wrapper);
+    const result = runner();
+    return { actual: String(result ?? ''), error: null };
+  } catch (e: any) {
+    return { actual: '', error: e.message || 'Unknown error' };
+  }
 }
