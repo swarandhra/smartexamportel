@@ -5,7 +5,8 @@ import { neon } from '@neondatabase/serverless';
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-const DATABASE_URL = 'postgresql://neondb_owner:npg_pYZa4K0hTPLD@ep-long-grass-azw38k3p.c-3.ap-southeast-1.aws.neon.tech/neondb?sslmode=require';
+// Uses Railway's env variable in production, hardcoded URL locally
+const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://neondb_owner:npg_pYZa4K0hTPLD@ep-long-grass-azw38k3p.c-3.ap-southeast-1.aws.neon.tech/neondb?sslmode=require';
 const sql = neon(DATABASE_URL);
 
 app.use(cors({ origin: '*' }));
