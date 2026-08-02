@@ -111,11 +111,16 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
       return a;
     }
 
+    // Ensure every question has an ID to prevent answers overwriting 'undefined'
+    const questionsWithIds = exam.questions.map((q, idx) => {
+      return q.id ? q : { ...q, id: `q_${idx}` };
+    });
+
     // ── Separate MCQ-type questions from coding/practical ones ─────────────
-    const rawMcqList = exam.questions.filter(
+    const rawMcqList = questionsWithIds.filter(
       q => q.type !== 'coding' && !q.type.startsWith('practical')
     );
-    const codingList = exam.questions.filter(
+    const codingList = questionsWithIds.filter(
       q => q.type === 'coding' || q.type.startsWith('practical')
     );
 
@@ -574,44 +579,15 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
         } catch (e) {}
 
         if (transpiledJS) {
-          const classMatch = transpiledJS.match(/class\s+(\w+)/);
-          const className = classMatch ? classMatch[1] : 'Solution';
-
-          let methodName = 'solution';
-          if (q.id.includes('coding_1') || q.questionText.toLowerCase().includes('zeroes')) {
-            methodName = 'moveZeroes';
-          } else if (q.id.includes('coding_2') || q.questionText.toLowerCase().includes('largest')) {
-            methodName = 'findSecondLargest';
-          } else if (q.id.includes('practical_2') || q.questionText.toLowerCase().includes('calculator')) {
-            methodName = 'calculateTotal';
-            if (transpiledJS.includes('calculateMarks')) {
-              methodName = 'calculateMarks';
-            }
-          } else {
-            const methodMatch = transpiledJS.match(/(\w+)\s*\([^)]*\)\s*\{/);
-            if (methodMatch) methodName = methodMatch[1];
-          }
-
-          const isStatic = transpiledJS.includes(`static ${methodName}`) || transpiledJS.includes(`static  ${methodName}`);
-          
-          q.testCases?.forEach(tc => {
-            try {
-              let execTrigger = '';
-              if (isStatic) {
-                execTrigger = `; return JSON.stringify(${className}.${methodName}(${tc.input}));`;
-              } else {
-                execTrigger = `; const _inst = new ${className}();
-                const _res = _inst.${methodName}(${tc.input});
-                return JSON.stringify(_res);`;
-              }
-              const cleanCode = transpiledJS + `\n${execTrigger}`;
-              const runner = new Function(cleanCode);
-              const val = runner();
-              if (String(val).trim().replace(/\s+/g, '') === tc.expected.trim().replace(/\s+/g, '')) {
+          const methodName = extractMethodName(transpiledJS);
+          if (methodName) {
+            q.testCases?.forEach(tc => {
+              const { actual, error } = runTestCase(transpiledJS, methodName, tc.input);
+              if (!error && actual.replace(/"/g, '').trim().replace(/\s+/g, '') === tc.expected.trim().replace(/\s+/g, '')) {
                 passCount++;
               }
-            } catch (e) {}
-          });
+            });
+          }
         }
 
         const totalCases = q.testCases?.length || 1;
