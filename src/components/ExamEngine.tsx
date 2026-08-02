@@ -1118,7 +1118,7 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
                     <div style={{ marginTop: '24px' }}>
                       <h5 style={{ borderBottom: '1px solid #1e293b', paddingBottom: '8px', marginBottom: '16px', fontSize: '13.5px', color: '#94a3b8', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Sample Test Cases</h5>
                       {activeQ.testCases.slice(0, 2).map((tc, idx) => (
-                        <div key={idx} style={{ background: '#1e293b', border: '1px solid #334155', padding: '12px 16px', borderRadius: '8px', fontSize: '13px', fontFamily: 'Consolas, Monaco, monospace', marginBottom: '12px', color: '#e2e8f0' }}>
+                        <div key={idx} style={{ background: '#1e293b', border: '1px solid #334155', padding: '12px 16px', borderRadius: '8px', fontSize: '13px', fontFamily: 'Consolas, Monaco, monospace', marginBottom: '12px', color: '#e2e8f0', whiteSpace: 'pre-wrap' }}>
                           <div style={{ marginBottom: '4px' }}><strong style={{ color: '#64748b' }}>Input arguments:</strong> {tc.input}</div>
                           <div><strong style={{ color: '#64748b' }}>Expected output:</strong> {tc.expected}</div>
                         </div>
@@ -1240,7 +1240,7 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
                           return (
                             <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#0f172a', border: '1px solid #1e293b', padding: '10px 14px', borderRadius: '6px', borderLeft: `3px solid ${tc.passed ? '#22c55e' : '#ef4444'}` }}>
                               {isPublic ? (
-                                <div>
+                                <div style={{ fontSize: '13px', background: 'rgba(0,0,0,0.2)', padding: '8px', borderRadius: '4px', marginTop: '6px', whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
                                   <div><span style={{ color: '#64748b' }}>Test Case {idx + 1}:</span> Input: <code>{tc.input}</code></div>
                                   <div><span style={{ color: '#64748b' }}>Expected:</span> <code>{tc.expected}</code></div>
                                   <div><span style={{ color: '#64748b' }}>Returned:</span> <span style={{ color: tc.passed ? '#4ade80' : '#f87171' }}><code>{tc.actual}</code></span></div>
