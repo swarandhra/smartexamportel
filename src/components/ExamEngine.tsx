@@ -33,6 +33,12 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
   const [warningMsg, setWarningMsg] = useState('');
   const [warningNum, setWarningNum] = useState(0);
 
+  // Centered violation count popup (shown on Tab Switch / Exit Fullscreen)
+  const [showViolationBanner, setShowViolationBanner] = useState(false);
+  const [violationBannerCount, setViolationBannerCount] = useState(0);
+  const violationBannerTimerRef = useRef<any>(null);
+  const MAX_VIOLATIONS = 8;
+
   // Sound & Face proctoring popup states
   const [showSoundPopup, setShowSoundPopup] = useState(false);
   const [showFacePopup, setShowFacePopup] = useState(false);
@@ -218,7 +224,13 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
             console.log('Integrity violation recorded:', v);
           },
           onWarning: (type, count) => {
-            setWarningTitle(`${type} Violation!`);
+            // Show centered violation count popup
+            setViolationBannerCount(count);
+            setShowViolationBanner(true);
+            if (violationBannerTimerRef.current) clearTimeout(violationBannerTimerRef.current);
+            violationBannerTimerRef.current = setTimeout(() => setShowViolationBanner(false), 5000);
+            // Also show the detailed warning overlay
+            setWarningTitle(`${type} Detected!`);
             setWarningMsg(getViolationTip(type));
             setWarningNum(count);
             setShowWarning(true);
@@ -1402,7 +1414,84 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
         onResume={handleResumeFullscreen}
       />
 
+      {/* ── Centered Violation Count Banner ── */}
+      {showViolationBanner && (
+        <div style={{
+          position: 'fixed',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          zIndex: 1000000,
+          background: 'linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%)',
+          border: '2px solid #ef4444',
+          borderRadius: '24px',
+          padding: '36px 44px',
+          textAlign: 'center',
+          boxShadow: '0 0 60px rgba(239,68,68,0.4), 0 25px 80px rgba(0,0,0,0.7)',
+          animation: 'modal-scale-in 0.3s cubic-bezier(0.34,1.56,0.64,1)',
+          fontFamily: 'system-ui, -apple-system, sans-serif',
+          minWidth: '320px',
+        }}>
+          {/* Red glow backdrop */}
+          <div style={{
+            position: 'absolute', inset: 0, borderRadius: '22px',
+            background: 'radial-gradient(circle at center, rgba(239,68,68,0.12) 0%, transparent 70%)',
+            pointerEvents: 'none'
+          }} />
+          {/* Warning icon */}
+          <div style={{
+            width: '64px', height: '64px', margin: '0 auto 18px',
+            background: 'rgba(239,68,68,0.15)',
+            border: '2px solid rgba(239,68,68,0.5)',
+            borderRadius: '50%',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: '32px'
+          }}>⚠️</div>
+          {/* Violation count */}
+          <div style={{ color: '#ef4444', fontWeight: '800', fontSize: '15px', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '10px' }}>
+            Security Violation
+          </div>
+          <div style={{
+            color: '#f8fafc', fontWeight: '800', fontSize: '42px', lineHeight: 1,
+            marginBottom: '8px'
+          }}>
+            {violationBannerCount} <span style={{ color: '#64748b', fontSize: '28px' }}>/ {MAX_VIOLATIONS}</span>
+          </div>
+          <div style={{ color: '#94a3b8', fontSize: '14px', marginBottom: '20px', lineHeight: 1.5 }}>
+            {violationBannerCount < MAX_VIOLATIONS
+              ? `${MAX_VIOLATIONS - violationBannerCount} more violation${MAX_VIOLATIONS - violationBannerCount === 1 ? '' : 's'} will auto-submit your exam.`
+              : 'Auto-submitting now...'}
+          </div>
+          {/* Progress bar */}
+          <div style={{ background: 'rgba(255,255,255,0.08)', borderRadius: '999px', height: '8px', overflow: 'hidden', marginBottom: '20px' }}>
+            <div style={{
+              height: '100%',
+              width: `${(violationBannerCount / MAX_VIOLATIONS) * 100}%`,
+              background: violationBannerCount >= MAX_VIOLATIONS - 2
+                ? 'linear-gradient(90deg, #ef4444, #b91c1c)'
+                : 'linear-gradient(90deg, #f59e0b, #ef4444)',
+              borderRadius: '999px',
+              transition: 'width 0.4s ease'
+            }} />
+          </div>
+          <button
+            onClick={() => setShowViolationBanner(false)}
+            style={{
+              background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.4)',
+              color: '#fca5a5', padding: '10px 28px', borderRadius: '12px',
+              cursor: 'pointer', fontWeight: '600', fontSize: '14px',
+              transition: 'all 0.2s'
+            }}
+            onMouseOver={e => (e.currentTarget.style.background = 'rgba(239,68,68,0.3)')}
+            onMouseOut={e => (e.currentTarget.style.background = 'rgba(239,68,68,0.15)')}
+          >
+            I Understand
+          </button>
+        </div>
+      )}
+
       {/* Sound Detected Popup - Non-violation, informational only */}
+
       {showSoundPopup && (
         <div style={{
           position: 'fixed',

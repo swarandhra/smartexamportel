@@ -13,7 +13,7 @@ let faceDetectionInterval: any = null;
 let violationLog: Violation[] = [];
 let cameraCaptures: CameraCapture[] = [];
 let warningCount = 0;
-const MAX_WARNINGS = 3;
+const MAX_WARNINGS = 8; // Auto-submit at 8 violations
 
 // Face tracking state
 let lastViolationTime: Record<string, number> = {};
@@ -114,7 +114,7 @@ export function logViolation(type: string, details = ''): void {
   const lastTime = lastViolationTime[type] || 0;
 
   // Debounce same-type violations except for high-priority ones
-  const highPriority = ['Tab Switch', 'Exit Fullscreen', 'Unfocused Window'];
+  const highPriority = ['Tab Switch', 'Exit Fullscreen'];
   if (!highPriority.includes(type) && (now - lastTime) < VIOLATION_COOLDOWN_MS) {
     return;
   }
@@ -122,10 +122,12 @@ export function logViolation(type: string, details = ''): void {
 
   const timestamp = new Date().toLocaleTimeString();
   
-  // These increment the official warning counter
+  // ONLY Tab Switch and Exit Fullscreen count as real violations that auto-submit.
+  // Camera events (Multiple Faces, No Face, Phone, Unfocused Window) are LOGGED ONLY
+  // for admin review — they never count toward auto-submit.
+  const realViolationTypes = ['Tab Switch', 'Exit Fullscreen'];
   let warningNum: number | null = null;
-  const warnTypes = ['Tab Switch', 'Exit Fullscreen', 'Unfocused Window', 'Multiple Faces Detected', 'No Face Detected', 'Face Obstructed', 'Phone Detected'];
-  if (warnTypes.includes(type)) {
+  if (realViolationTypes.includes(type)) {
     warningCount++;
     warningNum = warningCount;
   }
@@ -142,7 +144,7 @@ export function logViolation(type: string, details = ''): void {
 
   if (warningNum !== null) {
     if (warningCount >= MAX_WARNINGS) {
-      activeConfig.onAutoSubmit('Security violation limit reached (3 warnings).');
+      activeConfig.onAutoSubmit(`Security violation limit reached (${MAX_WARNINGS} violations).`);
     } else {
       activeConfig.onWarning(type, warningCount);
     }
@@ -281,7 +283,14 @@ function startFaceDetection(): void {
       if (!hasFace) {
         noFaceStreak++;
         if (noFaceStreak >= 4) { // 4 consecutive detections (~12s with 3s interval)
-          logViolation('No Face Detected', 'The student\'s face is not visible in the camera frame. Please ensure your face is clearly visible.');
+          // Log for admin but do NOT call logViolation (would count as a violation)
+          const cameraLogEntry: Violation = {
+            time: new Date().toLocaleTimeString(),
+            type: 'No Face Detected',
+            warningNumber: null,
+            details: 'The student\'s face is not visible in the camera frame.'
+          };
+          violationLog.push(cameraLogEntry);
           if (activeConfig.onFaceViolation) activeConfig.onFaceViolation('No Face Detected');
           noFaceStreak = 0;
         }
@@ -302,7 +311,14 @@ function startFaceDetection(): void {
         // Very high motion = excessive movement, not stationary
         if (motionScore > 35 && hasFace) {
           stableFrameCount = 0;
-          logViolation('Excessive Face Movement', 'Unusual or excessive head movement detected. Please remain stationary while taking the exam.');
+          // Log for admin only — not counted as a violation
+          const moveLogEntry: Violation = {
+            time: new Date().toLocaleTimeString(),
+            type: 'Excessive Face Movement',
+            warningNumber: null,
+            details: 'Unusual or excessive head movement detected.'
+          };
+          violationLog.push(moveLogEntry);
           if (activeConfig.onFaceViolation) activeConfig.onFaceViolation('Excessive Face Movement');
         } else {
           stableFrameCount++;
@@ -419,11 +435,13 @@ function handleWindowBlur(): void {
   if (document.activeElement && document.activeElement.tagName === 'IFRAME') {
     return;
   }
+  // Unfocused window is LOGGED for admin but does NOT count as a violation
   logViolation('Unfocused Window', 'Student shifted focus outside the browser (tab change or app change).');
 }
 
 function handleWindowResize(): void {
-  logViolation('Screen Resized', 'Browser window dimensions changed.');
+  // Screen resize is intentionally NOT logged — causes too many false positives
+  // especially when entering/exiting fullscreen programmatically
 }
 
 function handleFullscreenChange(): void {
