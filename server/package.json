@@ -1,0 +1,18 @@
+{
+  "name": "smart-exam-portal-api",
+  "version": "1.0.0",
+  "description": "Backend API for Smart Exam Portal using Neon PostgreSQL",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js",
+    "setup-db": "node setup-db.js"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^0.10.4",
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "ws": "^8.18.0"
+  }
+}
