@@ -1,0 +1,690 @@
+{
+  "title": "Swarandhra Assessment 2",
+  "duration": 90,
+  "passingMarks": 40,
+  "resumeWindow": 60,
+  "questions": [
+    {
+      "type": "mcq",
+      "questionText": "What is the HCF (Highest Common Factor) of 24, 36, and 60?",
+      "options": [
+        "4",
+        "12",
+        "6",
+        "18"
+      ],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "A student scored 72 marks out of 90. What is the percentage?",
+      "options": [
+        "75%",
+        "80%",
+        "82%",
+        "90%"
+      ],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "The ratio of boys to girls in a class is 7 : 5. If there are 84 students, how many are girls?",
+      "options": [
+        "30",
+        "32",
+        "35",
+        "42"
+      ],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "A can complete a piece of work in 10 days, while B can complete the same work in 15 days. Working together, they will complete the work in:",
+      "options": [
+        "5 days",
+        "6 days",
+        "8 days",
+        "12 days"
+      ],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Choose the correct sentence.",
+      "options": [
+        "The list of items are on the table.",
+        "The list of items is on the table.",
+        "The list of items were on the table.",
+        "The list of items have on the table."
+      ],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Choose the correct sentence.",
+      "options": [
+        "She have completed the task.",
+        "She had complete the task.",
+        "She has completed the task.",
+        "She has complete the task."
+      ],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Choose the synonym of \u201cPragmatic\u201d",
+      "options": [
+        "Emotional",
+        "Practical",
+        "Careless",
+        "Honest"
+      ],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Find the next number in the series: 3, 6, 12, 24, ?",
+      "options": [
+        "36",
+        "48",
+        "54",
+        "60"
+      ],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which CSS selector has the highest specificity?",
+      "options": [
+        "Element Selector",
+        "Universal Selector",
+        "Class Selector",
+        "ID Selector"
+      ],
+      "correctOptionIndex": 3,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "What will be the color of the text? <p class=\"red blue\">TechWing AI</p> red-class { color: red; } blue-class { color: blue; }",
+      "options": [
+        "Red",
+        "Blue",
+        "Black",
+        "Depends on the browser"
+      ],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which CSS selector applies styles to all elements on a page?",
+      "options": [
+        "Hash symbol",
+        "Dot",
+        "Asterisk",
+        "all"
+      ],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which of the following correctly links an external CSS file?",
+      "options": [
+        "<link href=\"style.css\">",
+        "<link rel=\"stylesheet\" href=\"style.css\">",
+        "<style src=\"style.css\">",
+        "<css src=\"style.css\">"
+      ],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which CSS property is used to create space outside an element\u2019s border?",
+      "options": [
+        "padding",
+        "border-spacing",
+        "margin",
+        "spacing"
+      ],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "What is the hexadecimal code for white?",
+      "options": [
+        "Hash 000000",
+        "Hash FFFFFF",
+        "Hash FFFF00",
+        "Hash FF0000"
+      ],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which property is used to round the corners of an element?",
+      "options": [
+        "border-style",
+        "border-width",
+        "border-radius",
+        "border-space"
+      ],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "After running git init, which command stages all modified files?",
+      "options": [
+        "git commit",
+        "git push",
+        "git add .",
+        "git branch"
+      ],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which command is used to create a commit?",
+      "options": [
+        "git save",
+        "git commit -m \u201cInitial Commit\u201d",
+        "git upload",
+        "git push origin"
+      ],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which command connects your local repository to a GitHub repository?",
+      "options": [
+        "git connect",
+        "git remote add origin",
+        "git origin",
+        "git clone"
+      ],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which command displays the current status of your Git repository?",
+      "options": [
+        "git show",
+        "git check",
+        "git status",
+        "git info"
+      ],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "What is the output? class Demo { Demo() { System.out.print(\"Constructor \"); } public static void main(String[] args) { new Demo(); } }",
+      "options": [
+        "Error",
+        "Demo",
+        "Constructor",
+        "Nothing"
+      ],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which constructor is automatically provided by Java if no constructor is written by the programmer?",
+      "options": [
+        "Copy Constructor",
+        "Parameterized Constructor",
+        "Default Constructor",
+        "Static Constructor"
+      ],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which keyword is used to inherit a class in Java?",
+      "options": [
+        "implements",
+        "inherits",
+        "extends",
+        "super"
+      ],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Consider the following code. What is the output? class Animal { void sound() { System.out.print(\"Animal\"); } } class Dog extends Animal { } public class Main { public static void main(String[] args) { Dog d = new Dog(); d.sound(); } }",
+      "options": [
+        "Dog",
+        "Error",
+        "Animal",
+        "Nothing"
+      ],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "What is the time complexity of finding the maximum element in an unsorted array containing N elements?",
+      "options": [
+        "O(1)",
+        "O(log N)",
+        "O(N)",
+        "O(N\u00b2)"
+      ],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which traversal correctly visits every element of an array exactly once?",
+      "options": [
+        "for(int i=0;i<arr.length;i++)",
+        "for(int i=1;i<arr.length;i++)",
+        "for(int i=arr.length;i>=0;i--)",
+        "while(true)"
+      ],
+      "correctOptionIndex": 0,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "What will be the output? <p id=\"msg\" class=\"text\">Hello</p> msg-id { color: red; } text-class { color: blue; }",
+      "options": [
+        "Blue",
+        "Black",
+        "Red",
+        "Depends on the browser"
+      ],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Consider the following CSS: box-class { width: 200px; padding: 20px; } Ignoring borders, what is the total horizontal space occupied by the element?",
+      "options": [
+        "200px",
+        "220px",
+        "240px",
+        "260px"
+      ],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which selector applies the same style to <h1>, <h2>, and <p> together?",
+      "options": [
+        "h1 h2 p",
+        "h1+h2+p",
+        "h1 > h2 > p",
+        "h1, h2, p"
+      ],
+      "correctOptionIndex": 3,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which CSS property is used to display a background image?",
+      "options": [
+        "image",
+        "background-src",
+        "background",
+        "background-image"
+      ],
+      "correctOptionIndex": 3,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which of the following is the correct syntax for adding an external CSS file?",
+      "options": [
+        "<style src=\"style.css\"></style>",
+        "<link rel=\"stylesheet\" href=\"style.css\">",
+        "<css href=\"style.css\">",
+        "<script src=\"style.css\">"
+      ],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Arrange the commands in the correct order to push a new project to GitHub for the first time. git commit -m \"Initial Commit\" git add . git push -u origin main",
+      "options": [
+        "2 \u2192 1 \u2192 3",
+        "1 \u2192 2 \u2192 3",
+        "3 \u2192 2 \u2192 1",
+        "2 \u2192 3 \u2192 1"
+      ],
+      "correctOptionIndex": 0,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which command downloads the latest changes from a remote repository and merges them into the current branch?",
+      "options": [
+        "git fetch",
+        "git merge",
+        "git pull",
+        "git push"
+      ],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which command creates a new branch named feature?",
+      "options": [
+        "git add feature",
+        "git branch feature",
+        "git checkout feature",
+        "git merge feature"
+      ],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which command configures the Git username globally?",
+      "options": [
+        "git config --global user.name \"Your Name\"",
+        "git username",
+        "git set username",
+        "git user"
+      ],
+      "correctOptionIndex": 0,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Before running git push, what is the primary purpose of git commit?",
+      "options": [
+        "Uploads files to GitHub",
+        "Creates a backup on GitHub",
+        "Saves a snapshot of staged changes in the local repository",
+        "Creates a new repository"
+      ],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "What is the output? class Demo { Demo() { System.out.print(\"Java \"); } Demo(int x) { System.out.print(\"Spring\"); } public static void main(String[] args) { new Demo(); } }",
+      "options": [
+        "Spring",
+        "Java Spring",
+        "Java",
+        "Error"
+      ],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "What is the output? class Animal { void display() { System.out.print(\"Animal \"); } } class Dog extends Animal { } public class Main {public static void main(String[] args) { Dog d = new Dog(); d.display(); } }",
+      "options": [
+        "Dog",
+        "Animal",
+        "Error",
+        "Nothing"
+      ],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which statement is TRUE about constructors?",
+      "options": [
+        "Constructors have a return type",
+        "Constructors can be called like normal methods",
+        "A constructor is automatically called when an object is created",
+        "Constructors cannot have parameters"
+      ],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which keyword refers to the parent class constructor?",
+      "options": [
+        "this",
+        "extends",
+        "parent",
+        "super"
+      ],
+      "correctOptionIndex": 3,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "What is the output?class Test { int x = 10; void show() { System.out.print(x); } } public class Main { public static void main(String[] args) { Test t = new Test(); t.show(); } }",
+      "options": [
+        "0",
+        "Error",
+        "10",
+        "Null"
+      ],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which traversal correctly visits an entire array from the last element to the first?",
+      "options": [
+        "for(int i=0;i<arr.length;i++)",
+        "for(int i=arr.length-1;i>=0;i--)",
+        "for(int i=arr.length;i>=0;i--)",
+        "while(i<arr.length)"
+      ],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "How many comparisons are required in the worst case to find the largest element in an array of N elements?",
+      "options": [
+        "N",
+        "N \u2212 1",
+        "log N",
+        "N\u00b2"
+      ],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Find the LCM (Least Common Multiple) of 12 and 18.",
+      "options": [
+        "24",
+        "30",
+        "36",
+        "48"
+      ],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "The ratio of two numbers is 4 : 7. If their sum is 99, the larger number is:",
+      "options": [
+        "28",
+        "35",
+        "63",
+        "56"
+      ],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Choose the correctly spelled word.",
+      "options": [
+        "Maintainance",
+        "Maintenance",
+        "Maintanence",
+        "Maintenence"
+      ],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Choose the synonym of \u201cConcise\u201d",
+      "options": [
+        "Long",
+        "Detailed",
+        "Brief",
+        "Confusing"
+      ],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Choose the antonym of \u201cExpand\u201d",
+      "options": [
+        "Increase",
+        "Extend",
+        "Contract",
+        "Grow"
+      ],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Choose the correct sentence.",
+      "options": [
+        "He don\u2019t know Java.",
+        "He doesn\u2019t know Java.",
+        "He doesn\u2019t knows Java.",
+        "He not know Java."
+      ],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which sentence is in the Present Perfect Tense?",
+      "options": [
+        "She writes the report.",
+        "She wrote the report.",
+        "She has written the report.",
+        "She was writing the report."
+      ],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "A can complete a piece of work in 8 days and B in 24 days. Working together, they can complete the work in:",
+      "options": [
+        "8 days",
+        "7 days",
+        "6 days",
+        "5 days"
+      ],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "type": "coding",
+      "questionText": "Given an array of integers nums and an integer target, return the indices of the two numbers such that they add up to the target. You may assume exactly one solution exists.",
+      "codeTemplate": "class Solution {\n    public int[] twoSum(int[] nums, int target) {\n        // Write your code here\n        return new int[]{};\n    }\n}",
+      "testCases": [
+        {
+          "input": "[2, 7, 11, 15], 9",
+          "expected": "[0,1]"
+        },
+        {
+          "input": "[3, 2, 4], 6",
+          "expected": "[1,2]"
+        },
+        {
+          "input": "[3, 3], 6",
+          "expected": "[0,1]"
+        },
+        {
+          "input": "[1, 5, 7, -1, 2], 6",
+          "expected": "[0,1]"
+        },
+        {
+          "input": "[2, 3, 5, 8, 11, 15], 13",
+          "expected": "[2,3]"
+        }
+      ],
+      "marks": 15
+    },
+    {
+      "type": "coding",
+      "questionText": "Given a binary array containing only 0s and 1s, find the maximum number of consecutive 1s present in the array.",
+      "codeTemplate": "class Solution {\n    public int findMaxConsecutiveOnes(int[] nums) {\n        // Write your code here\n        return 0;\n    }\n}",
+      "testCases": [
+        {
+          "input": "[1, 1, 0, 1, 1, 1]",
+          "expected": "3"
+        },
+        {
+          "input": "[1, 1, 1, 0, 0, 1, 1, 0]",
+          "expected": "3"
+        },
+        {
+          "input": "[1, 1, 1, 1, 1]",
+          "expected": "5"
+        },
+        {
+          "input": "[0, 0, 0, 0, 0]",
+          "expected": "0"
+        },
+        {
+          "input": "[1, 0, 1, 1, 0, 1, 1, 1, 1, 0]",
+          "expected": "4"
+        }
+      ],
+      "marks": 15
+    },
+    {
+      "type": "practical-html",
+      "questionText": "Create a comprehensive HTML form for student registration with fields: Student Name, Email Address, Password, Mobile Number, Date of Birth, Gender (Radio), Skills (Checkbox), Department (Select), Address (Textarea), Submit, and Reset buttons. Ensure basic HTML5 validations are used.",
+      "codeTemplate": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Student Registration</title>\n</head>\n<body>\n    <h2>Student Registration Form</h2>\n    <form>\n        <!-- Write your form fields here -->\n\n    </form>\n</body>\n</html>",
+      "marks": 10
+    },
+    {
+      "type": "practical-java",
+      "questionText": "Write a Java program to demonstrate Inheritance. Create a class named Employee with employeeId (int), employeeName (String), and salary (double). Create a derived class named Manager that extends Employee and adds department (String). Use a parameterized constructor to initialize all values. Create a method getDetails() to return a formatted string with all employee information.",
+      "codeTemplate": "class Employee {\n    int employeeId;\n    String employeeName;\n    double salary;\n\n    // Write constructor here\n\n    // Write getDetails() method here that returns a String\n}\n\nclass Manager extends Employee {\n    String department;\n\n    // Write constructor here\n\n    // Override getDetails() to include department and return the String\n}\n\nclass Solution {\n    public String testManager(int id, String name, double salary, String dept) {\n        Manager m = new Manager(id, name, salary, dept);\n        return m.getDetails();\n    }\n}",
+      "testCases": [
+        {
+          "input": "101, 'Rahul', 65000.0, 'Development'",
+          "expected": "Employee ID : 101\nEmployee Name : Rahul\nSalary : 65000.0\nDepartment : Development"
+        },
+        {
+          "input": "102, 'Priya', 75000.0, 'HR'",
+          "expected": "Employee ID : 102\nEmployee Name : Priya\nSalary : 75000.0\nDepartment : HR"
+        },
+        {
+          "input": "103, 'Amit', 55000.0, 'Finance'",
+          "expected": "Employee ID : 103\nEmployee Name : Amit\nSalary : 55000.0\nDepartment : Finance"
+        }
+      ],
+      "marks": 10
+    }
+  ]
+}
