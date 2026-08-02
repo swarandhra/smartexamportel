@@ -1,7 +1,8 @@
 // db.ts - Neon PostgreSQL API Client
-// All database operations now go through the Express API server
+// In production (Vercel): uses relative /api paths (no separate backend needed)
+// In local dev: uses http://localhost:3001
+const API_URL = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
 
-const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3001').replace(/\/$/, '');
 
 export interface Question {
   id: string;
