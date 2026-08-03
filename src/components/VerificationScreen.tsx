@@ -10,9 +10,7 @@ interface VerificationScreenProps {
 export default function VerificationScreen({ exam, onVerifySuccess, onCancel }: VerificationScreenProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [camStatus, setCamStatus] = useState<'checking' | 'success' | 'error'>('checking');
-  const [micStatus, setMicStatus] = useState<'checking' | 'success' | 'error'>('checking');
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
-  const [localAudioStream, setLocalAudioStream] = useState<MediaStream | null>(null);
 
   const checkDevices = async () => {
     // 1. Camera check
@@ -33,15 +31,6 @@ export default function VerificationScreen({ exam, onVerifySuccess, onCancel }: 
       setCamStatus('error');
     }
 
-    // 2. Microphone check
-    try {
-      const aStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      setLocalAudioStream(aStream);
-      setMicStatus('success');
-    } catch (e) {
-      console.error('Microphone initialization failed:', e);
-      setMicStatus('error');
-    }
   };
 
   useEffect(() => {
@@ -52,9 +41,6 @@ export default function VerificationScreen({ exam, onVerifySuccess, onCancel }: 
       if (localStream) {
         localStream.getTracks().forEach(track => track.stop());
       }
-      if (localAudioStream) {
-        localAudioStream.getTracks().forEach(track => track.stop());
-      }
     };
   }, []);
 
@@ -62,13 +48,10 @@ export default function VerificationScreen({ exam, onVerifySuccess, onCancel }: 
     if (localStream) {
       localStream.getTracks().forEach(t => t.stop());
     }
-    if (localAudioStream) {
-      localAudioStream.getTracks().forEach(t => t.stop());
-    }
     onVerifySuccess();
   };
 
-  const isReady = camStatus === 'success' && micStatus === 'success';
+  const isReady = camStatus === 'success';
 
   return (
     <div className="verification-screen animate-fade-in">
@@ -85,7 +68,7 @@ export default function VerificationScreen({ exam, onVerifySuccess, onCancel }: 
             <li><strong>Tab/App Tracking:</strong> Moving away, switching tabs, or resizing the browser logs a violation.</li>
             <li><strong>Limit of Warnings:</strong> Exceeding 3 security warnings submits the exam automatically.</li>
             <li><strong>Copy-Paste Disabled:</strong> Clipboard commands, right-clicks, and dragging are completely disabled.</li>
-            <li><strong>Continuous Monitoring:</strong> The camera and microphone will actively audit your room.</li>
+            <li><strong>Continuous Monitoring:</strong> The camera will actively audit your environment.</li>
           </ul>
         </div>
 
@@ -109,15 +92,11 @@ export default function VerificationScreen({ exam, onVerifySuccess, onCancel }: 
               <span className="dot"></span> 
               {camStatus === 'success' ? 'Camera Authorized' : camStatus === 'error' ? 'Camera Access Denied' : 'Camera: Checking...'}
             </div>
-            <div className={`status-indicator ${micStatus === 'success' ? 'status-success' : micStatus === 'error' ? 'status-error' : ''}`}>
-              <span className="dot"></span> 
-              {micStatus === 'success' ? 'Microphone Authorized' : micStatus === 'error' ? 'Microphone Access Denied' : 'Microphone: Checking...'}
-            </div>
           </div>
 
           {!isReady && (
             <button className="btn btn-secondary btn-full" onClick={checkDevices}>
-              Authorize Camera & Mic
+              Authorize Camera
             </button>
           )}
         </div>

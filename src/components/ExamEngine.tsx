@@ -40,30 +40,13 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
   const violationBannerTimerRef = useRef<any>(null);
   const MAX_VIOLATIONS = 8;
 
-  // Sound & Face proctoring popup states
-  const [showSoundPopup, setShowSoundPopup] = useState(false);
-  const [showFacePopup, setShowFacePopup] = useState(false);
-  const [facePopupType, setFacePopupType] = useState('');
-  const soundPopupTimerRef = useRef<any>(null);
-  const faceWarningTimerRef = useRef<any>(null);
+  // Sound & Face proctoring popup states removed
 
   // Active question instances
   const [questions, setQuestions] = useState<Question[]>([]);
   const [visitedQuestions, setVisitedQuestions] = useState<Record<string, boolean>>({});
   
-  // Fake timer for multiple faces warnings (every exam.duration / 10)
-  useEffect(() => {
-    if (!exam.duration || exam.duration <= 0) return;
-    const intervalMs = (exam.duration * 60 * 1000) / 10;
-    const intervalId = setInterval(() => {
-      setFacePopupType('Multiple Faces Detected');
-      setShowFacePopup(true);
-      if (faceWarningTimerRef.current) clearTimeout(faceWarningTimerRef.current);
-      faceWarningTimerRef.current = setTimeout(() => setShowFacePopup(false), 4000);
-    }, intervalMs);
-    
-    return () => clearInterval(intervalId);
-  }, [exam.duration]);
+
 
   // Track visited questions
   useEffect(() => {
@@ -248,19 +231,6 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
               'error'
             );
             handleAutoSubmit();
-          },
-          onSoundDetected: (_volume) => {
-            setShowSoundPopup(true);
-            if (soundPopupTimerRef.current) clearTimeout(soundPopupTimerRef.current);
-            soundPopupTimerRef.current = setTimeout(() => setShowSoundPopup(false), 4000);
-          },
-          onFaceViolation: (type) => {
-            setFacePopupType(type);
-            setShowFacePopup(true);
-            if (type === 'Multiple Faces Detected' || type === 'Phone Detected') {
-              if (faceWarningTimerRef.current) clearTimeout(faceWarningTimerRef.current);
-              faceWarningTimerRef.current = setTimeout(() => setShowFacePopup(false), 4000);
-            }
           }
         });
       }
@@ -382,10 +352,27 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
         doc.write(answers[activeQ.id] || activeQ.codeTemplate || '');
         doc.close();
       }
+      updateResultDraft(
+        resultIdRef.current,
+        { ...answers, [activeQ.id]: answers[activeQ.id] || activeQ.codeTemplate || '' },
+        getViolationLog(),
+        getCameraCaptures()
+      ).catch(err => console.error("Draft update failed:", err));
     }
   };
 
   const handleSubmitCode = (q: Question) => {
+    showConfirm(
+      'Submit Code?',
+      'Are you sure you want to save and submit this code?',
+      () => processCodeSubmission(q),
+      undefined,
+      'Submit',
+      'Cancel'
+    );
+  };
+
+  const processCodeSubmission = (q: Question) => {
     if (q.type === 'practical-html') {
       const userHtml = answers[q.id] || q.codeTemplate || '';
       const passed = userHtml.includes('<form') && userHtml.includes('<input') && userHtml.length > (q.codeTemplate?.length || 0) + 15;
@@ -393,8 +380,10 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
       setSubmissionFeedback(prev => ({
         ...prev,
         [q.id]: {
-          passed: true,
-          message: `✓ HTML Code Saved Successfully!`
+          passed,
+          message: passed 
+            ? `✓ HTML Code Submitted! Required elements found.` 
+            : `✗ HTML Code Submitted. Missing <form> or <input> elements. Please check your implementation.`
         }
       }));
       
@@ -439,8 +428,10 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
     setSubmissionFeedback(prev => ({
       ...prev,
       [q.id]: {
-        passed: true,
-        message: `✓ Code Saved Successfully! (Passed ${passCount}/${totalCases} test cases)`
+        passed: passedAll,
+        message: passedAll 
+          ? `✓ Code Submitted! Passed all ${passCount}/${totalCases} test cases.` 
+          : `✗ Code Submitted. Passed ${passCount}/${totalCases} test cases. Adjust your logic and submit again.`
       }
     }));
     
@@ -457,6 +448,13 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
 
     if ((q.type !== 'coding' && q.type !== 'practical-java') || !q.testCases) return;
     const userCode = answers[q.id] || q.codeTemplate || '';
+
+    updateResultDraft(
+      resultIdRef.current,
+      { ...answers, [q.id]: userCode },
+      getViolationLog(),
+      getCameraCaptures()
+    ).catch(err => console.error("Draft update failed:", err));
 
     let transpiledJS = '';
     let transpileError = '';
@@ -1359,7 +1357,7 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
         <div style={{
           position: 'fixed',
           top: '80px',
-          left: '24px',
+          right: '24px',
           zIndex: 99999,
           background: 'rgba(30, 41, 59, 0.97)',
           border: '1px solid #f59e0b',
@@ -1370,7 +1368,7 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
           gap: '14px',
           boxShadow: '0 8px 32px rgba(245, 158, 11, 0.25), 0 2px 8px rgba(0,0,0,0.4)',
           backdropFilter: 'blur(12px)',
-          animation: 'toast-slide-in-left 0.3s ease-out',
+          animation: 'toast-slide-in 0.3s ease-out',
           maxWidth: '320px',
           color: '#f8fafc',
           fontFamily: 'system-ui, -apple-system, sans-serif'
@@ -1405,37 +1403,43 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
         </div>
       )}
 
-      {/* Face Violation Popup - Non-blocking left toast */}
+      {/* Face Violation Popup - Shows proctoring alert with dismiss */}
       {showFacePopup && (facePopupType === 'No Face Detected' || facePopupType === 'Excessive Face Movement') && (
         <div style={{
           position: 'fixed',
-          top: showViolationBanner ? '230px' : showSoundPopup ? '150px' : '80px',
-          left: '24px',
-          zIndex: 99999,
-          background: 'rgba(30, 41, 59, 0.97)',
-          border: '1px solid #ef4444',
-          borderRadius: '14px',
-          padding: '16px 20px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '14px',
-          boxShadow: '0 8px 32px rgba(239, 68, 68, 0.25), 0 2px 8px rgba(0,0,0,0.4)',
-          backdropFilter: 'blur(12px)',
-          animation: 'toast-slide-in-left 0.3s ease-out',
-          maxWidth: '320px',
-          color: '#f8fafc',
-          fontFamily: 'system-ui, -apple-system, sans-serif'
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          zIndex: 999999,
+          background: '#0f172a',
+          border: '2px solid #ef4444',
+          borderRadius: '20px',
+          padding: '32px 28px',
+          maxWidth: '460px',
+          width: '90%',
+          textAlign: 'center',
+          boxShadow: '0 0 0 1px rgba(239,68,68,0.2), 0 25px 60px rgba(239,68,68,0.3)',
+          animation: 'modal-scale-in 0.3s cubic-bezier(0.34,1.56,0.64,1)',
+          fontFamily: 'system-ui, -apple-system, sans-serif',
+          color: '#f8fafc'
         }}>
+          {/* Backdrop */}
           <div style={{
-            width: '42px', height: '42px',
-            background: 'rgba(239, 68, 68, 0.15)',
+            position: 'fixed', inset: 0,
+            background: 'rgba(0,0,0,0.5)',
+            backdropFilter: 'blur(6px)',
+            zIndex: -1,
+            borderRadius: '20px'
+          }} />
+          <div style={{
+            width: '60px', height: '60px',
+            background: 'rgba(239,68,68,0.15)',
             border: '2px solid #ef4444',
             borderRadius: '50%',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            flexShrink: 0,
-            animation: 'sound-pulse 1s infinite'
+            margin: '0 auto 20px'
           }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2.5">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2">
               {facePopupType === 'No Face Detected' ? (
                 <><circle cx="12" cy="8" r="5"/><path d="M3 21v-2a7 7 0 0 1 7-7h4a7 7 0 0 1 7 7v2"/><line x1="2" y1="2" x2="22" y2="22"/></>
               ) : (
@@ -1443,27 +1447,38 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
               )}
             </svg>
           </div>
-          <div>
-            <div style={{ fontWeight: '700', fontSize: '13.5px', color: '#f87171', marginBottom: '3px' }}>
-              🚨 {facePopupType}
-            </div>
-            <div style={{ fontSize: '12px', color: '#94a3b8', lineHeight: '1.4' }}>
-              {facePopupType === 'No Face Detected' ? 'Face not visible.' : 'Unusual head movement.'} Violation recorded.
-            </div>
+          <h3 style={{ margin: '0 0 10px', fontSize: '19px', fontWeight: '800', color: '#f87171' }}>
+            🚨 {facePopupType}
+          </h3>
+          <p style={{ margin: '0 0 8px', fontSize: '14px', color: '#cbd5e1', lineHeight: '1.6' }}>
+            {facePopupType === 'No Face Detected' && 'Your face is not visible. Please ensure your face is fully visible within the camera frame.'}
+            {facePopupType === 'Excessive Face Movement' && 'Unusual head movement detected. Please remain stationary and face the camera directly.'}
+          </p>
+          <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '8px', padding: '10px 14px', marginBottom: '22px', fontSize: '12.5px', color: '#f87171', fontWeight: '600' }}>
+            ⚠️ This has been recorded as a violation. Repeated violations will auto-submit the exam.
           </div>
           <button
             onClick={() => setShowFacePopup(false)}
-            style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', fontSize: '18px', lineHeight: 1, padding: '0 4px', flexShrink: 0 }}
-          >×</button>
+            style={{
+              background: 'linear-gradient(135deg, #dc2626, #b91c1c)',
+              color: '#fff', border: 'none',
+              padding: '12px 32px', borderRadius: '10px',
+              fontWeight: '700', fontSize: '14px', cursor: 'pointer',
+              boxShadow: '0 4px 15px rgba(220,38,38,0.4)',
+              transition: 'all 0.2s'
+            }}
+          >
+            I Understand — Dismiss
+          </button>
         </div>
       )}
 
-      {/* Face Warning Popup - Top Left, like Sound */}
+      {/* Face Warning Popup - Top Right, like Sound */}
       {showFacePopup && (facePopupType === 'Multiple Faces Detected' || facePopupType === 'Phone Detected') && (
         <div style={{
           position: 'fixed',
-          top: showViolationBanner ? '230px' : showSoundPopup ? '150px' : '80px',
-          left: '24px',
+          top: showSoundPopup ? '150px' : '80px',
+          right: '24px',
           zIndex: 99999,
           background: 'rgba(30, 41, 59, 0.97)',
           border: '1px solid #f59e0b',
@@ -1474,7 +1489,7 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
           gap: '14px',
           boxShadow: '0 8px 32px rgba(245, 158, 11, 0.25), 0 2px 8px rgba(0,0,0,0.4)',
           backdropFilter: 'blur(12px)',
-          animation: 'toast-slide-in-left 0.3s ease-out',
+          animation: 'toast-slide-in 0.3s ease-out',
           maxWidth: '320px',
           color: '#f8fafc',
           fontFamily: 'system-ui, -apple-system, sans-serif'
