@@ -17,6 +17,6 @@ export default async function handler(req, res) {
     await sql`DELETE FROM exams WHERE id = ${id}`;
     return res.status(200).json({ success: true });
   } catch (e) {
-    return res.status(500).json({ success: false, error: e.message });
+    return res.status(500).json({ success: false, error: e.message || String(e) || 'Unknown database error' });
   }
 }

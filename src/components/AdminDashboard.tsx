@@ -179,7 +179,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
         if (res.success) {
           showToast('Exam deleted successfully.', 'success');
         } else {
-          showToast('Failed to delete: ' + res.error, 'error');
+          showToast('Failed to delete: ' + (res.error || 'Unknown network or database error'), 'error');
         }
         await syncData();
       },
