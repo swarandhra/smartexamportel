@@ -1117,7 +1117,7 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
                   {activeQ.testCases && activeQ.testCases.length > 0 && (
                     <div style={{ marginTop: '24px' }}>
                       <h5 style={{ borderBottom: '1px solid #1e293b', paddingBottom: '8px', marginBottom: '16px', fontSize: '13.5px', color: '#94a3b8', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Sample Test Cases</h5>
-                      {activeQ.testCases.slice(0, 2).map((tc, idx) => (
+                      {activeQ.testCases.map((tc, idx) => (
                         <div key={idx} style={{ background: '#1e293b', border: '1px solid #334155', padding: '12px 16px', borderRadius: '8px', fontSize: '13px', fontFamily: 'Consolas, Monaco, monospace', marginBottom: '12px', color: '#e2e8f0', whiteSpace: 'pre-wrap' }}>
                           <div style={{ marginBottom: '4px' }}><strong style={{ color: '#64748b' }}>Input arguments:</strong> {tc.input}</div>
                           <div><strong style={{ color: '#64748b' }}>Expected output:</strong> {tc.expected}</div>
@@ -1236,7 +1236,7 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
                     {sandboxOutputs[activeQ.id] ? (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                         {sandboxOutputs[activeQ.id].map((tc, idx) => {
-                          const isPublic = idx < 2;
+                          const isPublic = true;
                           return (
                             <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#0f172a', border: '1px solid #1e293b', padding: '10px 14px', borderRadius: '6px', borderLeft: `3px solid ${tc.passed ? '#22c55e' : '#ef4444'}` }}>
                               {isPublic ? (
@@ -1308,79 +1308,52 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
         onResume={handleResumeFullscreen}
       />
 
-      {/* ── Centered Violation Count Banner ── */}
+      {/* ── Security Violation Banner (Non-blocking Left Popup) ── */}
       {showViolationBanner && (
         <div style={{
           position: 'fixed',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          zIndex: 1000000,
-          background: 'linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%)',
-          border: '2px solid #ef4444',
-          borderRadius: '24px',
-          padding: '36px 44px',
-          textAlign: 'center',
-          boxShadow: '0 0 60px rgba(239,68,68,0.4), 0 25px 80px rgba(0,0,0,0.7)',
-          animation: 'modal-scale-in 0.3s cubic-bezier(0.34,1.56,0.64,1)',
-          fontFamily: 'system-ui, -apple-system, sans-serif',
-          minWidth: '320px',
+          top: '150px',
+          left: '24px',
+          zIndex: 99999,
+          background: 'rgba(30, 41, 59, 0.97)',
+          border: '1px solid #ef4444',
+          borderRadius: '14px',
+          padding: '16px 20px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '14px',
+          boxShadow: '0 8px 32px rgba(239, 68, 68, 0.25), 0 2px 8px rgba(0,0,0,0.4)',
+          backdropFilter: 'blur(12px)',
+          animation: 'toast-slide-in-left 0.3s ease-out',
+          maxWidth: '320px',
+          color: '#f8fafc',
+          fontFamily: 'system-ui, -apple-system, sans-serif'
         }}>
-          {/* Red glow backdrop */}
           <div style={{
-            position: 'absolute', inset: 0, borderRadius: '22px',
-            background: 'radial-gradient(circle at center, rgba(239,68,68,0.12) 0%, transparent 70%)',
-            pointerEvents: 'none'
-          }} />
-          {/* Warning icon */}
-          <div style={{
-            width: '64px', height: '64px', margin: '0 auto 18px',
-            background: 'rgba(239,68,68,0.15)',
-            border: '2px solid rgba(239,68,68,0.5)',
+            width: '42px', height: '42px',
+            background: 'rgba(239, 68, 68, 0.15)',
+            border: '2px solid #ef4444',
             borderRadius: '50%',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: '32px'
-          }}>⚠️</div>
-          {/* Violation count */}
-          <div style={{ color: '#ef4444', fontWeight: '800', fontSize: '15px', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '10px' }}>
-            Security Violation
-          </div>
-          <div style={{
-            color: '#f8fafc', fontWeight: '800', fontSize: '42px', lineHeight: 1,
-            marginBottom: '8px'
+            flexShrink: 0,
+            fontSize: '20px'
           }}>
-            {violationBannerCount} <span style={{ color: '#64748b', fontSize: '28px' }}>/ {MAX_VIOLATIONS}</span>
+            ⚠️
           </div>
-          <div style={{ color: '#94a3b8', fontSize: '14px', marginBottom: '20px', lineHeight: 1.5 }}>
-            {violationBannerCount < MAX_VIOLATIONS
-              ? `${MAX_VIOLATIONS - violationBannerCount} more violation${MAX_VIOLATIONS - violationBannerCount === 1 ? '' : 's'} will auto-submit your exam.`
-              : 'Auto-submitting now...'}
-          </div>
-          {/* Progress bar */}
-          <div style={{ background: 'rgba(255,255,255,0.08)', borderRadius: '999px', height: '8px', overflow: 'hidden', marginBottom: '20px' }}>
-            <div style={{
-              height: '100%',
-              width: `${(violationBannerCount / MAX_VIOLATIONS) * 100}%`,
-              background: violationBannerCount >= MAX_VIOLATIONS - 2
-                ? 'linear-gradient(90deg, #ef4444, #b91c1c)'
-                : 'linear-gradient(90deg, #f59e0b, #ef4444)',
-              borderRadius: '999px',
-              transition: 'width 0.4s ease'
-            }} />
+          <div>
+            <div style={{ fontWeight: '700', fontSize: '13.5px', color: '#f87171', marginBottom: '3px' }}>
+              Security Violation ({violationBannerCount}/{MAX_VIOLATIONS})
+            </div>
+            <div style={{ fontSize: '12px', color: '#94a3b8', lineHeight: '1.4' }}>
+              {violationBannerCount < MAX_VIOLATIONS
+                ? `${MAX_VIOLATIONS - violationBannerCount} more violation${MAX_VIOLATIONS - violationBannerCount === 1 ? '' : 's'} will auto-submit.`
+                : 'Auto-submitting now...'}
+            </div>
           </div>
           <button
             onClick={() => setShowViolationBanner(false)}
-            style={{
-              background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.4)',
-              color: '#fca5a5', padding: '10px 28px', borderRadius: '12px',
-              cursor: 'pointer', fontWeight: '600', fontSize: '14px',
-              transition: 'all 0.2s'
-            }}
-            onMouseOver={e => (e.currentTarget.style.background = 'rgba(239,68,68,0.3)')}
-            onMouseOut={e => (e.currentTarget.style.background = 'rgba(239,68,68,0.15)')}
-          >
-            I Understand
-          </button>
+            style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', fontSize: '18px', lineHeight: 1, padding: '0 4px', flexShrink: 0 }}
+          >×</button>
         </div>
       )}
 
@@ -1390,7 +1363,7 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
         <div style={{
           position: 'fixed',
           top: '80px',
-          right: '24px',
+          left: '24px',
           zIndex: 99999,
           background: 'rgba(30, 41, 59, 0.97)',
           border: '1px solid #f59e0b',
@@ -1401,7 +1374,7 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
           gap: '14px',
           boxShadow: '0 8px 32px rgba(245, 158, 11, 0.25), 0 2px 8px rgba(0,0,0,0.4)',
           backdropFilter: 'blur(12px)',
-          animation: 'toast-slide-in 0.3s ease-out',
+          animation: 'toast-slide-in-left 0.3s ease-out',
           maxWidth: '320px',
           color: '#f8fafc',
           fontFamily: 'system-ui, -apple-system, sans-serif'
@@ -1436,43 +1409,37 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
         </div>
       )}
 
-      {/* Face Violation Popup - Shows proctoring alert with dismiss */}
+      {/* Face Violation Popup - Non-blocking left toast */}
       {showFacePopup && (facePopupType === 'No Face Detected' || facePopupType === 'Excessive Face Movement') && (
         <div style={{
           position: 'fixed',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          zIndex: 999999,
-          background: '#0f172a',
-          border: '2px solid #ef4444',
-          borderRadius: '20px',
-          padding: '32px 28px',
-          maxWidth: '460px',
-          width: '90%',
-          textAlign: 'center',
-          boxShadow: '0 0 0 1px rgba(239,68,68,0.2), 0 25px 60px rgba(239,68,68,0.3)',
-          animation: 'modal-scale-in 0.3s cubic-bezier(0.34,1.56,0.64,1)',
-          fontFamily: 'system-ui, -apple-system, sans-serif',
-          color: '#f8fafc'
+          top: showViolationBanner ? '230px' : showSoundPopup ? '150px' : '80px',
+          left: '24px',
+          zIndex: 99999,
+          background: 'rgba(30, 41, 59, 0.97)',
+          border: '1px solid #ef4444',
+          borderRadius: '14px',
+          padding: '16px 20px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '14px',
+          boxShadow: '0 8px 32px rgba(239, 68, 68, 0.25), 0 2px 8px rgba(0,0,0,0.4)',
+          backdropFilter: 'blur(12px)',
+          animation: 'toast-slide-in-left 0.3s ease-out',
+          maxWidth: '320px',
+          color: '#f8fafc',
+          fontFamily: 'system-ui, -apple-system, sans-serif'
         }}>
-          {/* Backdrop */}
           <div style={{
-            position: 'fixed', inset: 0,
-            background: 'rgba(0,0,0,0.5)',
-            backdropFilter: 'blur(6px)',
-            zIndex: -1,
-            borderRadius: '20px'
-          }} />
-          <div style={{
-            width: '60px', height: '60px',
-            background: 'rgba(239,68,68,0.15)',
+            width: '42px', height: '42px',
+            background: 'rgba(239, 68, 68, 0.15)',
             border: '2px solid #ef4444',
             borderRadius: '50%',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            margin: '0 auto 20px'
+            flexShrink: 0,
+            animation: 'sound-pulse 1s infinite'
           }}>
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2.5">
               {facePopupType === 'No Face Detected' ? (
                 <><circle cx="12" cy="8" r="5"/><path d="M3 21v-2a7 7 0 0 1 7-7h4a7 7 0 0 1 7 7v2"/><line x1="2" y1="2" x2="22" y2="22"/></>
               ) : (
@@ -1480,38 +1447,27 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
               )}
             </svg>
           </div>
-          <h3 style={{ margin: '0 0 10px', fontSize: '19px', fontWeight: '800', color: '#f87171' }}>
-            🚨 {facePopupType}
-          </h3>
-          <p style={{ margin: '0 0 8px', fontSize: '14px', color: '#cbd5e1', lineHeight: '1.6' }}>
-            {facePopupType === 'No Face Detected' && 'Your face is not visible. Please ensure your face is fully visible within the camera frame.'}
-            {facePopupType === 'Excessive Face Movement' && 'Unusual head movement detected. Please remain stationary and face the camera directly.'}
-          </p>
-          <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '8px', padding: '10px 14px', marginBottom: '22px', fontSize: '12.5px', color: '#f87171', fontWeight: '600' }}>
-            ⚠️ This has been recorded as a violation. Repeated violations will auto-submit the exam.
+          <div>
+            <div style={{ fontWeight: '700', fontSize: '13.5px', color: '#f87171', marginBottom: '3px' }}>
+              🚨 {facePopupType}
+            </div>
+            <div style={{ fontSize: '12px', color: '#94a3b8', lineHeight: '1.4' }}>
+              {facePopupType === 'No Face Detected' ? 'Face not visible.' : 'Unusual head movement.'} Violation recorded.
+            </div>
           </div>
           <button
             onClick={() => setShowFacePopup(false)}
-            style={{
-              background: 'linear-gradient(135deg, #dc2626, #b91c1c)',
-              color: '#fff', border: 'none',
-              padding: '12px 32px', borderRadius: '10px',
-              fontWeight: '700', fontSize: '14px', cursor: 'pointer',
-              boxShadow: '0 4px 15px rgba(220,38,38,0.4)',
-              transition: 'all 0.2s'
-            }}
-          >
-            I Understand — Dismiss
-          </button>
+            style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', fontSize: '18px', lineHeight: 1, padding: '0 4px', flexShrink: 0 }}
+          >×</button>
         </div>
       )}
 
-      {/* Face Warning Popup - Top Right, like Sound */}
+      {/* Face Warning Popup - Top Left, like Sound */}
       {showFacePopup && (facePopupType === 'Multiple Faces Detected' || facePopupType === 'Phone Detected') && (
         <div style={{
           position: 'fixed',
-          top: showSoundPopup ? '150px' : '80px',
-          right: '24px',
+          top: showViolationBanner ? '230px' : showSoundPopup ? '150px' : '80px',
+          left: '24px',
           zIndex: 99999,
           background: 'rgba(30, 41, 59, 0.97)',
           border: '1px solid #f59e0b',
@@ -1522,7 +1478,7 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
           gap: '14px',
           boxShadow: '0 8px 32px rgba(245, 158, 11, 0.25), 0 2px 8px rgba(0,0,0,0.4)',
           backdropFilter: 'blur(12px)',
-          animation: 'toast-slide-in 0.3s ease-out',
+          animation: 'toast-slide-in-left 0.3s ease-out',
           maxWidth: '320px',
           color: '#f8fafc',
           fontFamily: 'system-ui, -apple-system, sans-serif'
@@ -1571,6 +1527,10 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
         }
         @keyframes toast-slide-in {
           from { transform: translateX(120%); opacity: 0; }
+          to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes toast-slide-in-left {
+          from { transform: translateX(-120%); opacity: 0; }
           to { transform: translateX(0); opacity: 1; }
         }
       `}</style>
