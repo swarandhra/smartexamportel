@@ -362,27 +362,8 @@ function startFaceDetection(): void {
 
 // Capture small base64 JPEG from video stream
 function captureSnapshot(): void {
-  if (!cameraStream || !activeConfig.videoElement) return;
-
-  const video = activeConfig.videoElement;
-  const canvas = document.createElement('canvas');
-  
-  canvas.width = 160;
-  canvas.height = 120;
-
-  const ctx = canvas.getContext('2d');
-  if (ctx) {
-    try {
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
-      cameraCaptures.push({
-        timestamp: new Date().toLocaleTimeString(),
-        image: dataUrl
-      });
-    } catch (e) {
-      console.warn('Snapshot capture failed:', e);
-    }
-  }
+  // Disabled to save database storage space as per requirements
+  return;
 }
 
 // 2. Microphone Monitoring
