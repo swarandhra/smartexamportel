@@ -193,6 +193,12 @@ async function initCameraMonitoring(): Promise<boolean> {
   }
 }
 
+// Capture small base64 JPEG from video stream
+function captureSnapshot(): void {
+  // Disabled to save database storage space as per requirements
+  return;
+}
+
 // 3. Focus & Visibility Listeners
 function handleVisibilityChange(): void {
   if (document.visibilityState === 'hidden') {
