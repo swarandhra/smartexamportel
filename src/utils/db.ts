@@ -1,5 +1,5 @@
 // db.ts - Neon PostgreSQL API Client
-// All database operations now go through the Express API server
+// All database operations now go through the Express API server (or Vercel serverless functions in production)
 
 const API_URL = import.meta.env.VITE_API_URL 
   ? import.meta.env.VITE_API_URL.replace(/\/$/, '') 
