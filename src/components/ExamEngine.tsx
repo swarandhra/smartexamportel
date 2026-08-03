@@ -346,6 +346,7 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
 
   const handleRunHtmlCode = () => {
     if (activeQ && activeQ.type === 'practical-html' && iframeRef.current) {
+      showToast('Rendering HTML...', 'info');
       const doc = iframeRef.current.contentDocument;
       if (doc) {
         doc.open();
@@ -358,6 +359,8 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
         getViolationLog(),
         getCameraCaptures()
       ).catch(err => console.error("Draft update failed:", err));
+      
+      showToast('HTML rendered successfully', 'success');
     }
   };
 
@@ -447,43 +450,49 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
   const handleRunCode = (q: Question) => {
 
     if ((q.type !== 'coding' && q.type !== 'practical-java') || !q.testCases) return;
-    const userCode = answers[q.id] || q.codeTemplate || '';
+    
+    showToast('Executing code...', 'info');
 
-    updateResultDraft(
-      resultIdRef.current,
-      { ...answers, [q.id]: userCode },
-      getViolationLog(),
-      getCameraCaptures()
-    ).catch(err => console.error("Draft update failed:", err));
+    setTimeout(() => {
+      const userCode = answers[q.id] || q.codeTemplate || '';
 
-    let transpiledJS = '';
-    let transpileError = '';
-    try {
-      transpiledJS = transpileJavaToJS(userCode);
-    } catch (e: any) {
-      transpileError = e.message;
-    }
+      updateResultDraft(
+        resultIdRef.current,
+        { ...answers, [q.id]: userCode },
+        getViolationLog(),
+        getCameraCaptures()
+      ).catch(err => console.error("Draft update failed:", err));
 
-    const methodName = extractMethodName(transpiledJS);
-
-    const results = q.testCases.map((tc) => {
-      if (transpileError) {
-        return { input: tc.input, expected: tc.expected, actual: 'Compilation Error: ' + transpileError, passed: false };
+      let transpiledJS = '';
+      let transpileError = '';
+      try {
+        transpiledJS = transpileJavaToJS(userCode);
+      } catch (e: any) {
+        transpileError = e.message;
       }
-      if (!methodName) {
-        return { input: tc.input, expected: tc.expected, actual: 'Error: Could not detect method name. Make sure your class has a public method.', passed: false };
-      }
-      const { actual, error } = runTestCase(transpiledJS, methodName, tc.input);
-      if (error) {
-        return { input: tc.input, expected: tc.expected, actual: 'Runtime Error: ' + error, passed: false };
-      }
-      // Parse both actual and expected for numeric comparison
-      let actualClean = actual.replace(/"/g, '').trim();
-      const passed = actualClean.replace(/\s+/g, '') === tc.expected.trim().replace(/\s+/g, '');
-      return { input: tc.input, expected: tc.expected, actual: actualClean, passed };
-    });
 
-    setSandboxOutputs(prev => ({ ...prev, [q.id]: results }));
+      const methodName = extractMethodName(transpiledJS);
+
+      const results = q.testCases!.map((tc) => {
+        if (transpileError) {
+          return { input: tc.input, expected: tc.expected, actual: 'Compilation Error: ' + transpileError, passed: false };
+        }
+        if (!methodName) {
+          return { input: tc.input, expected: tc.expected, actual: 'Error: Could not detect method name. Make sure your class has a public method.', passed: false };
+        }
+        const { actual, error } = runTestCase(transpiledJS, methodName, tc.input);
+        if (error) {
+          return { input: tc.input, expected: tc.expected, actual: 'Runtime Error: ' + error, passed: false };
+        }
+        // Parse both actual and expected for numeric comparison
+        let actualClean = actual.replace(/"/g, '').trim();
+        const passed = actualClean.replace(/\s+/g, '') === tc.expected.trim().replace(/\s+/g, '');
+        return { input: tc.input, expected: tc.expected, actual: actualClean, passed };
+      });
+
+      setSandboxOutputs(prev => ({ ...prev, [q.id]: results }));
+      showToast('Code execution completed', 'success');
+    }, 50);
   };
 
 
