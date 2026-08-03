@@ -15,8 +15,8 @@ export default async function handler(req, res) {
   const { id } = req.query;
   try {
     await sql`DELETE FROM exams WHERE id = ${id}`;
-    res.json({ success: true });
+    return res.status(200).json({ success: true });
   } catch (e) {
-    res.json({ success: false, error: e.message });
+    return res.status(500).json({ success: false, error: e.message });
   }
 }

@@ -68,6 +68,7 @@ export default async function handler(req, res) {
           total_violations = EXCLUDED.total_violations,
           status = EXCLUDED.status, is_submitted = EXCLUDED.is_submitted,
           marks_obtained = EXCLUDED.marks_obtained, percentage = EXCLUDED.percentage,
+          correct_answers = EXCLUDED.correct_answers, wrong_answers = EXCLUDED.wrong_answers,
           end_time = EXCLUDED.end_time, time_taken = EXCLUDED.time_taken
       `;
       return res.json({ success: true });

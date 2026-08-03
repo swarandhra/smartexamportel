@@ -1,8 +1,7 @@
 // db.ts - Neon PostgreSQL API Client
-// In production (Vercel): uses relative /api paths (no separate backend needed)
-// In local dev: uses http://localhost:3001
-const API_URL = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
+// All database operations now go through the Express API server
 
+const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3001').replace(/\/$/, '');
 
 export interface Question {
   id: string;
@@ -117,7 +116,14 @@ async function apiFetch(path: string, options: RequestInit = {}) {
     ...options,
     headers: { 'Content-Type': 'application/json', ...(options.headers || {}) }
   });
-  return res.json();
+  
+  const text = await res.text();
+  try {
+    return text ? JSON.parse(text) : { success: res.ok };
+  } catch (e: any) {
+    console.error("API response parse error:", text, res.status);
+    throw new Error(`Failed to parse JSON response. Status: ${res.status}. Body: ${text.slice(0, 50)}...`);
+  }
 }
 
 // ─── Local Fallbacks ─────────────────────────────────────────────
