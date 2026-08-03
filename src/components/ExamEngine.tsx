@@ -393,10 +393,8 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
       setSubmissionFeedback(prev => ({
         ...prev,
         [q.id]: {
-          passed,
-          message: passed 
-            ? `✓ HTML Code Submitted! Required elements found.` 
-            : `✗ HTML Code Submitted. Missing <form> or <input> elements. Please check your implementation.`
+          passed: true,
+          message: `✓ HTML Code Saved Successfully!`
         }
       }));
       
@@ -441,10 +439,8 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
     setSubmissionFeedback(prev => ({
       ...prev,
       [q.id]: {
-        passed: passedAll,
-        message: passedAll 
-          ? `✓ Code Submitted! Passed all ${passCount}/${totalCases} test cases.` 
-          : `✗ Code Submitted. Passed ${passCount}/${totalCases} test cases. Adjust your logic and submit again.`
+        passed: true,
+        message: `✓ Code Saved Successfully! (Passed ${passCount}/${totalCases} test cases)`
       }
     }));
     
