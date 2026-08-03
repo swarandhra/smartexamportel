@@ -1,7 +1,9 @@
 // db.ts - Neon PostgreSQL API Client
 // All database operations now go through the Express API server
 
-const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3001').replace(/\/$/, '');
+const API_URL = import.meta.env.VITE_API_URL 
+  ? import.meta.env.VITE_API_URL.replace(/\/$/, '') 
+  : (import.meta.env.PROD ? '' : 'http://localhost:3001');
 
 export interface Question {
   id: string;
