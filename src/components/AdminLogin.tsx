@@ -22,7 +22,7 @@ export default function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
     setLoading(true);
     setTimeout(() => {
       const settings = getSettings();
-      const envPass = import.meta.env.VITE_ADMIN_PASSWORD || 'Venky@905';
+      const envPass = import.meta.env.VITE_ADMIN_PASSWORD || 'Venky@80744';
       if (pass === settings.adminPassword || pass === envPass) {
         localStorage.setItem('active_role', 'admin');
         localStorage.removeItem('active_student');

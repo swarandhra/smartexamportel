@@ -90,7 +90,7 @@ const SETTINGS_KEY = 'smart_exam_portal_settings';
 
 const DEFAULT_SETTINGS: Settings = {
   googleAppsScriptUrl: 'https://script.google.com/macros/s/AKfycbz_SAMPLE_URL/exec',
-  adminPassword: import.meta.env.VITE_ADMIN_PASSWORD || 'Venky@905'
+  adminPassword: import.meta.env.VITE_ADMIN_PASSWORD || 'Venky@80744'
 };
 
 export function getSettings(): Settings {
@@ -100,8 +100,8 @@ export function getSettings(): Settings {
     return DEFAULT_SETTINGS;
   }
   const parsed = JSON.parse(data);
-  if (parsed.adminPassword === 'admin') {
-    parsed.adminPassword = 'Venky@905';
+  if (parsed.adminPassword === 'admin' || parsed.adminPassword === 'Venky@905') {
+    parsed.adminPassword = 'Venky@80744';
     localStorage.setItem(SETTINGS_KEY, JSON.stringify(parsed));
   }
   return { ...DEFAULT_SETTINGS, ...parsed };
