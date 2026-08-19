@@ -84,7 +84,7 @@ export default function Auth({ onLoginSuccess }: AuthProps) {
 
         .auth-page {
           min-height: 100vh;
-          background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+          background: radial-gradient(circle at 0% 0%, #0b1528 0%, #020617 60%, #090514 100%);
           display: flex;
           font-family: 'Inter', system-ui, sans-serif;
           position: relative;
@@ -108,8 +108,10 @@ export default function Auth({ onLoginSuccess }: AuthProps) {
         .auth-right {
           width: 480px;
           min-width: 480px;
-          background: rgba(15, 23, 42, 0.95);
-          border-left: 1px solid rgba(99, 102, 241, 0.15);
+          background: rgba(8, 12, 26, 0.7);
+          backdrop-filter: blur(24px);
+          -webkit-backdrop-filter: blur(24px);
+          border-left: 1px solid rgba(59, 130, 246, 0.15);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -117,6 +119,7 @@ export default function Auth({ onLoginSuccess }: AuthProps) {
           overflow-y: auto;
           position: relative;
           z-index: 1;
+          box-shadow: -10px 0 30px rgba(0, 0, 0, 0.4);
         }
         .auth-right-inner {
           width: 100%;
@@ -126,31 +129,54 @@ export default function Auth({ onLoginSuccess }: AuthProps) {
         /* Background decoration */
         .auth-orb-1 {
           position: absolute;
-          top: 10%;
-          left: 15%;
-          width: 400px;
-          height: 400px;
-          background: radial-gradient(circle, rgba(99,102,241,0.18) 0%, transparent 70%);
+          top: -5%;
+          left: 10%;
+          width: 450px;
+          height: 450px;
+          background: radial-gradient(circle, rgba(6, 182, 212, 0.18) 0%, transparent 70%);
           pointer-events: none;
           border-radius: 50%;
           filter: blur(40px);
+          animation: float-orb-1 20s ease-in-out infinite alternate;
         }
         .auth-orb-2 {
           position: absolute;
-          bottom: 15%;
-          right: 35%;
-          width: 300px;
-          height: 300px;
-          background: radial-gradient(circle, rgba(168,85,247,0.12) 0%, transparent 70%);
+          bottom: 5%;
+          right: 30%;
+          width: 350px;
+          height: 350px;
+          background: radial-gradient(circle, rgba(139, 92, 246, 0.16) 0%, transparent 70%);
           pointer-events: none;
           border-radius: 50%;
           filter: blur(40px);
+          animation: float-orb-2 25s ease-in-out infinite alternate;
         }
+        .auth-orb-3 {
+          position: absolute;
+          top: 40%;
+          left: 40%;
+          width: 280px;
+          height: 280px;
+          background: radial-gradient(circle, rgba(236, 72, 153, 0.08) 0%, transparent 75%);
+          pointer-events: none;
+          border-radius: 50%;
+          filter: blur(50px);
+        }
+        
+        @keyframes float-orb-1 {
+          0% { transform: translate(0, 0) scale(1); }
+          100% { transform: translate(30px, 20px) scale(1.05); }
+        }
+        @keyframes float-orb-2 {
+          0% { transform: translate(0, 0) scale(1); }
+          100% { transform: translate(-20px, -35px) scale(0.95); }
+        }
+
         .auth-grid {
           position: absolute;
           inset: 0;
-          background-image: radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px);
-          background-size: 40px 40px;
+          background-image: radial-gradient(rgba(99, 102, 241, 0.06) 1px, transparent 1px);
+          background-size: 36px 36px;
           pointer-events: none;
         }
 
@@ -164,34 +190,45 @@ export default function Auth({ onLoginSuccess }: AuthProps) {
         .auth-logo-icon {
           width: 52px;
           height: 52px;
-          background: linear-gradient(135deg, #6366f1, #8b5cf6);
+          background: linear-gradient(135deg, #2563eb, #06b6d4);
           border-radius: 14px;
           display: flex;
           align-items: center;
           justify-content: center;
-          box-shadow: 0 8px 24px rgba(99,102,241,0.4);
+          box-shadow: 0 8px 24px rgba(6, 182, 212, 0.35);
+          position: relative;
+        }
+        .auth-logo-icon::after {
+          content: '';
+          position: absolute;
+          inset: -2px;
+          border-radius: 16px;
+          background: linear-gradient(135deg, rgba(37, 99, 235, 0.4), rgba(6, 182, 212, 0.4));
+          z-index: -1;
+          filter: blur(4px);
         }
         .auth-brand-name {
-          font-size: 20px;
-          font-weight: 800;
+          font-size: 21px;
+          font-weight: 850;
           color: #f8fafc;
           letter-spacing: -0.5px;
         }
         .auth-brand-tag {
           font-size: 12px;
-          color: #6366f1;
+          color: #06b6d4;
           font-weight: 600;
+          letter-spacing: 0.5px;
         }
         .auth-hero-title {
-          font-size: 46px;
+          font-size: 48px;
           font-weight: 900;
           color: #f8fafc;
-          line-height: 1.1;
+          line-height: 1.15;
           letter-spacing: -1.5px;
           margin: 0 0 20px;
         }
         .auth-hero-title span {
-          background: linear-gradient(135deg, #818cf8, #c084fc);
+          background: linear-gradient(135deg, #60a5fa, #06b6d4);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
@@ -211,68 +248,78 @@ export default function Auth({ onLoginSuccess }: AuthProps) {
           display: flex;
           align-items: center;
           gap: 12px;
+          transition: transform 0.2s ease;
+        }
+        .auth-feature-item:hover {
+          transform: translateX(4px);
         }
         .auth-feature-dot {
           width: 36px;
           height: 36px;
-          background: rgba(99, 102, 241, 0.12);
-          border: 1px solid rgba(99, 102, 241, 0.25);
+          background: rgba(6, 182, 212, 0.08);
+          border: 1px solid rgba(6, 182, 212, 0.2);
           border-radius: 10px;
           display: flex;
           align-items: center;
           justify-content: center;
           flex-shrink: 0;
+          transition: all 0.2s;
+        }
+        .auth-feature-item:hover .auth-feature-dot {
+          background: rgba(6, 182, 212, 0.15);
+          border-color: rgba(6, 182, 212, 0.4);
+          box-shadow: 0 0 10px rgba(6, 182, 212, 0.2);
         }
         .auth-feature-text {
-          font-size: 14px;
+          font-size: 14.5px;
           color: #cbd5e1;
           font-weight: 500;
         }
 
         /* Right side form */
         .auth-form-title {
-          font-size: 24px;
+          font-size: 26px;
           font-weight: 800;
           color: #f8fafc;
           margin: 0 0 6px;
           letter-spacing: -0.5px;
         }
         .auth-form-subtitle {
-          font-size: 13.5px;
+          font-size: 14px;
           color: #64748b;
           margin: 0 0 32px;
         }
         /* Tab switcher */
         .auth-tabs {
           display: flex;
-          background: rgba(30, 41, 59, 0.8);
-          border: 1px solid rgba(51, 65, 85, 0.6);
-          border-radius: 12px;
+          background: rgba(15, 23, 42, 0.6);
+          border: 1px solid rgba(51, 65, 85, 0.5);
+          border-radius: 14px;
           padding: 4px;
           margin-bottom: 28px;
           gap: 4px;
         }
         .auth-tab {
           flex: 1;
-          padding: 9px 16px;
+          padding: 10px 16px;
           border: none;
-          border-radius: 9px;
-          font-size: 13.5px;
+          border-radius: 10px;
+          font-size: 14px;
           font-weight: 600;
           cursor: pointer;
-          transition: all 0.2s;
+          transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
           font-family: inherit;
         }
         .auth-tab-active {
-          background: linear-gradient(135deg, #6366f1, #8b5cf6);
+          background: linear-gradient(135deg, #2563eb, #06b6d4);
           color: #fff;
-          box-shadow: 0 2px 10px rgba(99,102,241,0.35);
+          box-shadow: 0 4px 15px rgba(37, 99, 235, 0.35);
         }
         .auth-tab-inactive {
           background: transparent;
           color: #64748b;
         }
-        .auth-tab-inactive:hover { color: #94a3b8; }
+        .auth-tab-inactive:hover { color: #cbd5e1; }
 
         /* Form fields */
         .auth-field {
@@ -286,26 +333,26 @@ export default function Auth({ onLoginSuccess }: AuthProps) {
         }
         .auth-label {
           display: block;
-          font-size: 12px;
+          font-size: 11.5px;
           font-weight: 600;
           color: #94a3b8;
           margin-bottom: 7px;
           text-transform: uppercase;
-          letter-spacing: 0.5px;
+          letter-spacing: 0.75px;
         }
         .auth-input-wrap {
           position: relative;
         }
         .auth-input {
           width: 100%;
-          background: rgba(30, 41, 59, 0.9);
-          border: 1.5px solid rgba(51, 65, 85, 0.7);
-          border-radius: 11px;
+          background: rgba(15, 23, 42, 0.6);
+          border: 1.5px solid rgba(51, 65, 85, 0.5);
+          border-radius: 12px;
           padding: 12px 44px 12px 14px;
           font-size: 14.5px;
-          color: #f1f5f9;
+          color: #f8fafc;
           outline: none;
-          transition: all 0.2s;
+          transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
           box-sizing: border-box;
           font-family: inherit;
         }
@@ -316,11 +363,11 @@ export default function Auth({ onLoginSuccess }: AuthProps) {
           padding-right: 14px;
         }
         .auth-input:focus {
-          border-color: rgba(99, 102, 241, 0.65);
-          background: rgba(30, 41, 59, 1);
-          box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+          border-color: #06b6d4;
+          background: rgba(15, 23, 42, 0.9);
+          box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.15);
         }
-        .auth-input::placeholder { color: #334155; }
+        .auth-input::placeholder { color: #475569; }
         .auth-input-icon {
           position: absolute;
           right: 13px;
@@ -335,19 +382,19 @@ export default function Auth({ onLoginSuccess }: AuthProps) {
           align-items: center;
           transition: color 0.2s;
         }
-        .auth-input-icon:hover { color: #a5b4fc; }
+        .auth-input-icon:hover { color: #38bdf8; }
 
         /* Divider */
         .auth-divider {
           border: none;
-          border-top: 1px solid rgba(51, 65, 85, 0.6);
+          border-top: 1px solid rgba(51, 65, 85, 0.4);
           margin: 22px 0;
         }
 
         /* Submit button */
         .auth-submit {
           width: 100%;
-          background: linear-gradient(135deg, #6366f1, #8b5cf6);
+          background: linear-gradient(135deg, #2563eb, #06b6d4);
           color: #fff;
           border: none;
           border-radius: 12px;
@@ -355,10 +402,10 @@ export default function Auth({ onLoginSuccess }: AuthProps) {
           font-size: 14.5px;
           font-weight: 700;
           cursor: pointer;
-          transition: all 0.25s;
+          transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
           font-family: inherit;
           letter-spacing: 0.2px;
-          box-shadow: 0 4px 20px rgba(99, 102, 241, 0.3);
+          box-shadow: 0 4px 20px rgba(37, 99, 235, 0.3);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -366,7 +413,8 @@ export default function Auth({ onLoginSuccess }: AuthProps) {
         }
         .auth-submit:hover:not(:disabled) {
           transform: translateY(-2px);
-          box-shadow: 0 8px 28px rgba(99, 102, 241, 0.5);
+          box-shadow: 0 8px 28px rgba(6, 182, 212, 0.45);
+          filter: brightness(1.05);
         }
         .auth-submit:active { transform: translateY(0); }
         .auth-submit:disabled { opacity: 0.65; cursor: not-allowed; }
@@ -375,13 +423,13 @@ export default function Auth({ onLoginSuccess }: AuthProps) {
         .admin-portal-hint {
           margin-top: 28px;
           padding-top: 20px;
-          border-top: 1px solid rgba(51,65,85,0.4);
+          border-top: 1px solid rgba(51,65,85,0.3);
           text-align: center;
         }
         .admin-portal-hint p {
-          font-size: 12px;
+          font-size: 12.5px;
           color: #475569;
-          margin: 0 0 8px;
+          margin: 0 0 10px;
         }
         .admin-portal-link {
           display: inline-flex;
@@ -389,18 +437,19 @@ export default function Auth({ onLoginSuccess }: AuthProps) {
           gap: 6px;
           font-size: 12.5px;
           font-weight: 600;
-          color: #6366f1;
+          color: #06b6d4;
           text-decoration: none;
           cursor: pointer;
-          transition: color 0.2s;
-          padding: 6px 14px;
-          background: rgba(99,102,241,0.08);
-          border: 1px solid rgba(99,102,241,0.2);
-          border-radius: 8px;
+          transition: all 0.2s;
+          padding: 7px 16px;
+          background: rgba(6, 182, 212, 0.06);
+          border: 1px solid rgba(6, 182, 212, 0.15);
+          border-radius: 9px;
         }
         .admin-portal-link:hover {
-          color: #a5b4fc;
-          background: rgba(99,102,241,0.14);
+          color: #38bdf8;
+          background: rgba(6, 182, 212, 0.12);
+          border-color: rgba(6, 182, 212, 0.3);
         }
 
         /* Info hint text */
@@ -439,6 +488,7 @@ export default function Auth({ onLoginSuccess }: AuthProps) {
       <div className="auth-grid" />
       <div className="auth-orb-1" />
       <div className="auth-orb-2" />
+      <div className="auth-orb-3" />
 
       {/* LEFT PANEL */}
       <div className="auth-left">

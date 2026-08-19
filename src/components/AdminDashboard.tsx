@@ -586,7 +586,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
   let pracObtained = 0, pracTotal = 0;
 
   if (selectedResult && matchingExam) {
-    matchingExam.questions.forEach(q => {
+    matchingExam.questions.forEach((q, idx) => {
       const ans = selectedResult.answers[q.id];
       let isCorrect = false;
       let partialMarks = 0;

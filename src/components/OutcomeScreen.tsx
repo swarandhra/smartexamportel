@@ -9,9 +9,9 @@ interface OutcomeScreenProps {
 export default function OutcomeScreen({ result, uploadSuccess, onDone }: OutcomeScreenProps) {
   return (
     <div className="result-screen animate-fade-in">
-      <div className="outcome-card" style={{ maxWidth: '500px', padding: '32px' }}>
-        <div className="check-icon" style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px', background: 'var(--success-light)', color: 'var(--success)' }}>
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+      <div className="outcome-card" style={{ maxWidth: '500px', margin: '40px auto', padding: '32px' }}>
+        <div className="check-icon" style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px' }}>
+          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2.5">
             <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
             <polyline points="22 4 12 14.01 9 11.01"/>
           </svg>
@@ -43,7 +43,7 @@ export default function OutcomeScreen({ result, uploadSuccess, onDone }: Outcome
           )}
         </div>
 
-        <div className="result-hidden-notice" style={{ background: 'var(--bg-input)', padding: '16px', borderRadius: '8px', border: '1px solid var(--border-color)', color: 'var(--text-muted)', fontSize: '13px', lineHeight: '1.5', marginBottom: '24px' }}>
+        <div className="result-hidden-notice" style={{ background: '#f8fafc', padding: '16px', borderRadius: '8px', border: '1px solid #e2e8f0', color: 'var(--text-muted)', fontSize: '13px', lineHeight: '1.5', marginBottom: '24px' }}>
           <p style={{ margin: 0 }}>
             <strong>Note:</strong> To maintain evaluation integrity, detailed marks and correct options are restricted. Your responses are logged securely and are available only in the teacher's dashboard.
           </p>
