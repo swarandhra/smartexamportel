@@ -126,6 +126,8 @@ async function saveResultToGoogleSheetWithoutQueueing(resultData: Result): Promi
 export function downloadResultsCSV(results: Result[], examName = 'All_Exams'): void {
   if (results.length === 0) return;
 
+  const sortedResults = [...results].sort((a, b) => b.marksObtained - a.marksObtained);
+
   const headers = [
     'Student Name', 'Roll Number', 'Exam Name', 'Date', 'Start Time', 'End Time',
     'Total Questions', 'Correct Answers', 'Wrong Answers', 'Marks Obtained', 'Total Marks',
@@ -133,7 +135,7 @@ export function downloadResultsCSV(results: Result[], examName = 'All_Exams'): v
     'Microphone Violations', 'Full Screen Violations', 'Tab Switches', 'Total Violations'
   ];
 
-  const rows = results.map(r => [
+  const rows = sortedResults.map(r => [
     r.studentName,
     r.rollNumber,
     r.examName,
