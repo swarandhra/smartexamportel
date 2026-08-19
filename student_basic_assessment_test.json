@@ -1,0 +1,608 @@
+{
+  "title": "Student Basic Assessment Test",
+  "duration": 90,
+  "passingMarks": 20,
+  "resumeWindow": 15,
+  "questions": [
+    {
+      "type": "mcq",
+      "questionText": "What does HTML stand for?",
+      "marks": 1,
+      "options": [
+        "Hyper Text Markup Language",
+        "High Text Machine Language",
+        "Hyperlinks Text Mark Language",
+        "Home Tool Markup Language"
+      ],
+      "correctOptionIndex": 0
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which tag is used to create the largest heading?",
+      "marks": 1,
+      "options": [
+        "<h6>",
+        "<head>",
+        "<h1>",
+        "<heading>"
+      ],
+      "correctOptionIndex": 2
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which tag is used to create a hyperlink?",
+      "marks": 1,
+      "options": [
+        "<link>",
+        "<a>",
+        "<href>",
+        "<url>"
+      ],
+      "correctOptionIndex": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which attribute specifies the destination of a hyperlink?",
+      "marks": 1,
+      "options": [
+        "src",
+        "link",
+        "href",
+        "url"
+      ],
+      "correctOptionIndex": 2
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which tag is used to display an image?",
+      "marks": 1,
+      "options": [
+        "<picture>",
+        "<image>",
+        "<img>",
+        "<src>"
+      ],
+      "correctOptionIndex": 2
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which attribute is used to specify the image path?",
+      "marks": 1,
+      "options": [
+        "href",
+        "src",
+        "path",
+        "link"
+      ],
+      "correctOptionIndex": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which HTML element is used to create a numbered list?",
+      "marks": 1,
+      "options": [
+        "<ul>",
+        "<li>",
+        "<ol>",
+        "<list>"
+      ],
+      "correctOptionIndex": 2
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which input type allows the user to select only one option from a group?",
+      "marks": 1,
+      "options": [
+        "checkbox",
+        "text",
+        "radio",
+        "select"
+      ],
+      "correctOptionIndex": 2
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which tag is used to create a table row?",
+      "marks": 1,
+      "options": [
+        "<td>",
+        "<th>",
+        "<tr>",
+        "<row>"
+      ],
+      "correctOptionIndex": 2
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which tag is used to create a form?",
+      "marks": 1,
+      "options": [
+        "<input>",
+        "<form>",
+        "<fieldset>",
+        "<submit>"
+      ],
+      "correctOptionIndex": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "What does CSS stand for?",
+      "marks": 1,
+      "options": [
+        "Computer Style Sheets",
+        "Cascading Style Sheets",
+        "Creative Style System",
+        "Colorful Style Sheets"
+      ],
+      "correctOptionIndex": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which property is used to change text color?",
+      "marks": 1,
+      "options": [
+        "text-color",
+        "font-color",
+        "color",
+        "text-style"
+      ],
+      "correctOptionIndex": 2
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which property is used to change the background color?",
+      "marks": 1,
+      "options": [
+        "bgcolor",
+        "background-color",
+        "background",
+        "color-background"
+      ],
+      "correctOptionIndex": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which symbol is used to select an element by its ID?",
+      "marks": 1,
+      "options": [
+        ".",
+        "#",
+        "*",
+        "@"
+      ],
+      "correctOptionIndex": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which symbol is used to select elements by class?",
+      "marks": 1,
+      "options": [
+        "#",
+        "@",
+        ".",
+        "*"
+      ],
+      "correctOptionIndex": 2
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which CSS property is used to change the font size?",
+      "marks": 1,
+      "options": [
+        "text-size",
+        "font-size",
+        "font-style",
+        "size"
+      ],
+      "correctOptionIndex": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which property is used to make text bold?",
+      "marks": 1,
+      "options": [
+        "font-weight",
+        "text-bold",
+        "font-bold",
+        "bold"
+      ],
+      "correctOptionIndex": 0
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which property controls the space inside an element?",
+      "marks": 1,
+      "options": [
+        "margin",
+        "padding",
+        "spacing",
+        "border"
+      ],
+      "correctOptionIndex": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which property controls the space outside an element?",
+      "marks": 1,
+      "options": [
+        "padding",
+        "border",
+        "margin",
+        "space"
+      ],
+      "correctOptionIndex": 2
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which CSS property is commonly used to create a flexible layout?",
+      "marks": 1,
+      "options": [
+        "display: block",
+        "display: flex",
+        "position: flex",
+        "layout: flex"
+      ],
+      "correctOptionIndex": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which keyword is used to create a class in Java?",
+      "marks": 1,
+      "options": [
+        "class",
+        "Class",
+        "new",
+        "object"
+      ],
+      "correctOptionIndex": 0
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which method is the entry point of a Java program?",
+      "marks": 1,
+      "options": [
+        "start()",
+        "run()",
+        "main()",
+        "execute()"
+      ],
+      "correctOptionIndex": 2
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which of the following is the correct main method?",
+      "marks": 1,
+      "options": [
+        "public void main()",
+        "static public main(String args)",
+        "public static void main(String[] args)",
+        "public main(String[] args)"
+      ],
+      "correctOptionIndex": 2
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which data type is used to store whole numbers?",
+      "marks": 1,
+      "options": [
+        "float",
+        "String",
+        "int",
+        "char"
+      ],
+      "correctOptionIndex": 2
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which data type stores a single character?",
+      "marks": 1,
+      "options": [
+        "String",
+        "char",
+        "character",
+        "text"
+      ],
+      "correctOptionIndex": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which keyword is used to create an object?",
+      "marks": 1,
+      "options": [
+        "class",
+        "object",
+        "create",
+        "new"
+      ],
+      "correctOptionIndex": 3
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which operator is used for comparison of two values?",
+      "marks": 1,
+      "options": [
+        "=",
+        "==",
+        "===",
+        "!="
+      ],
+      "correctOptionIndex": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "What is the output? int x = 10; System.out.println(x + 5);",
+      "marks": 1,
+      "options": [
+        "10",
+        "15",
+        "105",
+        "Error"
+      ],
+      "correctOptionIndex": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which keyword is used to inherit a class in Java?",
+      "marks": 1,
+      "options": [
+        "implements",
+        "inherits",
+        "extends",
+        "inherit"
+      ],
+      "correctOptionIndex": 2
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which collection does not allow duplicate elements?",
+      "marks": 1,
+      "options": [
+        "ArrayList",
+        "LinkedList",
+        "HashSet",
+        "Array"
+      ],
+      "correctOptionIndex": 2
+    },
+    {
+      "type": "mcq",
+      "questionText": "A number is increased by 20% and then decreased by 20%. What is the net percentage change?",
+      "marks": 1,
+      "options": [
+        "4% increase",
+        "4% decrease",
+        "No change",
+        "2% decrease"
+      ],
+      "correctOptionIndex": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "A and B can complete a work together in 12 days. A alone takes 20 days. How many days will B alone take?",
+      "marks": 1,
+      "options": [
+        "24 days",
+        "28 days",
+        "30 days",
+        "32 days"
+      ],
+      "correctOptionIndex": 2
+    },
+    {
+      "type": "mcq",
+      "questionText": "A train 180 m long crosses a pole in 9 seconds. What is its speed in km/h?",
+      "marks": 1,
+      "options": [
+        "60",
+        "72",
+        "80",
+        "90"
+      ],
+      "correctOptionIndex": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "The ratio of ages of A and B is 4:5. After 6 years, the ratio becomes 5:6. What is A's present age?",
+      "marks": 1,
+      "options": [
+        "18",
+        "20",
+        "24",
+        "30"
+      ],
+      "correctOptionIndex": 2
+    },
+    {
+      "type": "mcq",
+      "questionText": "A shopkeeper marks an item 40% above cost price and gives a 15% discount. What is his profit percentage?",
+      "marks": 1,
+      "options": [
+        "15%",
+        "19%",
+        "21%",
+        "25%"
+      ],
+      "correctOptionIndex": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "The average of 8 numbers is 24. If one number 18 is replaced by 34, what is the new average?",
+      "marks": 1,
+      "options": [
+        "25",
+        "26",
+        "27",
+        "28"
+      ],
+      "correctOptionIndex": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "A bag contains 5 red, 4 blue and 3 green balls. Two balls are drawn without replacement. What is the probability that both are red?",
+      "marks": 1,
+      "options": [
+        "5/33",
+        "5/22",
+        "10/33",
+        "20/132"
+      ],
+      "correctOptionIndex": 0
+    },
+    {
+      "type": "mcq",
+      "questionText": "Find the next number: 3, 8, 18, 38, 78, ?",
+      "marks": 1,
+      "options": [
+        "148",
+        "156",
+        "158",
+        "160"
+      ],
+      "correctOptionIndex": 2
+    },
+    {
+      "type": "mcq",
+      "questionText": "If in a code, COMPUTER is written as RFUVQNCP, following the same rule, how is PROGRAM written?",
+      "marks": 1,
+      "options": [
+        "QSPHSBN",
+        "QSPHSBM",
+        "QSPHSBO",
+        "RSPHSBN"
+      ],
+      "correctOptionIndex": 0
+    },
+    {
+      "type": "mcq",
+      "questionText": "Statements: All engineers are graduates. Some graduates are programmers. Which conclusion is definitely valid?",
+      "marks": 1,
+      "options": [
+        "All engineers are programmers",
+        "Some engineers are programmers",
+        "All programmers are engineers",
+        "All engineers are graduates"
+      ],
+      "correctOptionIndex": 3
+    },
+    {
+      "type": "mcq",
+      "questionText": "A person walks 8 km north, turns right and walks 6 km, then turns right and walks 8 km. How far is he from the starting point?",
+      "marks": 1,
+      "options": [
+        "2 km",
+        "6 km",
+        "8 km",
+        "14 km"
+      ],
+      "correctOptionIndex": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Five people P, Q, R, S and T sit in a row. P is left of Q but right of R. S is right of Q. T is between Q and S. Who sits in the middle?",
+      "marks": 1,
+      "options": [
+        "P",
+        "Q",
+        "R",
+        "T"
+      ],
+      "correctOptionIndex": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "A can do a job in 15 days and B in 10 days. They work together for 3 days. What fraction of the work remains?",
+      "marks": 1,
+      "options": [
+        "1/5",
+        "1/2",
+        "1/3",
+        "3/5"
+      ],
+      "correctOptionIndex": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "A two-digit number has digits whose sum is 11. When the digits are reversed, the new number is 27 less than the original. What is the original number?",
+      "marks": 1,
+      "options": [
+        "47",
+        "56",
+        "65",
+        "74"
+      ],
+      "correctOptionIndex": 3
+    },
+    {
+      "type": "mcq",
+      "questionText": "If 12 men can complete a work in 18 days, how many men are required to complete the same work in 8 days?",
+      "marks": 1,
+      "options": [
+        "24",
+        "27",
+        "30",
+        "32"
+      ],
+      "correctOptionIndex": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "A, B and C invest 6000, 8000 and 10000 respectively for the same period. If the total profit is 4800, what is C's share?",
+      "marks": 1,
+      "options": [
+        "1600",
+        "1800",
+        "2000",
+        "2200"
+      ],
+      "correctOptionIndex": 2
+    },
+    {
+      "type": "mcq",
+      "questionText": "A clock gains 5 minutes every hour. If it is set correctly at 8:00 AM, what time will it show at actual 8:00 PM?",
+      "marks": 1,
+      "options": [
+        "8:45 PM",
+        "9:00 PM",
+        "8:55 PM",
+        "9:05 PM"
+      ],
+      "correctOptionIndex": 2
+    },
+    {
+      "type": "mcq",
+      "questionText": "In a class, 60% passed English, 70% passed Mathematics and 50% passed both. What percentage passed at least one of the two subjects?",
+      "marks": 1,
+      "options": [
+        "80%",
+        "85%",
+        "90%",
+        "120%"
+      ],
+      "correctOptionIndex": 2
+    },
+    {
+      "type": "mcq",
+      "questionText": "Find the missing term: AZ, BY, CX, DW, ?",
+      "marks": 1,
+      "options": [
+        "EU",
+        "EV",
+        "FU",
+        "EW"
+      ],
+      "correctOptionIndex": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "A committee of 3 is to be selected from 5 men and 4 women. How many committees can be formed with exactly 2 women?",
+      "marks": 1,
+      "options": [
+        "30",
+        "40",
+        "45",
+        "50"
+      ],
+      "correctOptionIndex": 2
+    }
+  ]
+}
