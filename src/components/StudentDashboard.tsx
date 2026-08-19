@@ -64,7 +64,7 @@ export default function StudentDashboard({ student, onStartExam, onLogout }: Stu
     return (
       <div className="student-dashboard" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
         <div className="loading-state">
-          {checkingDraft ? 'Scanning active drafts in database...' : 'Syncing dashboard logs with Supabase...'}
+          {checkingDraft ? 'Scanning active drafts in database...' : 'Syncing dashboard logs...'}
         </div>
       </div>
     );

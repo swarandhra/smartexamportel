@@ -156,7 +156,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
       setResults(fetchedResults);
       setSettings(getSettings());
     } catch (e) {
-      console.error('Failed to sync admin data from Supabase:', e);
+      console.error('Failed to sync admin data from database:', e);
     } finally {
       setLoading(false);
     }
@@ -172,7 +172,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
   const handleDeleteExam = async (id: string) => {
     showConfirm(
       'Delete Exam?',
-      'Are you sure you want to permanently delete this exam from Supabase? This action cannot be undone.',
+      'Are you sure you want to permanently delete this exam from the database? This action cannot be undone.',
       async () => {
         setLoading(true);
         const res = await deleteExam(id);
@@ -412,7 +412,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
     setLoading(false);
 
     if (res.success) {
-      showToast('Exam created and scheduled in Supabase successfully!', 'success');
+      showToast('Exam created and scheduled successfully!', 'success');
       setExamTitle('');
       setCurrentQuestions([]);
       await syncData();
@@ -572,7 +572,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
   if (loading && exams.length === 0) {
     return (
       <div className="admin-workspace" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh' }}>
-        <div className="loading-state">Syncing secure database records from Supabase...</div>
+        <div className="loading-state">Syncing secure database records...</div>
       </div>
     );
   }
@@ -695,7 +695,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
             <div className="pane-header">
               <div>
                 <h2>Manage Scheduled Examinations</h2>
-                <p>Create, update, and review exams available in Supabase.</p>
+                <p>Create, update, and review exams available in the database.</p>
               </div>
               <button className="btn btn-primary" onClick={() => setActiveTab('create')}>+ Create New Exam</button>
             </div>
@@ -703,7 +703,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
             <div className="exams-grid">
               {exams.length === 0 ? (
                 <div className="empty-state card-full">
-                  <p>No exams configured in Supabase yet. Click 'Create Exam' to get started.</p>
+                  <p>No exams configured in the database yet. Click 'Create Exam' to get started.</p>
                 </div>
               ) : (
                 exams.map(exam => (
@@ -1206,7 +1206,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
           <div className="tab-pane animate-fade-in">
             <div className="pane-header">
               <div>
-                <h2>Data Results Summary (Supabase Sync)</h2>
+                <h2>Data Results Summary (Database Sync)</h2>
                 <p>Review logs, marks, cheating violations, and download sheets.</p>
               </div>
               <div className="results-toolbar">
@@ -1241,7 +1241,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                 <tbody>
                   {filteredResults.length === 0 ? (
                     <tr>
-                      <td colSpan={8} style={{ textAlign: 'center' }}>No student records found in Supabase.</td>
+                      <td colSpan={8} style={{ textAlign: 'center' }}>No student records found in the database.</td>
                     </tr>
                   ) : (
                     filteredResults.map(res => (
@@ -1391,7 +1391,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
           <div className="tab-pane animate-fade-in">
             <div className="pane-header">
               <h2>System Configuration</h2>
-              <p>Manage Apps Script webhooks, credentials, and Supabase integration status.</p>
+              <p>Manage Apps Script webhooks, credentials, and database integration status.</p>
             </div>
 
             <div className="form-container" style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '24px' }}>

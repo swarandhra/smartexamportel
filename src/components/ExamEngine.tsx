@@ -195,7 +195,7 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
     };
     
     const preventClose = (e: BeforeUnloadEvent) => {
-      const msg = 'Are you sure you want to close the exam? Your progress is saved in Supabase but violations will be logged.';
+      const msg = 'Are you sure you want to close the exam? Your progress is saved in the database but violations will be logged.';
       e.preventDefault();
       e.returnValue = msg;
       return msg;
