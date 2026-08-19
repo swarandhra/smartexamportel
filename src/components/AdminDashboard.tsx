@@ -179,7 +179,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
         if (res.success) {
           showToast('Exam deleted successfully.', 'success');
         } else {
-          showToast('Failed to delete: ' + res.error, 'error');
+          showToast('Failed to delete: ' + (res.error || 'Unknown network or database error'), 'error');
         }
         await syncData();
       },
@@ -386,6 +386,13 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
       }
     }
 
+    // Validate passing marks against actual total marks from questions
+    const computedTotalMarks = currentQuestions.reduce((sum, q) => sum + q.marks, 0);
+    if (examPassingMarks > computedTotalMarks) {
+      showToast(`Passing marks (${examPassingMarks}) exceeds total question marks (${computedTotalMarks}). Please add more questions or reduce passing marks.`, 'warning');
+      return;
+    }
+
     const exam: Exam = {
       id: 'exam_' + Date.now(),
       title,
@@ -420,8 +427,41 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
     try {
       const parsed = JSON.parse(jsonExamContent.trim());
       
+      // Handle case where user pastes a questions-only array instead of a full exam object
+      if (Array.isArray(parsed)) {
+        showModal(
+          'Invalid JSON Format',
+          'Your JSON contains only a questions array. Please wrap it in an exam object like:\n\n{\n  "title": "My Exam",\n  "duration": 90,\n  "passingMarks": 40,\n  "questions": [ ... your questions ... ]\n}',
+          'error'
+        );
+        return;
+      }
+
       if (!parsed.title || !parsed.questions || !Array.isArray(parsed.questions)) {
         showToast('Invalid JSON structure. Missing "title" or "questions" list.', 'error');
+        return;
+      }
+
+      const mappedQuestions = parsed.questions.map((q: any, idx: number) => ({
+        id: q.id || `q_json_${idx}_${Date.now()}`,
+        type: q.type || 'mcq',
+        questionText: q.questionText || 'Question text missing',
+        marks: q.marks || 1,
+        options: q.options || undefined,
+        correctOptionIndex: q.correctOptionIndex !== undefined ? q.correctOptionIndex : undefined,
+        correctAnswer: q.correctAnswer || undefined,
+        codingLanguage: q.codingLanguage || undefined,
+        codeTemplate: q.codeTemplate || undefined,
+        testCases: q.testCases || undefined
+      }));
+
+      // Compute total marks dynamically from the questions
+      const computedTotalMarks = mappedQuestions.reduce((sum: number, q: any) => sum + q.marks, 0);
+      const passingMarks = parsed.passingMarks !== undefined ? parsed.passingMarks : Math.round(computedTotalMarks * 0.4);
+
+      // Validate passing marks against total marks
+      if (passingMarks > computedTotalMarks) {
+        showToast(`Passing marks (${passingMarks}) exceeds total question marks (${computedTotalMarks}). Please reduce passing marks or add more questions.`, 'warning');
         return;
       }
 
@@ -429,25 +469,14 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
         id: parsed.id || 'exam_' + Date.now(),
         title: parsed.title,
         duration: parsed.duration || 90,
-        passingMarks: parsed.passingMarks || 40,
+        passingMarks: passingMarks,
         startDate: parsed.startDate || new Date().toISOString().slice(0, 16),
         endDate: parsed.endDate || new Date(Date.now() + 86400000).toISOString().slice(0, 16),
         shuffleQuestions: parsed.shuffleQuestions !== undefined ? parsed.shuffleQuestions : true,
         shuffleOptions: parsed.shuffleOptions !== undefined ? parsed.shuffleOptions : true,
         showResultToStudent: parsed.showResultToStudent !== undefined ? parsed.showResultToStudent : true,
         resumeWindow: parsed.resumeWindow !== undefined ? parsed.resumeWindow : 60,
-        questions: parsed.questions.map((q: any, idx: number) => ({
-          id: q.id || `q_json_${idx}_${Date.now()}`,
-          type: q.type || 'mcq',
-          questionText: q.questionText || 'Question text missing',
-          marks: q.marks || 1,
-          options: q.options || undefined,
-          correctOptionIndex: q.correctOptionIndex !== undefined ? q.correctOptionIndex : undefined,
-          correctAnswer: q.correctAnswer || undefined,
-          codingLanguage: q.codingLanguage || undefined,
-          codeTemplate: q.codeTemplate || undefined,
-          testCases: q.testCases || undefined
-        }))
+        questions: mappedQuestions
       };
 
       setLoading(true);
@@ -455,7 +484,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
       setLoading(false);
 
       if (res.success) {
-        showToast(`Bulk Exam "${exam.title}" with ${exam.questions.length} questions successfully imported!`, 'success');
+        showToast(`Exam "${exam.title}" imported! ${exam.questions.length} questions, Total: ${computedTotalMarks} marks, Pass: ${passingMarks} marks.`, 'success');
         setJsonExamContent('');
         await syncData();
         setActiveTab('exams');
@@ -606,20 +635,19 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
 
       const score = isCorrect ? q.marks : partialMarks;
 
-      if (q.type === 'coding') {
+      if (q.type === 'coding' || q.type === 'practical-java') {
         codingObtained += score;
         codingTotal += q.marks;
-      } else if (q.type.startsWith('practical')) {
+      } else if (q.type === 'practical-html') {
         pracObtained += score;
         pracTotal += q.marks;
+      } else if (q.type === 'mcq') {
+        aptObtained += score;
+        aptTotal += q.marks;
       } else {
-        if (idx < 5) {
-          aptObtained += score;
-          aptTotal += q.marks;
-        } else {
-          techObtained += score;
-          techTotal += q.marks;
-        }
+        // tf, fib, sa — Theory / Short Answer
+        techObtained += score;
+        techTotal += q.marks;
       }
     });
   }
@@ -685,6 +713,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                       <div className="exam-meta-details">
                         <div><strong>Duration:</strong> {exam.duration} Minutes</div>
                         <div><strong>Questions:</strong> {exam.questions.length}</div>
+                        <div><strong>Total Marks:</strong> {exam.questions.reduce((s: number, q: any) => s + (q.marks || 0), 0)}</div>
                         <div><strong>Passing Marks:</strong> {exam.passingMarks}</div>
                         <div><strong>Resume Window:</strong> {exam.resumeWindow} mins</div>
                         <div><strong>Start:</strong> {new Date(exam.startDate).toLocaleString()}</div>
@@ -1131,6 +1160,37 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                     </div>
                   </div>
                 </div>
+
+                {/* Live Total Marks Summary */}
+                {currentQuestions.length > 0 && (() => {
+                  const liveTotalMarks = currentQuestions.reduce((sum, q) => sum + q.marks, 0);
+                  const isOverflow = examPassingMarks > liveTotalMarks;
+                  return (
+                    <div style={{
+                      marginTop: '24px',
+                      padding: '16px 20px',
+                      borderRadius: '10px',
+                      background: isOverflow ? '#fef2f2' : '#f0fdf4',
+                      border: `1px solid ${isOverflow ? '#fecaca' : '#bbf7d0'}`,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: '16px',
+                      flexWrap: 'wrap'
+                    }}>
+                      <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap', fontSize: '14px', fontWeight: 600 }}>
+                        <span>📝 Questions: <strong>{currentQuestions.length}</strong></span>
+                        <span>📊 Total Marks: <strong>{liveTotalMarks}</strong></span>
+                        <span>✅ Passing Marks: <strong>{examPassingMarks}</strong></span>
+                      </div>
+                      {isOverflow && (
+                        <span style={{ color: '#dc2626', fontSize: '13px', fontWeight: 600 }}>
+                          ⚠️ Passing marks ({examPassingMarks}) exceeds total ({liveTotalMarks})!
+                        </span>
+                      )}
+                    </div>
+                  );
+                })()}
 
                 <div className="form-actions" style={{ marginTop: '24px', display: 'flex', gap: '12px' }}>
                   <button className="btn btn-secondary" onClick={() => setActiveTab('exams')}>Cancel</button>

@@ -128,7 +128,7 @@ export function downloadResultsCSV(results: Result[], examName = 'All_Exams'): v
 
   const headers = [
     'Student Name', 'Roll Number', 'Exam Name', 'Date', 'Start Time', 'End Time',
-    'Total Questions', 'Correct Answers', 'Wrong Answers', 'Marks Obtained',
+    'Total Questions', 'Correct Answers', 'Wrong Answers', 'Marks Obtained', 'Total Marks',
     'Percentage', 'Pass/Fail', 'Time Taken', 'Camera Violations',
     'Microphone Violations', 'Full Screen Violations', 'Tab Switches', 'Total Violations'
   ];
@@ -144,6 +144,7 @@ export function downloadResultsCSV(results: Result[], examName = 'All_Exams'): v
     r.correctAnswers,
     r.wrongAnswers,
     r.marksObtained,
+    r.totalMarks,
     r.percentage.toFixed(1) + '%',
     r.status,
     r.timeTaken,

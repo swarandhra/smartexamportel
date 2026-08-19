@@ -108,7 +108,7 @@ export default function StudentDashboard({ student, onStartExam, onLogout }: Stu
                     <div className="exam-info">
                       <h4>{exam.title}</h4>
                       <p className="meta">
-                        <span>Duration: {exam.duration} mins</span> | <span>Questions: {exam.questions.length}</span>
+                        <span>Duration: {exam.duration} mins</span> | <span>Questions: {exam.questions.length}</span> | <span>Total: {exam.questions.reduce((s: number, q: any) => s + (q.marks || 0), 0)} marks</span> | <span>Pass: {exam.passingMarks} marks</span>
                       </p>
                     </div>
                     <div className="exam-action">

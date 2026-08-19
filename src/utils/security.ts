@@ -3,12 +3,7 @@
 import type { Violation, CameraCapture } from './db';
 
 let cameraStream: MediaStream | null = null;
-let audioContext: AudioContext | null = null;
-let audioAnalyser: AnalyserNode | null = null;
-let audioStream: MediaStream | null = null;
-let audioInterval: any = null;
 let cameraInterval: any = null;
-let faceDetectionInterval: any = null;
 
 let violationLog: Violation[] = [];
 let cameraCaptures: CameraCapture[] = [];
@@ -24,28 +19,22 @@ interface SecurityConfig {
   onWarning: (type: string, count: number) => void;
   onAutoSubmit: (reason: string) => void;
   videoElement: HTMLVideoElement | null;
-  onSoundDetected?: (volume: number) => void;
-  onFaceViolation?: (type: string) => void;
 }
 
 let activeConfig: SecurityConfig = {
   onViolation: () => {},
   onWarning: () => {},
   onAutoSubmit: () => {},
-  videoElement: null,
-  onSoundDetected: () => {},
-  onFaceViolation: () => {}
+  videoElement: null
 };
 
 // Start all security listeners and camera/mic streams
-export async function startSecuritySystem(config: Partial<SecurityConfig>): Promise<{ cameraOk: boolean; micOk: boolean }> {
+export async function startSecuritySystem(config: Partial<SecurityConfig>): Promise<{ cameraOk: boolean }> {
   activeConfig = {
     onViolation: config.onViolation || (() => {}),
     onWarning: config.onWarning || (() => {}),
     onAutoSubmit: config.onAutoSubmit || (() => {}),
-    videoElement: config.videoElement || null,
-    onSoundDetected: config.onSoundDetected || (() => {}),
-    onFaceViolation: config.onFaceViolation || (() => {})
+    videoElement: config.videoElement || null
   };
   
   violationLog = [];
@@ -61,24 +50,17 @@ export async function startSecuritySystem(config: Partial<SecurityConfig>): Prom
 
   // Start devices
   const cameraOk = await initCameraMonitoring();
-  const micOk = await initMicrophoneMonitoring();
 
   // Try initiating Full Screen mode
   requestFullscreen();
 
-  return { cameraOk, micOk };
+  return { cameraOk };
 }
 
 // Stop all security listeners and release device locks
 export function stopSecuritySystem(): void {
   toggleEventBlockers(false);
   toggleWindowFocusListeners(false);
-
-  // Stop face detection
-  if (faceDetectionInterval) {
-    clearInterval(faceDetectionInterval);
-    faceDetectionInterval = null;
-  }
 
   // Stop camera
   if (cameraStream) {
@@ -91,20 +73,6 @@ export function stopSecuritySystem(): void {
   if (cameraInterval) {
     clearInterval(cameraInterval);
     cameraInterval = null;
-  }
-
-  // Stop microphone
-  if (audioStream) {
-    audioStream.getTracks().forEach(track => track.stop());
-    audioStream = null;
-  }
-  if (audioContext) {
-    audioContext.close();
-    audioContext = null;
-  }
-  if (audioInterval) {
-    clearInterval(audioInterval);
-    audioInterval = null;
   }
 }
 
@@ -218,11 +186,6 @@ async function initCameraMonitoring(): Promise<boolean> {
     // Take an initial snapshot immediately
     setTimeout(() => captureSnapshot(), 2000);
 
-    // Start face detection after a short delay (allow video to stabilize)
-    setTimeout(() => {
-      startFaceDetection();
-    }, 3000);
-
     return true;
   } catch (error: any) {
     console.error('Camera setup error:', error);
@@ -230,204 +193,10 @@ async function initCameraMonitoring(): Promise<boolean> {
   }
 }
 
-// Pixel-based face presence and motion analysis + phone detection heuristic
-function startFaceDetection(): void {
-  if (!activeConfig.videoElement) return;
-
-  const video = activeConfig.videoElement;
-  const canvas = document.createElement('canvas');
-  canvas.width = 160;
-  canvas.height = 120;
-  const ctx = canvas.getContext('2d', { willReadFrequently: true });
-
-  if (!ctx) return;
-
-  let prevPixels: Uint8ClampedArray | null = null;
-  let stableFrameCount = 0;
-  let noFaceStreak = 0;
-  
-  // We use brightness histogram to detect face-like skin tone regions
-  // and motion delta to detect face movement / complete absence
-
-  faceDetectionInterval = setInterval(() => {
-    if (!video || video.readyState < 2) return;
-
-    try {
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      const pixels = imageData.data;
-
-      // --- Skin tone pixel counting for face presence detection ---
-      let skinPixelCount = 0;
-      let brightRegionCount = 0;
-      let darkRegionCount = 0;
-      let totalPixels = canvas.width * canvas.height;
-
-      for (let i = 0; i < pixels.length; i += 4) {
-        const r = pixels[i];
-        const g = pixels[i + 1];
-        const b = pixels[i + 2];
-
-        // Skin tone heuristic (covers various ethnicities)
-        const isSkinTone = (
-          r > 95 && g > 40 && b > 20 &&
-          r > g && r > b &&
-          Math.abs(r - g) > 15 &&
-          r - b > 15 &&
-          r < 250
-        );
-
-        if (isSkinTone) skinPixelCount++;
-
-        const brightness = (r + g + b) / 3;
-        if (brightness > 180) brightRegionCount++;
-        if (brightness < 30) darkRegionCount++;
-      }
-
-      const skinRatio = skinPixelCount / totalPixels;
-      const brightRatio = brightRegionCount / totalPixels;
-      const darkRatio = darkRegionCount / totalPixels;
-
-      // --- Face presence check ---
-      // If < 1.5% skin pixels, likely no face visible
-      const hasFace = skinRatio > 0.015;
-
-      if (!hasFace) {
-        noFaceStreak++;
-        if (noFaceStreak >= 4) { // 4 consecutive detections (~12s with 3s interval)
-          // Log for admin but do NOT call logViolation (would count as a violation)
-          const cameraLogEntry: Violation = {
-            time: new Date().toLocaleTimeString(),
-            type: 'No Face Detected',
-            warningNumber: null,
-            details: 'The student\'s face is not visible in the camera frame.'
-          };
-          violationLog.push(cameraLogEntry);
-          if (activeConfig.onFaceViolation) activeConfig.onFaceViolation('No Face Detected');
-          noFaceStreak = 0;
-        }
-      } else {
-        noFaceStreak = 0;
-      }
-
-      // --- Motion / Face movement detection ---
-      if (prevPixels) {
-        let motionSum = 0;
-        for (let i = 0; i < pixels.length; i += 4) {
-          motionSum += Math.abs(pixels[i] - prevPixels[i]);
-          motionSum += Math.abs(pixels[i + 1] - prevPixels[i + 1]);
-          motionSum += Math.abs(pixels[i + 2] - prevPixels[i + 2]);
-        }
-        const motionScore = motionSum / (totalPixels * 3);
-
-        // Very high motion = excessive movement, not stationary
-        if (motionScore > 35 && hasFace) {
-          stableFrameCount = 0;
-          // Log for admin only — not counted as a violation
-          const moveLogEntry: Violation = {
-            time: new Date().toLocaleTimeString(),
-            type: 'Excessive Face Movement',
-            warningNumber: null,
-            details: 'Unusual or excessive head movement detected.'
-          };
-          violationLog.push(moveLogEntry);
-          if (activeConfig.onFaceViolation) activeConfig.onFaceViolation('Excessive Face Movement');
-        } else {
-          stableFrameCount++;
-        }
-      }
-
-      // --- Multiple faces heuristic ---
-      // If skin ratio is abnormally high (>25%), suspect multiple people
-      if (hasFace && skinRatio > 0.25) {
-        // Disabled real Multiple Faces detection to rely on fake timer-based popup
-        // if (activeConfig.onFaceViolation) activeConfig.onFaceViolation('Multiple Faces Detected');
-      }
-
-      // --- Phone detection heuristic ---
-      // Phones in front of face tend to create large dark rectangular blocks
-      // combined with sudden reflection bright spots
-      if (hasFace && darkRatio > 0.2 && brightRatio > 0.15 && skinRatio < 0.08) {
-        // Removed logViolation for Phone Detected to treat it as a warning
-        if (activeConfig.onFaceViolation) activeConfig.onFaceViolation('Phone Detected');
-      }
-
-      prevPixels = new Uint8ClampedArray(pixels);
-    } catch (e) {
-      // Canvas tainted or video not ready
-      console.warn('Face detection frame error:', e);
-    }
-  }, 3000); // Run every 3 seconds
-}
-
 // Capture small base64 JPEG from video stream
 function captureSnapshot(): void {
   // Disabled to save database storage space as per requirements
   return;
-}
-
-// 2. Microphone Monitoring
-async function initMicrophoneMonitoring(): Promise<boolean> {
-  const micConstraints: MediaStreamConstraints[] = [
-    { audio: { echoCancellation: true, noiseSuppression: false } },
-    { audio: true }
-  ];
-
-  for (const constraints of micConstraints) {
-    try {
-      audioStream = await navigator.mediaDevices.getUserMedia(constraints);
-      break;
-    } catch (err) {
-      audioStream = null;
-    }
-  }
-
-  if (!audioStream) {
-    console.warn('Microphone not available on this device.');
-    return false;
-  }
-
-  try {
-    const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
-    audioContext = new AudioCtx();
-    const source = audioContext.createMediaStreamSource(audioStream);
-    audioAnalyser = audioContext.createAnalyser();
-    audioAnalyser.fftSize = 512;
-    source.connect(audioAnalyser);
-
-    const bufferLength = audioAnalyser.frequencyBinCount;
-    const dataArray = new Uint8Array(bufferLength);
-
-    let highNoiseDuration = 0;
-    
-    audioInterval = setInterval(() => {
-      if (!audioAnalyser) return;
-      audioAnalyser.getByteFrequencyData(dataArray);
-      
-      let sum = 0;
-      for (let i = 0; i < bufferLength; i++) {
-        sum += dataArray[i];
-      }
-      const averageVolume = sum / bufferLength;
-
-      if (averageVolume > 35) {
-        highNoiseDuration += 1;
-        if (highNoiseDuration >= 2) {
-          if (activeConfig.onSoundDetected) {
-            activeConfig.onSoundDetected(averageVolume);
-          }
-          highNoiseDuration = 0;
-        }
-      } else {
-        highNoiseDuration = Math.max(0, highNoiseDuration - 1);
-      }
-    }, 1000);
-
-    return true;
-  } catch (error: any) {
-    console.error('Microphone setup error:', error);
-    return false;
-  }
 }
 
 // 3. Focus & Visibility Listeners

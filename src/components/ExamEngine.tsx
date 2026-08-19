@@ -40,30 +40,13 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
   const violationBannerTimerRef = useRef<any>(null);
   const MAX_VIOLATIONS = 8;
 
-  // Sound & Face proctoring popup states
-  const [showSoundPopup, setShowSoundPopup] = useState(false);
-  const [showFacePopup, setShowFacePopup] = useState(false);
-  const [facePopupType, setFacePopupType] = useState('');
-  const soundPopupTimerRef = useRef<any>(null);
-  const faceWarningTimerRef = useRef<any>(null);
+  // Sound & Face proctoring popup states removed
 
   // Active question instances
   const [questions, setQuestions] = useState<Question[]>([]);
   const [visitedQuestions, setVisitedQuestions] = useState<Record<string, boolean>>({});
   
-  // Fake timer for multiple faces warnings (every exam.duration / 10)
-  useEffect(() => {
-    if (!exam.duration || exam.duration <= 0) return;
-    const intervalMs = (exam.duration * 60 * 1000) / 10;
-    const intervalId = setInterval(() => {
-      setFacePopupType('Multiple Faces Detected');
-      setShowFacePopup(true);
-      if (faceWarningTimerRef.current) clearTimeout(faceWarningTimerRef.current);
-      faceWarningTimerRef.current = setTimeout(() => setShowFacePopup(false), 4000);
-    }, intervalMs);
-    
-    return () => clearInterval(intervalId);
-  }, [exam.duration]);
+
 
   // Track visited questions
   useEffect(() => {
@@ -248,19 +231,6 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
               'error'
             );
             handleAutoSubmit();
-          },
-          onSoundDetected: (_volume) => {
-            setShowSoundPopup(true);
-            if (soundPopupTimerRef.current) clearTimeout(soundPopupTimerRef.current);
-            soundPopupTimerRef.current = setTimeout(() => setShowSoundPopup(false), 4000);
-          },
-          onFaceViolation: (type) => {
-            setFacePopupType(type);
-            setShowFacePopup(true);
-            if (type === 'Multiple Faces Detected' || type === 'Phone Detected') {
-              if (faceWarningTimerRef.current) clearTimeout(faceWarningTimerRef.current);
-              faceWarningTimerRef.current = setTimeout(() => setShowFacePopup(false), 4000);
-            }
           }
         });
       }
@@ -376,16 +346,36 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
 
   const handleRunHtmlCode = () => {
     if (activeQ && activeQ.type === 'practical-html' && iframeRef.current) {
+      showToast('Rendering HTML...', 'info');
       const doc = iframeRef.current.contentDocument;
       if (doc) {
         doc.open();
         doc.write(answers[activeQ.id] || activeQ.codeTemplate || '');
         doc.close();
       }
+      updateResultDraft(
+        resultIdRef.current,
+        { ...answers, [activeQ.id]: answers[activeQ.id] || activeQ.codeTemplate || '' },
+        getViolationLog(),
+        getCameraCaptures()
+      ).catch(err => console.error("Draft update failed:", err));
+      
+      showToast('HTML rendered successfully', 'success');
     }
   };
 
   const handleSubmitCode = (q: Question) => {
+    showConfirm(
+      'Submit Code?',
+      'Are you sure you want to save and submit this code?',
+      () => processCodeSubmission(q),
+      undefined,
+      'Submit',
+      'Cancel'
+    );
+  };
+
+  const processCodeSubmission = (q: Question) => {
     if (q.type === 'practical-html') {
       const userHtml = answers[q.id] || q.codeTemplate || '';
       const passed = userHtml.includes('<form') && userHtml.includes('<input') && userHtml.length > (q.codeTemplate?.length || 0) + 15;
@@ -393,8 +383,10 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
       setSubmissionFeedback(prev => ({
         ...prev,
         [q.id]: {
-          passed: passed,
-          message: `✓ HTML Code Saved Successfully!`
+          passed,
+          message: passed 
+            ? `✓ HTML Code Submitted! Required elements found.` 
+            : `✗ HTML Code Submitted. Missing <form> or <input> elements. Please check your implementation.`
         }
       }));
       
@@ -440,7 +432,9 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
       ...prev,
       [q.id]: {
         passed: passedAll,
-        message: `✓ Code Saved Successfully! (Passed ${passCount}/${totalCases} test cases)`
+        message: passedAll 
+          ? `✓ Code Submitted! Passed all ${passCount}/${totalCases} test cases.` 
+          : `✗ Code Submitted. Passed ${passCount}/${totalCases} test cases. Adjust your logic and submit again.`
       }
     }));
     
@@ -456,36 +450,49 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
   const handleRunCode = (q: Question) => {
 
     if ((q.type !== 'coding' && q.type !== 'practical-java') || !q.testCases) return;
-    const userCode = answers[q.id] || q.codeTemplate || '';
+    
+    showToast('Executing code...', 'info');
 
-    let transpiledJS = '';
-    let transpileError = '';
-    try {
-      transpiledJS = transpileJavaToJS(userCode);
-    } catch (e: any) {
-      transpileError = e.message;
-    }
+    setTimeout(() => {
+      const userCode = answers[q.id] || q.codeTemplate || '';
 
-    const methodName = extractMethodName(transpiledJS);
+      updateResultDraft(
+        resultIdRef.current,
+        { ...answers, [q.id]: userCode },
+        getViolationLog(),
+        getCameraCaptures()
+      ).catch(err => console.error("Draft update failed:", err));
 
-    const results = q.testCases.map((tc) => {
-      if (transpileError) {
-        return { input: tc.input, expected: tc.expected, actual: 'Compilation Error: ' + transpileError, passed: false };
+      let transpiledJS = '';
+      let transpileError = '';
+      try {
+        transpiledJS = transpileJavaToJS(userCode);
+      } catch (e: any) {
+        transpileError = e.message;
       }
-      if (!methodName) {
-        return { input: tc.input, expected: tc.expected, actual: 'Error: Could not detect method name. Make sure your class has a public method.', passed: false };
-      }
-      const { actual, error } = runTestCase(transpiledJS, methodName, tc.input);
-      if (error) {
-        return { input: tc.input, expected: tc.expected, actual: 'Runtime Error: ' + error, passed: false };
-      }
-      // Parse both actual and expected for numeric comparison
-      let actualClean = actual.replace(/"/g, '').trim();
-      const passed = actualClean.replace(/\s+/g, '') === tc.expected.trim().replace(/\s+/g, '');
-      return { input: tc.input, expected: tc.expected, actual: actualClean, passed };
-    });
 
-    setSandboxOutputs(prev => ({ ...prev, [q.id]: results }));
+      const methodName = extractMethodName(transpiledJS);
+
+      const results = q.testCases!.map((tc) => {
+        if (transpileError) {
+          return { input: tc.input, expected: tc.expected, actual: 'Compilation Error: ' + transpileError, passed: false };
+        }
+        if (!methodName) {
+          return { input: tc.input, expected: tc.expected, actual: 'Error: Could not detect method name. Make sure your class has a public method.', passed: false };
+        }
+        const { actual, error } = runTestCase(transpiledJS, methodName, tc.input);
+        if (error) {
+          return { input: tc.input, expected: tc.expected, actual: 'Runtime Error: ' + error, passed: false };
+        }
+        // Parse both actual and expected for numeric comparison
+        let actualClean = actual.replace(/"/g, '').trim();
+        const passed = actualClean.replace(/\s+/g, '') === tc.expected.trim().replace(/\s+/g, '');
+        return { input: tc.input, expected: tc.expected, actual: actualClean, passed };
+      });
+
+      setSandboxOutputs(prev => ({ ...prev, [q.id]: results }));
+      showToast('Code execution completed', 'success');
+    }, 50);
   };
 
 
@@ -1353,181 +1360,11 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
         </div>
       )}
 
-      {/* Sound Detected Popup - Non-violation, informational only */}
-
-      {showSoundPopup && (
-        <div style={{
-          position: 'fixed',
-          top: '80px',
-          left: '24px',
-          zIndex: 99999,
-          background: 'rgba(30, 41, 59, 0.97)',
-          border: '1px solid #f59e0b',
-          borderRadius: '14px',
-          padding: '16px 20px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '14px',
-          boxShadow: '0 8px 32px rgba(245, 158, 11, 0.25), 0 2px 8px rgba(0,0,0,0.4)',
-          backdropFilter: 'blur(12px)',
-          animation: 'toast-slide-in-left 0.3s ease-out',
-          maxWidth: '320px',
-          color: '#f8fafc',
-          fontFamily: 'system-ui, -apple-system, sans-serif'
-        }}>
-          <div style={{
-            width: '42px', height: '42px',
-            background: 'rgba(245, 158, 11, 0.15)',
-            border: '2px solid #f59e0b',
-            borderRadius: '50%',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            flexShrink: 0,
-            animation: 'sound-pulse 1s infinite'
-          }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2.5">
-              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
-              <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
-              <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
-            </svg>
-          </div>
-          <div>
-            <div style={{ fontWeight: '700', fontSize: '13.5px', color: '#fbbf24', marginBottom: '3px' }}>
-              🔊 Sound Detected
-            </div>
-            <div style={{ fontSize: '12px', color: '#94a3b8', lineHeight: '1.4' }}>
-              Noise detected in your environment. Silence is required during the exam.
-            </div>
-          </div>
-          <button
-            onClick={() => setShowSoundPopup(false)}
-            style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', fontSize: '18px', lineHeight: 1, padding: '0 4px', flexShrink: 0 }}
-          >×</button>
-        </div>
-      )}
-
-      {/* Face Violation Popup - Non-blocking left toast */}
-      {showFacePopup && (facePopupType === 'No Face Detected' || facePopupType === 'Excessive Face Movement') && (
-        <div style={{
-          position: 'fixed',
-          top: showViolationBanner ? '230px' : showSoundPopup ? '150px' : '80px',
-          left: '24px',
-          zIndex: 99999,
-          background: 'rgba(30, 41, 59, 0.97)',
-          border: '1px solid #ef4444',
-          borderRadius: '14px',
-          padding: '16px 20px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '14px',
-          boxShadow: '0 8px 32px rgba(239, 68, 68, 0.25), 0 2px 8px rgba(0,0,0,0.4)',
-          backdropFilter: 'blur(12px)',
-          animation: 'toast-slide-in-left 0.3s ease-out',
-          maxWidth: '320px',
-          color: '#f8fafc',
-          fontFamily: 'system-ui, -apple-system, sans-serif'
-        }}>
-          <div style={{
-            width: '42px', height: '42px',
-            background: 'rgba(239, 68, 68, 0.15)',
-            border: '2px solid #ef4444',
-            borderRadius: '50%',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            flexShrink: 0,
-            animation: 'sound-pulse 1s infinite'
-          }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2.5">
-              {facePopupType === 'No Face Detected' ? (
-                <><circle cx="12" cy="8" r="5"/><path d="M3 21v-2a7 7 0 0 1 7-7h4a7 7 0 0 1 7 7v2"/><line x1="2" y1="2" x2="22" y2="22"/></>
-              ) : (
-                <><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></>
-              )}
-            </svg>
-          </div>
-          <div>
-            <div style={{ fontWeight: '700', fontSize: '13.5px', color: '#f87171', marginBottom: '3px' }}>
-              🚨 {facePopupType}
-            </div>
-            <div style={{ fontSize: '12px', color: '#94a3b8', lineHeight: '1.4' }}>
-              {facePopupType === 'No Face Detected' ? 'Face not visible.' : 'Unusual head movement.'} Violation recorded.
-            </div>
-          </div>
-          <button
-            onClick={() => setShowFacePopup(false)}
-            style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', fontSize: '18px', lineHeight: 1, padding: '0 4px', flexShrink: 0 }}
-          >×</button>
-        </div>
-      )}
-
-      {/* Face Warning Popup - Top Left, like Sound */}
-      {showFacePopup && (facePopupType === 'Multiple Faces Detected' || facePopupType === 'Phone Detected') && (
-        <div style={{
-          position: 'fixed',
-          top: showViolationBanner ? '230px' : showSoundPopup ? '150px' : '80px',
-          left: '24px',
-          zIndex: 99999,
-          background: 'rgba(30, 41, 59, 0.97)',
-          border: '1px solid #f59e0b',
-          borderRadius: '14px',
-          padding: '16px 20px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '14px',
-          boxShadow: '0 8px 32px rgba(245, 158, 11, 0.25), 0 2px 8px rgba(0,0,0,0.4)',
-          backdropFilter: 'blur(12px)',
-          animation: 'toast-slide-in-left 0.3s ease-out',
-          maxWidth: '320px',
-          color: '#f8fafc',
-          fontFamily: 'system-ui, -apple-system, sans-serif'
-        }}>
-          <div style={{
-            width: '42px', height: '42px',
-            background: 'rgba(245, 158, 11, 0.15)',
-            border: '2px solid #f59e0b',
-            borderRadius: '50%',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            flexShrink: 0,
-            animation: 'sound-pulse 1s infinite'
-          }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2.5">
-              {facePopupType === 'Phone Detected' ? (
-                <><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></>
-              ) : (
-                <><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></>
-              )}
-            </svg>
-          </div>
-          <div>
-            <div style={{ fontWeight: '700', fontSize: '13.5px', color: '#fbbf24', marginBottom: '3px' }}>
-              ⚠️ {facePopupType}
-            </div>
-            <div style={{ fontSize: '12px', color: '#94a3b8', lineHeight: '1.4' }}>
-              {facePopupType === 'Phone Detected' ? 'A phone or device has been detected in the camera frame.' : 'More than one person is visible in the camera frame.'}
-            </div>
-          </div>
-          <button
-            onClick={() => setShowFacePopup(false)}
-            style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', fontSize: '18px', lineHeight: 1, padding: '0 4px', flexShrink: 0 }}
-          >×</button>
-        </div>
-      )}
-
-      {/* Add CSS animations for face popup and sound pulse */}
+      {/* Add CSS animations */}
       <style>{`
-        @keyframes sound-pulse {
-          0%, 100% { box-shadow: 0 0 0 0 rgba(245,158,11,0.4); }
-          50% { box-shadow: 0 0 0 8px rgba(245,158,11,0); }
-        }
         @keyframes modal-scale-in {
           from { transform: translate(-50%, -50%) scale(0.9); opacity: 0; }
           to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-        }
-        @keyframes toast-slide-in {
-          from { transform: translateX(120%); opacity: 0; }
-          to { transform: translateX(0); opacity: 1; }
-        }
-        @keyframes toast-slide-in-left {
-          from { transform: translateX(-120%); opacity: 0; }
-          to { transform: translateX(0); opacity: 1; }
         }
       `}</style>
     </div>
