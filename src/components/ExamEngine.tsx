@@ -393,7 +393,7 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
       setSubmissionFeedback(prev => ({
         ...prev,
         [q.id]: {
-          passed: true,
+          passed: passed,
           message: `✓ HTML Code Saved Successfully!`
         }
       }));
@@ -439,7 +439,7 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
     setSubmissionFeedback(prev => ({
       ...prev,
       [q.id]: {
-        passed: true,
+        passed: passedAll,
         message: `✓ Code Saved Successfully! (Passed ${passCount}/${totalCases} test cases)`
       }
     }));

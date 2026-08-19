@@ -93,10 +93,7 @@ export default function StudentDashboard({ student, onStartExam, onLogout }: Stu
         {/* Available Exams */}
         <div className="dashboard-card animate-slide-up">
           <div className="card-header">
-            <h3>
-
-              Available Examinations
-            </h3>
+            <h3>Available Examinations</h3>
           </div>
           <div className="exams-list">
             {availableExams.length === 0 ? (
@@ -111,8 +108,7 @@ export default function StudentDashboard({ student, onStartExam, onLogout }: Stu
                     <div className="exam-info">
                       <h4>{exam.title}</h4>
                       <p className="meta">
-                        <span>Duration: {exam.duration} mins</span> |
-                        <span>Questions: {exam.questions.length}</span>
+                        <span>Duration: {exam.duration} mins</span> | <span>Questions: {exam.questions.length}</span>
                       </p>
                     </div>
                     <div className="exam-action">
@@ -131,7 +127,33 @@ export default function StudentDashboard({ student, onStartExam, onLogout }: Stu
           </div>
         </div>
 
-
+        {/* Past Assessment Results */}
+        <div className="dashboard-card animate-slide-up" style={{ animationDelay: '0.1s' }}>
+          <div className="card-header">
+            <h3>Past Assessments</h3>
+          </div>
+          <div className="results-list">
+            {studentResults.length === 0 ? (
+              <div className="empty-state">
+                <p>No past assessments found.</p>
+              </div>
+            ) : (
+              studentResults.map(result => (
+                <div key={result.id} className="result-item">
+                  <div className="result-meta">
+                    <h4>{result.examName}</h4>
+                    <p className="meta">
+                      <span>{result.date}</span> | <span>Score: {result.marksObtained}/{result.totalMarks}</span>
+                    </p>
+                  </div>
+                  <span className={`score-pill ${result.status.toLowerCase()}`}>
+                    {result.status}
+                  </span>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
