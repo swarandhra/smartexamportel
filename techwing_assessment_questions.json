@@ -1,7 +1,7 @@
 {
   "title": " GGU Technical Assigenment 1",
   "duration": 120,
-  "passingMarks": 40,
+  "passingMarks": 30,
   "resumeWindow": 60,
   "questions": [
     {
@@ -929,7 +929,7 @@
           "expected": "avaJ"
         }
       ],
-      "marks": 10,
+      "marks": 1,
       "id": "q_71"
     },
     {
@@ -947,7 +947,7 @@
           "expected": "false"
         }
       ],
-      "marks": 10,
+      "marks": 1,
       "id": "q_72"
     },
     {
@@ -965,7 +965,7 @@
           "expected": "-1"
         }
       ],
-      "marks": 10,
+      "marks": 1,
       "id": "q_73"
     },
     {
@@ -983,7 +983,7 @@
           "expected": "1"
         }
       ],
-      "marks": 10,
+      "marks": 1,
       "id": "q_74"
     }
   ]

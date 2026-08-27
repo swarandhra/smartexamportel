@@ -19,19 +19,17 @@ export function transpileJavaToJS(javaCode: string): string {
   // 4. Remove access modifiers
   js = js.replace(/\b(public|private|protected|final|static)\s+/g, '');
 
-  // 5. Remove Java type annotations on method parameters
-  // e.g. "int[] arr" -> "arr", "int n" -> "n", "String s" -> "s"
-  js = js.replace(/\b(int|long|double|float|boolean|char|String|Integer|Long|Double|Float|Boolean|void)\s*(?:\[\s*\])?\s+(\w+)/g, '$2');
-
-  // 6. Convert Java method declarations to JS functions
-  // After step 4+5, methods look like: "methodName(params) {"  — wrap in function
-  // Match identifiers followed by ( ... ) { that don't start with "if|for|while|else|switch"
-  js = js.replace(/^(\s*)(\w+)\s*\(([^)]*)\)\s*\{/gm, (match, indent, name, params) => {
-    const controlFlow = ['if', 'for', 'while', 'else', 'switch', 'catch', 'try', 'do'];
-    if (controlFlow.includes(name)) return match; // keep as-is
-    // Clean params: already cleaned in step 5, just trim
-    const cleanParams = params.split(',').map((p: string) => p.trim()).filter(Boolean).join(', ');
-    return `${indent}function ${name}(${cleanParams}) {`;
+  // 5. Remove Java type annotations on method parameters and convert method declarations to JS functions
+  js = js.replace(/\b(int|long|double|float|boolean|char|String|Integer|Long|Double|Float|Boolean|void)\s*(?:\[\s*\])?\s+(\w+)\s*\(([^)]*)\)\s*\{/g, (match, returnType, methodName, params) => {
+    // Clean params: String str -> str, int[] arr -> arr
+    const cleanParams = params.split(',')
+      .map((p: string) => {
+        const parts = p.trim().split(/\s+/);
+        return parts[parts.length - 1];
+      })
+      .filter(Boolean)
+      .join(', ');
+    return `function ${methodName}(${cleanParams}) {`;
   });
 
   // 7. Variable declarations: "int x = 0;" -> "let x = 0;"
@@ -67,6 +65,12 @@ export function transpileJavaToJS(javaCode: string): string {
 
   // 15. toString() removal
   js = js.replace(/\.toString\(\)/g, '.toString()'); // keep as-is
+
+  // 16. toCharArray() conversion -> .split('')
+  js = js.replace(/\.toCharArray\s*\(\s*\)/g, ".split('')");
+
+  // 17. new String(charArray) conversion -> charArray.join('')
+  js = js.replace(/new\s+String\s*\(\s*(\w+)\s*\)/g, "$1.join('')");
 
   return js.trim();
 }
