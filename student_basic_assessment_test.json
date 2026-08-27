@@ -1,606 +1,126 @@
 {
-  "title": "Student Basic Assessment Test",
-  "duration": 90,
-  "passingMarks": 20,
-  "resumeWindow": 15,
+  "title": "Comprehensive Reading Comprehension Assessment",
+  "duration": 30,
+  "passingMarks": 4,
+  "resumeWindow": 10,
   "questions": [
     {
       "type": "mcq",
-      "questionText": "What does HTML stand for?",
+      "questionText": "Passage:\nThe water cycle is a continuous process that circulates water throughout the Earth's atmosphere, land, and oceans. Powered by the sun's heat, liquid water on the Earth's surface evaporates into water vapor. This warm, light vapor rises into the atmosphere, where it cools and condenses to form clouds. When these clouds become saturated, precipitation occurs in the form of rain, snow, or sleet, returning water back to the ground to restart the cycle.\n\n---\n\nAccording to the passage, what power source drives the evaporation phase of the water cycle?",
       "marks": 1,
       "options": [
-        "Hyper Text Markup Language",
-        "High Text Machine Language",
-        "Hyperlinks Text Mark Language",
-        "Home Tool Markup Language"
-      ],
-      "correctOptionIndex": 0
-    },
-    {
-      "type": "mcq",
-      "questionText": "Which tag is used to create the largest heading?",
-      "marks": 1,
-      "options": [
-        "<h6>",
-        "<head>",
-        "<h1>",
-        "<heading>"
+        "Earth's gravitational pull",
+        "Ocean currents",
+        "The sun's heat",
+        "Atmospheric wind"
       ],
       "correctOptionIndex": 2
     },
     {
       "type": "mcq",
-      "questionText": "Which tag is used to create a hyperlink?",
+      "questionText": "Passage:\nPhotosynthesis is the biological process by which green plants, algae, and some bacteria convert light energy into chemical energy. Using sunlight absorbed by chlorophyll, plants combine water and carbon dioxide to produce glucose (sugar) and oxygen. Glucose serves as the primary energy source for the plant's growth, while oxygen is released into the atmosphere as a byproduct, supporting aerobic life on Earth.\n\n---\n\nWhat gaseous byproduct is released by plants into the atmosphere during photosynthesis?",
       "marks": 1,
       "options": [
-        "<link>",
-        "<a>",
-        "<href>",
-        "<url>"
-      ],
-      "correctOptionIndex": 1
-    },
-    {
-      "type": "mcq",
-      "questionText": "Which attribute specifies the destination of a hyperlink?",
-      "marks": 1,
-      "options": [
-        "src",
-        "link",
-        "href",
-        "url"
+        "Carbon dioxide",
+        "Nitrogen",
+        "Oxygen",
+        "Hydrogen"
       ],
       "correctOptionIndex": 2
     },
     {
       "type": "mcq",
-      "questionText": "Which tag is used to display an image?",
+      "questionText": "Passage:\nThe Great Barrier Reef, located off the coast of Australia, is the world's largest coral reef system. It hosts thousands of species of marine life, making it a critical biodiversity hotspot. However, rising ocean temperatures due to climate change have triggered widespread coral bleaching, where corals expel the colorful algae living in their tissues. Without these algae, the coral loses its primary source of food and becomes highly vulnerable to disease and death.\n\n---\n\nWhat primary cause of coral bleaching in the Great Barrier Reef is identified in the passage?",
       "marks": 1,
       "options": [
-        "<picture>",
-        "<image>",
-        "<img>",
-        "<src>"
+        "Toxic chemical spills",
+        "Rising ocean temperatures",
+        "Overfishing by commercial boats",
+        "An overpopulation of predatory starfish"
+      ],
+      "correctOptionIndex": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Passage:\nIn the mid-15th century, Johannes Gutenberg introduced the movable type printing press to Europe, sparking a major communications revolution. Prior to this invention, books had to be copied by hand, a laborious process that made them rare and expensive. Gutenberg's press allowed for the rapid, mass production of texts. This dramatic reduction in cost made books accessible to a wider audience, accelerating the spread of literacy, scientific discovery, and religious reform.\n\n---\n\nHow did Gutenberg's printing press influence European society in the 15th century?",
+      "marks": 1,
+      "options": [
+        "It restricted books to only the wealthiest classes.",
+        "It led to the decline of local languages.",
+        "It accelerated the spread of literacy and scientific discovery.",
+        "It banned the copying of religious texts."
       ],
       "correctOptionIndex": 2
     },
     {
       "type": "mcq",
-      "questionText": "Which attribute is used to specify the image path?",
+      "questionText": "Passage:\nHoneybees use an extraordinary method of communication known as the 'waggle dance' to share information about the location of food resources with their hive mates. By performing a series of figure-eight movements, a foraging bee communicates both the direction of the food relative to the sun and its distance from the hive. The duration of the waggle phase of the dance directly correlates to the distance of the food source, allowing other bees to locate it accurately.\n\n---\n\nHow do honeybees communicate the distance of a food source to their hive mates?",
       "marks": 1,
       "options": [
-        "href",
-        "src",
-        "path",
-        "link"
+        "By the high-pitched buzz of their wings",
+        "By the duration of the waggle phase of their dance",
+        "By releasing unique pheromone scents",
+        "By tapping their antennae against other bees"
       ],
       "correctOptionIndex": 1
     },
     {
       "type": "mcq",
-      "questionText": "Which HTML element is used to create a numbered list?",
+      "questionText": "Passage:\nWind energy is a clean, renewable energy source that converts the kinetic energy of moving air into electricity. Giant wind turbines are placed in windy areas, such as coastlines or open plains. As the wind blows, it spins the turbine's blades, which turns a rotor connected to a generator. This generator then converts the mechanical rotation into electrical energy, emitting zero greenhouse gases during the process.\n\n---\n\nWhat energy conversion takes place within a wind turbine to generate electricity?",
       "marks": 1,
       "options": [
-        "<ul>",
-        "<li>",
-        "<ol>",
-        "<list>"
+        "Solar energy to thermal energy",
+        "Chemical energy to electrical energy",
+        "Kinetic energy of moving air to electrical energy",
+        "Nuclear energy to mechanical energy"
       ],
       "correctOptionIndex": 2
     },
     {
       "type": "mcq",
-      "questionText": "Which input type allows the user to select only one option from a group?",
+      "questionText": "Passage:\nThe Great Library of Alexandria in Egypt was once one of the largest and most significant libraries of the ancient world. Established in the 3rd century BCE, it aimed to house the entirety of human knowledge, collecting hundreds of thousands of papyrus scrolls from across the Mediterranean. Its eventual destruction by fire resulted in the tragic loss of countless historical, philosophical, and scientific works, creating a major gap in modern understanding of ancient civilizations.\n\n---\n\nWhat was the primary historical consequence of the destruction of the Library of Alexandria?",
       "marks": 1,
       "options": [
-        "checkbox",
-        "text",
-        "radio",
-        "select"
-      ],
-      "correctOptionIndex": 2
-    },
-    {
-      "type": "mcq",
-      "questionText": "Which tag is used to create a table row?",
-      "marks": 1,
-      "options": [
-        "<td>",
-        "<th>",
-        "<tr>",
-        "<row>"
-      ],
-      "correctOptionIndex": 2
-    },
-    {
-      "type": "mcq",
-      "questionText": "Which tag is used to create a form?",
-      "marks": 1,
-      "options": [
-        "<input>",
-        "<form>",
-        "<fieldset>",
-        "<submit>"
+        "The immediate collapse of the Egyptian empire",
+        "The loss of countless ancient historical, philosophical, and scientific works",
+        "The invention of paper to replace papyrus scrolls",
+        "The migration of scholars to western Europe"
       ],
       "correctOptionIndex": 1
     },
     {
       "type": "mcq",
-      "questionText": "What does CSS stand for?",
+      "questionText": "Passage:\nThe human immune system defends the body against harmful pathogens like bacteria and viruses. When a pathogen enters, white blood cells produce proteins called antibodies that target and neutralize the threat. Vaccines help this system by introducing a harmless, weakened, or inactive version of the pathogen. This trains the immune system to recognize and fight the invader in the future, providing immunity without causing the actual illness.\n\n---\n\nHow do vaccines prepare the human immune system to fight infections?",
       "marks": 1,
       "options": [
-        "Computer Style Sheets",
-        "Cascading Style Sheets",
-        "Creative Style System",
-        "Colorful Style Sheets"
+        "By directly attacking and destroying manual bacteria in the body",
+        "By introducing a harmless or weakened version of a pathogen to train the system",
+        "By increasing the red blood cell count in the body",
+        "By blocking pathogens from entering the nose and mouth"
       ],
       "correctOptionIndex": 1
     },
     {
       "type": "mcq",
-      "questionText": "Which property is used to change text color?",
+      "questionText": "Passage:\nDeep on the ocean floor, far beyond the reach of sunlight, hydrothermal vents erupt superheated, mineral-rich water into the freezing sea. Despite the extreme pressure and dark environment, these vents support thriving ecosystems. Because there is no sunlight, organisms here cannot rely on photosynthesis. Instead, specialized bacteria perform chemosynthesis, using the chemical energy from toxic hydrogen sulfide dissolved in the vent water to produce food, forming the base of a unique food web.\n\n---\n\nWhat process do bacteria at deep-sea hydrothermal vents use to produce food in the absence of sunlight?",
       "marks": 1,
       "options": [
-        "text-color",
-        "font-color",
-        "color",
-        "text-style"
-      ],
-      "correctOptionIndex": 2
-    },
-    {
-      "type": "mcq",
-      "questionText": "Which property is used to change the background color?",
-      "marks": 1,
-      "options": [
-        "bgcolor",
-        "background-color",
-        "background",
-        "color-background"
+        "Photosynthesis",
+        "Chemosynthesis",
+        "Fermentation",
+        "Respiration"
       ],
       "correctOptionIndex": 1
     },
     {
       "type": "mcq",
-      "questionText": "Which symbol is used to select an element by its ID?",
+      "questionText": "Passage:\nThe modern Internet traces its origins back to ARPANET (Advanced Research Projects Agency Network), a project funded by the United States Department of Defense in the late 1960s. Designed to allow multiple computers to communicate over a single network, ARPANET pioneered 'packet switching' technology, which breaks data into small pieces for transmission. This breakthrough paved the way for the global, decentralized network of networks we use today.\n\n---\n\nWhat was the primary technological breakthrough pioneered by ARPANET in the late 1960s?",
       "marks": 1,
       "options": [
-        ".",
-        "#",
-        "*",
-        "@"
-      ],
-      "correctOptionIndex": 1
-    },
-    {
-      "type": "mcq",
-      "questionText": "Which symbol is used to select elements by class?",
-      "marks": 1,
-      "options": [
-        "#",
-        "@",
-        ".",
-        "*"
-      ],
-      "correctOptionIndex": 2
-    },
-    {
-      "type": "mcq",
-      "questionText": "Which CSS property is used to change the font size?",
-      "marks": 1,
-      "options": [
-        "text-size",
-        "font-size",
-        "font-style",
-        "size"
-      ],
-      "correctOptionIndex": 1
-    },
-    {
-      "type": "mcq",
-      "questionText": "Which property is used to make text bold?",
-      "marks": 1,
-      "options": [
-        "font-weight",
-        "text-bold",
-        "font-bold",
-        "bold"
-      ],
-      "correctOptionIndex": 0
-    },
-    {
-      "type": "mcq",
-      "questionText": "Which property controls the space inside an element?",
-      "marks": 1,
-      "options": [
-        "margin",
-        "padding",
-        "spacing",
-        "border"
-      ],
-      "correctOptionIndex": 1
-    },
-    {
-      "type": "mcq",
-      "questionText": "Which property controls the space outside an element?",
-      "marks": 1,
-      "options": [
-        "padding",
-        "border",
-        "margin",
-        "space"
-      ],
-      "correctOptionIndex": 2
-    },
-    {
-      "type": "mcq",
-      "questionText": "Which CSS property is commonly used to create a flexible layout?",
-      "marks": 1,
-      "options": [
-        "display: block",
-        "display: flex",
-        "position: flex",
-        "layout: flex"
-      ],
-      "correctOptionIndex": 1
-    },
-    {
-      "type": "mcq",
-      "questionText": "Which keyword is used to create a class in Java?",
-      "marks": 1,
-      "options": [
-        "class",
-        "Class",
-        "new",
-        "object"
-      ],
-      "correctOptionIndex": 0
-    },
-    {
-      "type": "mcq",
-      "questionText": "Which method is the entry point of a Java program?",
-      "marks": 1,
-      "options": [
-        "start()",
-        "run()",
-        "main()",
-        "execute()"
-      ],
-      "correctOptionIndex": 2
-    },
-    {
-      "type": "mcq",
-      "questionText": "Which of the following is the correct main method?",
-      "marks": 1,
-      "options": [
-        "public void main()",
-        "static public main(String args)",
-        "public static void main(String[] args)",
-        "public main(String[] args)"
-      ],
-      "correctOptionIndex": 2
-    },
-    {
-      "type": "mcq",
-      "questionText": "Which data type is used to store whole numbers?",
-      "marks": 1,
-      "options": [
-        "float",
-        "String",
-        "int",
-        "char"
-      ],
-      "correctOptionIndex": 2
-    },
-    {
-      "type": "mcq",
-      "questionText": "Which data type stores a single character?",
-      "marks": 1,
-      "options": [
-        "String",
-        "char",
-        "character",
-        "text"
-      ],
-      "correctOptionIndex": 1
-    },
-    {
-      "type": "mcq",
-      "questionText": "Which keyword is used to create an object?",
-      "marks": 1,
-      "options": [
-        "class",
-        "object",
-        "create",
-        "new"
-      ],
-      "correctOptionIndex": 3
-    },
-    {
-      "type": "mcq",
-      "questionText": "Which operator is used for comparison of two values?",
-      "marks": 1,
-      "options": [
-        "=",
-        "==",
-        "===",
-        "!="
-      ],
-      "correctOptionIndex": 1
-    },
-    {
-      "type": "mcq",
-      "questionText": "What is the output? int x = 10; System.out.println(x + 5);",
-      "marks": 1,
-      "options": [
-        "10",
-        "15",
-        "105",
-        "Error"
-      ],
-      "correctOptionIndex": 1
-    },
-    {
-      "type": "mcq",
-      "questionText": "Which keyword is used to inherit a class in Java?",
-      "marks": 1,
-      "options": [
-        "implements",
-        "inherits",
-        "extends",
-        "inherit"
-      ],
-      "correctOptionIndex": 2
-    },
-    {
-      "type": "mcq",
-      "questionText": "Which collection does not allow duplicate elements?",
-      "marks": 1,
-      "options": [
-        "ArrayList",
-        "LinkedList",
-        "HashSet",
-        "Array"
-      ],
-      "correctOptionIndex": 2
-    },
-    {
-      "type": "mcq",
-      "questionText": "A number is increased by 20% and then decreased by 20%. What is the net percentage change?",
-      "marks": 1,
-      "options": [
-        "4% increase",
-        "4% decrease",
-        "No change",
-        "2% decrease"
-      ],
-      "correctOptionIndex": 1
-    },
-    {
-      "type": "mcq",
-      "questionText": "A and B can complete a work together in 12 days. A alone takes 20 days. How many days will B alone take?",
-      "marks": 1,
-      "options": [
-        "24 days",
-        "28 days",
-        "30 days",
-        "32 days"
-      ],
-      "correctOptionIndex": 2
-    },
-    {
-      "type": "mcq",
-      "questionText": "A train 180 m long crosses a pole in 9 seconds. What is its speed in km/h?",
-      "marks": 1,
-      "options": [
-        "60",
-        "72",
-        "80",
-        "90"
-      ],
-      "correctOptionIndex": 1
-    },
-    {
-      "type": "mcq",
-      "questionText": "The ratio of ages of A and B is 4:5. After 6 years, the ratio becomes 5:6. What is A's present age?",
-      "marks": 1,
-      "options": [
-        "18",
-        "20",
-        "24",
-        "30"
-      ],
-      "correctOptionIndex": 2
-    },
-    {
-      "type": "mcq",
-      "questionText": "A shopkeeper marks an item 40% above cost price and gives a 15% discount. What is his profit percentage?",
-      "marks": 1,
-      "options": [
-        "15%",
-        "19%",
-        "21%",
-        "25%"
-      ],
-      "correctOptionIndex": 1
-    },
-    {
-      "type": "mcq",
-      "questionText": "The average of 8 numbers is 24. If one number 18 is replaced by 34, what is the new average?",
-      "marks": 1,
-      "options": [
-        "25",
-        "26",
-        "27",
-        "28"
-      ],
-      "correctOptionIndex": 1
-    },
-    {
-      "type": "mcq",
-      "questionText": "A bag contains 5 red, 4 blue and 3 green balls. Two balls are drawn without replacement. What is the probability that both are red?",
-      "marks": 1,
-      "options": [
-        "5/33",
-        "5/22",
-        "10/33",
-        "20/132"
-      ],
-      "correctOptionIndex": 0
-    },
-    {
-      "type": "mcq",
-      "questionText": "Find the next number: 3, 8, 18, 38, 78, ?",
-      "marks": 1,
-      "options": [
-        "148",
-        "156",
-        "158",
-        "160"
-      ],
-      "correctOptionIndex": 2
-    },
-    {
-      "type": "mcq",
-      "questionText": "If in a code, COMPUTER is written as RFUVQNCP, following the same rule, how is PROGRAM written?",
-      "marks": 1,
-      "options": [
-        "QSPHSBN",
-        "QSPHSBM",
-        "QSPHSBO",
-        "RSPHSBN"
-      ],
-      "correctOptionIndex": 0
-    },
-    {
-      "type": "mcq",
-      "questionText": "Statements: All engineers are graduates. Some graduates are programmers. Which conclusion is definitely valid?",
-      "marks": 1,
-      "options": [
-        "All engineers are programmers",
-        "Some engineers are programmers",
-        "All programmers are engineers",
-        "All engineers are graduates"
-      ],
-      "correctOptionIndex": 3
-    },
-    {
-      "type": "mcq",
-      "questionText": "A person walks 8 km north, turns right and walks 6 km, then turns right and walks 8 km. How far is he from the starting point?",
-      "marks": 1,
-      "options": [
-        "2 km",
-        "6 km",
-        "8 km",
-        "14 km"
-      ],
-      "correctOptionIndex": 1
-    },
-    {
-      "type": "mcq",
-      "questionText": "Five people P, Q, R, S and T sit in a row. P is left of Q but right of R. S is right of Q. T is between Q and S. Who sits in the middle?",
-      "marks": 1,
-      "options": [
-        "P",
-        "Q",
-        "R",
-        "T"
-      ],
-      "correctOptionIndex": 1
-    },
-    {
-      "type": "mcq",
-      "questionText": "A can do a job in 15 days and B in 10 days. They work together for 3 days. What fraction of the work remains?",
-      "marks": 1,
-      "options": [
-        "1/5",
-        "1/2",
-        "1/3",
-        "3/5"
-      ],
-      "correctOptionIndex": 1
-    },
-    {
-      "type": "mcq",
-      "questionText": "A two-digit number has digits whose sum is 11. When the digits are reversed, the new number is 27 less than the original. What is the original number?",
-      "marks": 1,
-      "options": [
-        "47",
-        "56",
-        "65",
-        "74"
-      ],
-      "correctOptionIndex": 3
-    },
-    {
-      "type": "mcq",
-      "questionText": "If 12 men can complete a work in 18 days, how many men are required to complete the same work in 8 days?",
-      "marks": 1,
-      "options": [
-        "24",
-        "27",
-        "30",
-        "32"
-      ],
-      "correctOptionIndex": 1
-    },
-    {
-      "type": "mcq",
-      "questionText": "A, B and C invest 6000, 8000 and 10000 respectively for the same period. If the total profit is 4800, what is C's share?",
-      "marks": 1,
-      "options": [
-        "1600",
-        "1800",
-        "2000",
-        "2200"
-      ],
-      "correctOptionIndex": 2
-    },
-    {
-      "type": "mcq",
-      "questionText": "A clock gains 5 minutes every hour. If it is set correctly at 8:00 AM, what time will it show at actual 8:00 PM?",
-      "marks": 1,
-      "options": [
-        "8:45 PM",
-        "9:00 PM",
-        "8:55 PM",
-        "9:05 PM"
-      ],
-      "correctOptionIndex": 2
-    },
-    {
-      "type": "mcq",
-      "questionText": "In a class, 60% passed English, 70% passed Mathematics and 50% passed both. What percentage passed at least one of the two subjects?",
-      "marks": 1,
-      "options": [
-        "80%",
-        "85%",
-        "90%",
-        "120%"
-      ],
-      "correctOptionIndex": 2
-    },
-    {
-      "type": "mcq",
-      "questionText": "Find the missing term: AZ, BY, CX, DW, ?",
-      "marks": 1,
-      "options": [
-        "EU",
-        "EV",
-        "FU",
-        "EW"
-      ],
-      "correctOptionIndex": 1
-    },
-    {
-      "type": "mcq",
-      "questionText": "A committee of 3 is to be selected from 5 men and 4 women. How many committees can be formed with exactly 2 women?",
-      "marks": 1,
-      "options": [
-        "30",
-        "40",
-        "45",
-        "50"
+        "Wireless satellite television broadcasting",
+        "Dial-up telephone modems",
+        "Packet switching technology",
+        "Fiber-optic submarine cables"
       ],
       "correctOptionIndex": 2
     }

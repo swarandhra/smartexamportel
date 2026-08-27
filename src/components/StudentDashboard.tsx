@@ -135,6 +135,37 @@ export default function StudentDashboard({ student, onStartExam, onLogout }: Stu
 
 
       </div>
+
+      <div className="dashboard-footer animate-fade-in" style={{
+        marginTop: '48px',
+        textAlign: 'center',
+        padding: '24px 0',
+        borderTop: '1px solid var(--border-color)'
+      }}>
+        <p style={{
+          color: 'var(--text-muted)',
+          fontSize: '0.875rem',
+          fontWeight: '500',
+          letterSpacing: '0.025em',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '8px'
+        }}>
+          <span>This is</span>
+          <span style={{
+            fontWeight: '700',
+            background: 'linear-gradient(135deg, var(--primary) 0%, #3b82f6 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            position: 'relative',
+            display: 'inline-block'
+          }}>
+            Venkys flatforms
+          </span>
+          <span style={{ fontSize: '1.1rem' }}>🚀</span>
+        </p>
+      </div>
     </div>
   );
 }

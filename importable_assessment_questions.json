@@ -1,5 +1,5 @@
 {
-  "title": "Swarandhra Assessment 2",
+  "title": "Comprehensive Student Assessment",
   "duration": 120,
   "passingMarks": 40,
   "resumeWindow": 60,
@@ -922,11 +922,11 @@
       "testCases": [
         {
           "input": "\"hello\"",
-          "expected": "olleh"
+          "expected": "\"olleh\""
         },
         {
           "input": "\"Java\"",
-          "expected": "avaJ"
+          "expected": "\"avaJ\""
         }
       ],
       "marks": 10,

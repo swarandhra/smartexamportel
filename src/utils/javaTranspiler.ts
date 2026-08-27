@@ -91,11 +91,15 @@ export function extractMethodName(transpiledCode: string): string {
  */
 export function runTestCase(transpiledCode: string, methodName: string, input: string): { actual: string; error: string | null } {
   try {
+    // Clean Java-style inputs (e.g. new int[]{1, 2, 3} -> [1, 2, 3])
+    let cleanInput = input.trim();
+    cleanInput = cleanInput.replace(/new\s+\w+\s*\[\s*\]\s*\{([^}]*)\}/g, '[$1]');
+
     // Wrap everything in a self-contained function scope
     const wrapper = `
       "use strict";
       ${transpiledCode}
-      return JSON.stringify(${methodName}(${input}));
+      return JSON.stringify(${methodName}(${cleanInput}));
     `;
     // eslint-disable-next-line no-new-func
     const runner = new Function(wrapper);
