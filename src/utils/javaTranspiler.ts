@@ -20,7 +20,7 @@ export function transpileJavaToJS(javaCode: string): string {
   js = js.replace(/\b(public|private|protected|final|static)\s+/g, '');
 
   // 5. Remove Java type annotations on method parameters and convert method declarations to JS functions
-  js = js.replace(/\b(int|long|double|float|boolean|char|String|Integer|Long|Double|Float|Boolean|void)\s*(?:\[\s*\])?\s+(\w+)\s*\(([^)]*)\)\s*\{/g, (match, returnType, methodName, params) => {
+  js = js.replace(/\b(int|long|double|float|boolean|char|String|Integer|Long|Double|Float|Boolean|void)\s*(?:\[\s*\])?\s+(\w+)\s*\(([^)]*)\)\s*\{/g, (_match, _returnType, methodName, params) => {
     // Clean params: String str -> str, int[] arr -> arr
     const cleanParams = params.split(',')
       .map((p: string) => {
