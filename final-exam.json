@@ -653,14 +653,14 @@
       "type": "sql-join",
       "questionText": "JOIN Query 1 — Student and Course\n\nGiven the tables:\n- Students(student_id, student_name, course_id)\n- Courses(course_id, course_name)\n\nWrite a SQL query using INNER JOIN to display each student's name and course name.",
       "codeTemplate": "",
-      "marks": 5
+      "marks": 1
     },
     {
       "id": "q_sql2",
       "type": "sql-join",
       "questionText": "JOIN Query 2 — Student and Marks\n\nGiven the tables:\n- Students(student_id, student_name)\n- Marks(student_id, subject, marks)\n\nWrite a SQL query using INNER JOIN to display student name, subject and marks for every matching student record.",
       "codeTemplate": "",
-      "marks": 5
+      "marks": 1
     },
     {
       "id": "q_java_coding_1",
@@ -675,7 +675,7 @@
         { "input": "\"a\"", "expected": "\"a\"" },
         { "input": "\"\"", "expected": "\"\"" }
       ],
-      "marks": 10
+      "marks": 1
     },
     {
       "id": "q_java_coding_2",
@@ -690,14 +690,14 @@
         { "input": "\"Beautiful Day\"", "expected": "5" },
         { "input": "\"\"", "expected": "0" }
       ],
-      "marks": 10
+      "marks": 1
     },
     {
       "id": "q_html_coding",
       "type": "practical-html",
       "questionText": "Create a simple responsive student profile card layout.\n\nRequirements:\n1. Must contain a heading (e.g. h1, h2, or h3).\n2. Must contain details: Student Name, Course Name, and Email Address.\n3. Must contain a button (e.g. button or styled button).\n4. All elements must be inside a card container card.\n5. Use CSS for padding, spacing, border, and centered margin.\n6. CSS must include a responsive @media query for mobile screens (e.g. width <= 500px).",
       "codeTemplate": "<!DOCTYPE html>\n<html>\n<head>\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Student Card</title>\n    <style>\n        body {\n            font-family: Arial, sans-serif;\n            background: #f2f2f2;\n            margin: 0;\n            padding: 30px;\n        }\n        /* Write your CSS styling here */\n        \n    </style>\n</head>\n<body>\n    <!-- Write your HTML structure here -->\n    \n</body>\n</html>",
-      "marks": 10
+      "marks": 1
     }
   ]
 }
