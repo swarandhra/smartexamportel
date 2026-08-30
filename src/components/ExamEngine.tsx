@@ -27,6 +27,10 @@ function cleanSql(sql: string): string {
 
 function evaluateSqlJoin1(ans: string): boolean {
   const cleaned = cleanSql(ans);
+  const ref1 = cleanSql("SELECT s.student_name, c.course_name FROM Students s INNER JOIN Courses c ON s.course_id = c.course_id");
+  const ref2 = cleanSql("SELECT student_name, course_name FROM Students INNER JOIN Courses ON Students.course_id = Courses.course_id");
+  if (cleaned === ref1 || cleaned === ref2) return true;
+
   if (!cleaned.startsWith('select')) return false;
   if (!cleaned.includes('join')) return false;
   if (!cleaned.includes('on')) return false;
@@ -46,6 +50,10 @@ function evaluateSqlJoin1(ans: string): boolean {
 
 function evaluateSqlJoin2(ans: string): boolean {
   const cleaned = cleanSql(ans);
+  const ref1 = cleanSql("SELECT s.student_name, m.subject, m.marks FROM Students s INNER JOIN Marks m ON s.student_id = m.student_id");
+  const ref2 = cleanSql("SELECT student_name, subject, marks FROM Students INNER JOIN Marks ON Students.student_id = Marks.student_id");
+  if (cleaned === ref1 || cleaned === ref2) return true;
+
   if (!cleaned.startsWith('select')) return false;
   if (!cleaned.includes('join')) return false;
   if (!cleaned.includes('on')) return false;
