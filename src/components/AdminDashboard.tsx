@@ -4,6 +4,98 @@ import type { Exam, Question, Result } from '../utils/db';
 import { downloadResultsCSV } from '../utils/helpers';
 import { showToast, showModal, showConfirm } from '../utils/notifications';
 import TodoPage from '../TodoPage'; 
+import { transpileJavaToJS, extractMethodName, runTestCase } from '../utils/javaTranspiler'; 
+
+function cleanSql(sql: string): string {
+  return sql
+    .toLowerCase()
+    .replace(/[\r\n\t]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .replace(/;$/, '')
+    .trim();
+}
+
+function evaluateSqlJoin1(ans: string): boolean {
+  const cleaned = cleanSql(ans);
+  const ref1 = cleanSql("SELECT s.student_name, c.course_name FROM Students s INNER JOIN Courses c ON s.course_id = c.course_id");
+  const ref2 = cleanSql("SELECT student_name, course_name FROM Students INNER JOIN Courses ON Students.course_id = Courses.course_id");
+  if (cleaned === ref1 || cleaned === ref2) return true;
+
+  if (!cleaned.startsWith('select')) return false;
+  if (!cleaned.includes('join')) return false;
+  if (!cleaned.includes('on')) return false;
+  
+  if (!cleaned.includes('student_name') || !cleaned.includes('course_name')) return false;
+  if (!cleaned.includes('students') || !cleaned.includes('courses')) return false;
+  
+  const onPart = cleaned.split('on')[1] || '';
+  if (!onPart.includes('course_id')) return false;
+  
+  const parts = onPart.split('=');
+  if (parts.length !== 2) return false;
+  if (!parts[0].includes('course_id') || !parts[1].includes('course_id')) return false;
+  
+  return true;
+}
+
+function evaluateSqlJoin2(ans: string): boolean {
+  const cleaned = cleanSql(ans);
+  const ref1 = cleanSql("SELECT s.student_name, m.subject, m.marks FROM Students s INNER JOIN Marks m ON s.student_id = m.student_id");
+  const ref2 = cleanSql("SELECT student_name, subject, marks FROM Students INNER JOIN Marks ON Students.student_id = Marks.student_id");
+  if (cleaned === ref1 || cleaned === ref2) return true;
+
+  if (!cleaned.startsWith('select')) return false;
+  if (!cleaned.includes('join')) return false;
+  if (!cleaned.includes('on')) return false;
+  
+  if (!cleaned.includes('student_name') || !cleaned.includes('subject') || !cleaned.includes('marks')) return false;
+  if (!cleaned.includes('students') || !cleaned.includes('marks')) return false;
+  
+  const onPart = cleaned.split('on')[1] || '';
+  if (!onPart.includes('student_id')) return false;
+  
+  const parts = onPart.split('=');
+  if (parts.length !== 2) return false;
+  if (!parts[0].includes('student_id') || !parts[1].includes('student_id')) return false;
+  
+  return true;
+}
+
+function evaluateHtmlCssCoding(htmlCode: string): { passed: boolean; marks: number } {
+  try {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(htmlCode, 'text/html');
+    
+    let score = 0;
+    const heading = doc.querySelector('h1, h2, h3, h4, h5, h6');
+    if (heading && heading.textContent?.trim()) score += 1.5;
+    
+    const button = doc.querySelector('button, input[type="button"], input[type="submit"], .btn, .button');
+    if (button) score += 1.5;
+    
+    const bodyText = doc.body ? doc.body.textContent || '' : '';
+    const bodyTextLower = bodyText.toLowerCase();
+    
+    if (bodyTextLower.includes('name') || bodyTextLower.includes('rahul')) score += 1.5;
+    if (bodyTextLower.includes('course') || bodyTextLower.includes('java') || bodyTextLower.includes('stack')) score += 1.5;
+    if (bodyTextLower.includes('email') || bodyTextLower.includes('@')) score += 1.5;
+    
+    const styleTags = doc.querySelectorAll('style');
+    let cssText = '';
+    styleTags.forEach(s => { cssText += s.textContent || ''; });
+    
+    if (cssText.trim().length > 0) {
+      score += 1.0;
+      if (cssText.includes('padding') || cssText.includes('margin') || cssText.includes('border') || cssText.includes('width')) score += 1.0;
+      if (cssText.includes('@media')) score += 2.0;
+    }
+    
+    return { passed: score >= 6.0, marks: Math.round(score) };
+  } catch (e) {
+    return { passed: false, marks: 0 };
+  }
+}
 
 function parseCSVQuestions(csvText: string): Question[] {
   const lines = csvText.split('\n');
@@ -577,13 +669,16 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
     );
   }
 
-  // Find matching exam for score breakdown
   const matchingExam = selectedResult ? exams.find(e => e.id === selectedResult.examId) : null;
+  const isFinalExam = matchingExam?.id === 'final-exam';
   
   let aptObtained = 0, aptTotal = 0;
   let techObtained = 0, techTotal = 0;
   let codingObtained = 0, codingTotal = 0;
   let pracObtained = 0, pracTotal = 0;
+
+  // Custom Final Exam categories
+  let sqlObtained = 0, sqlTotal = 0;
 
   if (selectedResult && matchingExam) {
     matchingExam.questions.forEach(q => {
@@ -607,25 +702,56 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
         if (ans !== undefined && ans.trim().length > 15) {
           isCorrect = true;
         }
+      } else if (q.type === 'sql-join') {
+        const isQuery1 = q.id === 'q_sql1' || q.questionText.includes('Student and Course');
+        isCorrect = isQuery1 ? evaluateSqlJoin1(ans || '') : evaluateSqlJoin2(ans || '');
       } else if (q.type === 'practical-html') {
         const userHtml = ans || q.codeTemplate || '';
-        if (userHtml.includes('<form') && userHtml.includes('<input') && userHtml.length > q.codeTemplate!.length + 20) {
-          isCorrect = true;
+        if (isFinalExam && (q.id === 'q_html_coding' || q.questionText.toLowerCase().includes('card') || q.questionText.toLowerCase().includes('profile'))) {
+          const evalResult = evaluateHtmlCssCoding(userHtml);
+          if (evalResult.passed) {
+            isCorrect = true;
+          } else {
+            partialMarks = evalResult.marks;
+          }
+        } else {
+          if (userHtml.includes('<form') && userHtml.includes('<input') && userHtml.length > q.codeTemplate!.length + 20) {
+            isCorrect = true;
+          }
         }
       } else if (q.type === 'coding' || q.type === 'practical-java') {
-        let passCount = 0;
         const userCode = ans || q.codeTemplate || '';
-        q.testCases?.forEach(tc => {
-          try {
-            const cleanCode = userCode + `\n; if (typeof moveZeroes !== "undefined") { let a = ${tc.input}; moveZeroes(a); return JSON.stringify(a); } else if (typeof findSecondLargest !== "undefined") { return String(findSecondLargest(${tc.input})); } else if (typeof calculateMarks !== "undefined") { return JSON.stringify(calculateMarks(${tc.input})); } else { return null; }`;
-            const runner = new Function(cleanCode);
-            const val = runner();
-            if (String(val).trim().replace(/\s+/g, '') === tc.expected.trim().replace(/\s+/g, '')) {
-              passCount++;
-            }
-          } catch (e) {}
-        });
+        let passCount = 0;
         const totalCases = q.testCases?.length || 1;
+
+        q.testCases?.forEach(tc => {
+          let codeToTranspile = userCode;
+          let rawInput = tc.input.trim();
+          if (!rawInput.startsWith('"') && !rawInput.startsWith("'")) {
+            rawInput = `"${rawInput}"`;
+          }
+          codeToTranspile = userCode.replace(/String\s+s\s*=\s*(["'])(.*?)\1\s*;/g, `String s = ${rawInput};`);
+
+          let transpiledJS = '';
+          try {
+            transpiledJS = transpileJavaToJS(codeToTranspile);
+          } catch (e) {}
+
+          if (transpiledJS) {
+            const methodName = extractMethodName(transpiledJS);
+            if (methodName) {
+              const { actual, error } = runTestCase(transpiledJS, methodName, tc.input);
+              if (!error) {
+                const actualClean = actual.replace(/"/g, '').trim().replace(/\s+/g, '');
+                const expectedClean = tc.expected.trim().replace(/\s+/g, '').replace(/"/g, '');
+                if (actualClean === expectedClean) {
+                  passCount++;
+                }
+              }
+            }
+          }
+        });
+
         if (passCount === totalCases) {
           isCorrect = true;
         } else if (passCount > 0) {
@@ -635,19 +761,34 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
 
       const score = isCorrect ? q.marks : partialMarks;
 
-      if (q.type === 'coding' || q.type === 'practical-java') {
-        codingObtained += score;
-        codingTotal += q.marks;
-      } else if (q.type === 'practical-html') {
-        pracObtained += score;
-        pracTotal += q.marks;
-      } else if (q.type === 'mcq') {
-        aptObtained += score;
-        aptTotal += q.marks;
+      if (isFinalExam) {
+        if (q.id.startsWith('q_apt_')) {
+          aptObtained += score;
+          aptTotal += q.marks;
+        } else if (q.id.startsWith('q_java_') || q.id.startsWith('q_html_') || (q.type === 'mcq' && q.id !== 'q_apt_')) {
+          techObtained += score;
+          techTotal += q.marks;
+        } else if (q.type === 'sql-join') {
+          sqlObtained += score;
+          sqlTotal += q.marks;
+        } else if (q.type === 'coding' || q.type === 'practical-java' || q.type === 'practical-html') {
+          codingObtained += score;
+          codingTotal += q.marks;
+        }
       } else {
-        // tf, fib, sa — Theory / Short Answer
-        techObtained += score;
-        techTotal += q.marks;
+        if (q.type === 'coding' || q.type === 'practical-java') {
+          codingObtained += score;
+          codingTotal += q.marks;
+        } else if (q.type === 'practical-html') {
+          pracObtained += score;
+          pracTotal += q.marks;
+        } else if (q.type === 'mcq') {
+          aptObtained += score;
+          aptTotal += q.marks;
+        } else {
+          techObtained += score;
+          techTotal += q.marks;
+        }
       }
     });
   }
@@ -1499,18 +1640,37 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   <div className="report-section" style={{ background: '#f8fafc', padding: '16px', borderRadius: '8px', border: '1px solid #e2e8f0', marginBottom: '24px' }}>
                     <h4 style={{ marginTop: 0, marginBottom: '12px', borderBottom: '1px solid #cbd5e1', paddingBottom: '6px' }}>Detailed Sectional Grade Breakdown</h4>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', fontSize: '13px' }}>
-                      <div>
-                        <strong>1. Aptitude & Verbal (MCQs):</strong> <span className="highlight" style={{ fontSize: '14px', fontWeight: 'bold' }}>{aptObtained} / {aptTotal}</span> marks
-                      </div>
-                      <div>
-                        <strong>2. Technical Core (Java/HTML/DSA):</strong> <span className="highlight" style={{ fontSize: '14px', fontWeight: 'bold' }}>{techObtained} / {techTotal}</span> marks
-                      </div>
-                      <div>
-                        <strong>3. Coding Round (Leetcode Problems):</strong> <span className="highlight" style={{ fontSize: '14px', fontWeight: 'bold' }}>{codingObtained} / {codingTotal}</span> marks
-                      </div>
-                      <div>
-                        <strong>4. Practical Tasks (HTML Form/Calculator):</strong> <span className="highlight" style={{ fontSize: '14px', fontWeight: 'bold' }}>{pracObtained} / {pracTotal}</span> marks
-                      </div>
+                      {isFinalExam ? (
+                        <>
+                          <div>
+                            <strong>1. Aptitude & Reasoning (MCQs):</strong> <span className="highlight" style={{ fontSize: '14px', fontWeight: 'bold' }}>{aptObtained} / {aptTotal}</span> marks
+                          </div>
+                          <div>
+                            <strong>2. Technical Core (Java/HTML MCQs):</strong> <span className="highlight" style={{ fontSize: '14px', fontWeight: 'bold' }}>{techObtained} / {techTotal}</span> marks
+                          </div>
+                          <div>
+                            <strong>3. SQL JOIN Queries (Written):</strong> <span className="highlight" style={{ fontSize: '14px', fontWeight: 'bold' }}>{sqlObtained} / {sqlTotal}</span> marks
+                          </div>
+                          <div>
+                            <strong>4. Coding & Practical Round (Java & HTML):</strong> <span className="highlight" style={{ fontSize: '14px', fontWeight: 'bold' }}>{codingObtained} / {codingTotal}</span> marks
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div>
+                            <strong>1. Aptitude & Verbal (MCQs):</strong> <span className="highlight" style={{ fontSize: '14px', fontWeight: 'bold' }}>{aptObtained} / {aptTotal}</span> marks
+                          </div>
+                          <div>
+                            <strong>2. Technical Core (Java/HTML/DSA):</strong> <span className="highlight" style={{ fontSize: '14px', fontWeight: 'bold' }}>{techObtained} / {techTotal}</span> marks
+                          </div>
+                          <div>
+                            <strong>3. Coding Round (Leetcode Problems):</strong> <span className="highlight" style={{ fontSize: '14px', fontWeight: 'bold' }}>{codingObtained} / {codingTotal}</span> marks
+                          </div>
+                          <div>
+                            <strong>4. Practical Tasks (HTML Form/Calculator):</strong> <span className="highlight" style={{ fontSize: '14px', fontWeight: 'bold' }}>{pracObtained} / {pracTotal}</span> marks
+                          </div>
+                        </>
+                      )}
                     </div>
                   </div>
                 )}

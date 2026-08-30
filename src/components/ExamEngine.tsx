@@ -158,6 +158,7 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
   const [warningTitle, setWarningTitle] = useState('');
   const [warningMsg, setWarningMsg] = useState('');
   const [warningNum, setWarningNum] = useState(0);
+  const [showUnfocusPopup, setShowUnfocusPopup] = useState(false);
 
   // Centered violation count popup (shown on Tab Switch / Exit Fullscreen)
   const [showViolationBanner, setShowViolationBanner] = useState(false);
@@ -336,6 +337,12 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
           videoElement: videoRef.current,
           onViolation: (v) => {
             console.log('Integrity violation recorded:', v);
+            if (v.type === 'Unfocused Window') {
+              setShowUnfocusPopup(true);
+              setTimeout(() => {
+                setShowUnfocusPopup(false);
+              }, 5000);
+            }
           },
           onWarning: (type, count) => {
             // Show centered violation count popup
@@ -1528,6 +1535,53 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
           </div>
           <button
             onClick={() => setShowViolationBanner(false)}
+            style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', fontSize: '18px', lineHeight: 1, padding: '0 4px', flexShrink: 0 }}
+          >×</button>
+        </div>
+      )}
+
+      {/* Unfocus warning banner on left side */}
+      {showUnfocusPopup && (
+        <div style={{
+          position: 'fixed',
+          top: '250px',
+          left: '24px',
+          zIndex: 99999,
+          background: 'rgba(30, 41, 59, 0.97)',
+          border: '1px solid #f59e0b',
+          borderRadius: '14px',
+          padding: '16px 20px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '14px',
+          boxShadow: '0 8px 32px rgba(245, 158, 11, 0.25), 0 2px 8px rgba(0,0,0,0.4)',
+          backdropFilter: 'blur(12px)',
+          animation: 'toast-slide-in-left 0.3s ease-out',
+          maxWidth: '320px',
+          color: '#f8fafc',
+          fontFamily: 'system-ui, -apple-system, sans-serif'
+        }}>
+          <div style={{
+            width: '42px', height: '42px',
+            background: 'rgba(245, 158, 11, 0.15)',
+            border: '2px solid #f59e0b',
+            borderRadius: '50%',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            flexShrink: 0,
+            fontSize: '20px'
+          }}>
+            ⚠️
+          </div>
+          <div>
+            <div style={{ fontWeight: '700', fontSize: '13.5px', color: '#fbbf24', marginBottom: '3px' }}>
+              Window Unfocused!
+            </div>
+            <div style={{ fontSize: '12px', color: '#94a3b8', lineHeight: '1.4' }}>
+              Please focus back on the exam window. Continued shifting may flag your test.
+            </div>
+          </div>
+          <button
+            onClick={() => setShowUnfocusPopup(false)}
             style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', fontSize: '18px', lineHeight: 1, padding: '0 4px', flexShrink: 0 }}
           >×</button>
         </div>
