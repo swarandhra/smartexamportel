@@ -15,6 +15,123 @@ interface ExamEngineProps {
   onFinished: (result: Result, uploadSuccess: boolean) => void;
 }
 
+function cleanSql(sql: string): string {
+  return sql
+    .toLowerCase()
+    .replace(/[\r\n\t]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .replace(/;$/, '')
+    .trim();
+}
+
+function evaluateSqlJoin1(ans: string): boolean {
+  const cleaned = cleanSql(ans);
+  if (!cleaned.startsWith('select')) return false;
+  if (!cleaned.includes('join')) return false;
+  if (!cleaned.includes('on')) return false;
+  
+  if (!cleaned.includes('student_name') || !cleaned.includes('course_name')) return false;
+  if (!cleaned.includes('students') || !cleaned.includes('courses')) return false;
+  
+  const onPart = cleaned.split('on')[1] || '';
+  if (!onPart.includes('course_id')) return false;
+  
+  const parts = onPart.split('=');
+  if (parts.length !== 2) return false;
+  if (!parts[0].includes('course_id') || !parts[1].includes('course_id')) return false;
+  
+  return true;
+}
+
+function evaluateSqlJoin2(ans: string): boolean {
+  const cleaned = cleanSql(ans);
+  if (!cleaned.startsWith('select')) return false;
+  if (!cleaned.includes('join')) return false;
+  if (!cleaned.includes('on')) return false;
+  
+  if (!cleaned.includes('student_name') || !cleaned.includes('subject') || !cleaned.includes('marks')) return false;
+  if (!cleaned.includes('students') || !cleaned.includes('marks')) return false;
+  
+  const onPart = cleaned.split('on')[1] || '';
+  if (!onPart.includes('student_id')) return false;
+  
+  const parts = onPart.split('=');
+  if (parts.length !== 2) return false;
+  if (!parts[0].includes('student_id') || !parts[1].includes('student_id')) return false;
+  
+  return true;
+}
+
+function evaluateHtmlCssCoding(htmlCode: string): { passed: boolean; marks: number } {
+  try {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(htmlCode, 'text/html');
+    
+    let score = 0;
+    
+    // Check heading
+    const heading = doc.querySelector('h1, h2, h3, h4, h5, h6');
+    if (heading && heading.textContent?.trim()) {
+      score += 1.5;
+    }
+    
+    // Check button
+    const button = doc.querySelector('button, input[type="button"], input[type="submit"], .btn, .button');
+    if (button) {
+      score += 1.5;
+    }
+    
+    // Check text content
+    const bodyText = doc.body ? doc.body.textContent || '' : '';
+    const bodyTextLower = bodyText.toLowerCase();
+    
+    const hasName = bodyTextLower.includes('name') || bodyTextLower.includes('rahul');
+    if (hasName) {
+      score += 1.5;
+    }
+    
+    const hasCourse = bodyTextLower.includes('course') || bodyTextLower.includes('java') || bodyTextLower.includes('stack');
+    if (hasCourse) {
+      score += 1.5;
+    }
+    
+    const hasEmail = bodyTextLower.includes('email') || bodyTextLower.includes('@');
+    if (hasEmail) {
+      score += 1.5;
+    }
+    
+    // Check style and CSS content
+    const styleTags = doc.querySelectorAll('style');
+    let cssText = '';
+    styleTags.forEach(s => {
+      cssText += s.textContent || '';
+    });
+    
+    const hasCss = cssText.trim().length > 0;
+    if (hasCss) {
+      score += 1.0;
+      
+      const hasLayoutProps = cssText.includes('padding') || cssText.includes('margin') || cssText.includes('border') || cssText.includes('width');
+      if (hasLayoutProps) {
+        score += 1.0;
+      }
+      
+      const hasMedia = cssText.includes('@media');
+      if (hasMedia) {
+        score += 2.0;
+      }
+    }
+    
+    const passed = score >= 6.0;
+    const finalMarks = Math.round(score);
+    
+    return { passed, marks: finalMarks };
+  } catch (e) {
+    return { passed: false, marks: 0 };
+  }
+}
+
 export default function ExamEngine({ exam, student, activeDraft, onFinished }: ExamEngineProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -407,23 +524,35 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
     handleRunCode(q);
     
     const userCode = answers[q.id] || q.codeTemplate || '';
-    let transpiledJS = '';
-    try {
-      transpiledJS = transpileJavaToJS(userCode);
-    } catch (e) {}
-
     let passCount = 0;
-    if (transpiledJS) {
-      const methodName = extractMethodName(transpiledJS);
-      if (methodName) {
-        q.testCases.forEach(tc => {
-          const { actual, error } = runTestCase(transpiledJS, methodName, tc.input);
-          if (!error && actual.replace(/"/g, '').trim().replace(/\s+/g, '') === tc.expected.trim().replace(/\s+/g, '')) {
-            passCount++;
-          }
-        });
+    
+    q.testCases.forEach(tc => {
+      let codeToTranspile = userCode;
+      let rawInput = tc.input.trim();
+      if (!rawInput.startsWith('"') && !rawInput.startsWith("'")) {
+        rawInput = `"${rawInput}"`;
       }
-    }
+      codeToTranspile = userCode.replace(/String\s+s\s*=\s*(["'])(.*?)\1\s*;/g, `String s = ${rawInput};`);
+
+      let transpiledJS = '';
+      try {
+        transpiledJS = transpileJavaToJS(codeToTranspile);
+      } catch (e) {}
+
+      if (transpiledJS) {
+        const methodName = extractMethodName(transpiledJS);
+        if (methodName) {
+          const { actual, error } = runTestCase(transpiledJS, methodName, tc.input);
+          if (!error) {
+            const actualClean = actual.replace(/"/g, '').trim().replace(/\s+/g, '');
+            const expectedClean = tc.expected.trim().replace(/\s+/g, '').replace(/"/g, '');
+            if (actualClean === expectedClean) {
+              passCount++;
+            }
+          }
+        }
+      }
+    });
 
     const totalCases = q.testCases.length;
     const passedAll = passCount === totalCases;
@@ -463,20 +592,26 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
         getCameraCaptures()
       ).catch(err => console.error("Draft update failed:", err));
 
-      let transpiledJS = '';
-      let transpileError = '';
-      try {
-        transpiledJS = transpileJavaToJS(userCode);
-      } catch (e: any) {
-        transpileError = e.message;
-      }
-
-      const methodName = extractMethodName(transpiledJS);
-
       const results = q.testCases!.map((tc) => {
+        let codeToTranspile = userCode;
+        let rawInput = tc.input.trim();
+        if (!rawInput.startsWith('"') && !rawInput.startsWith("'")) {
+          rawInput = `"${rawInput}"`;
+        }
+        codeToTranspile = userCode.replace(/String\s+s\s*=\s*(["'])(.*?)\1\s*;/g, `String s = ${rawInput};`);
+
+        let transpiledJS = '';
+        let transpileError = '';
+        try {
+          transpiledJS = transpileJavaToJS(codeToTranspile);
+        } catch (e: any) {
+          transpileError = e.message;
+        }
+
         if (transpileError) {
           return { input: tc.input, expected: tc.expected, actual: 'Compilation Error: ' + transpileError, passed: false };
         }
+        const methodName = extractMethodName(transpiledJS);
         if (!methodName) {
           return { input: tc.input, expected: tc.expected, actual: 'Error: Could not detect method name. Make sure your class has a public method.', passed: false };
         }
@@ -484,9 +619,9 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
         if (error) {
           return { input: tc.input, expected: tc.expected, actual: 'Runtime Error: ' + error, passed: false };
         }
-        // Parse both actual and expected for numeric comparison
         let actualClean = actual.replace(/"/g, '').trim();
-        const passed = actualClean.replace(/\s+/g, '') === tc.expected.trim().replace(/\s+/g, '');
+        const expectedClean = tc.expected.trim().replace(/"/g, '');
+        const passed = actualClean.replace(/\s+/g, '') === expectedClean.replace(/\s+/g, '');
         return { input: tc.input, expected: tc.expected, actual: actualClean, passed };
       });
 
@@ -563,37 +698,67 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
         } else {
           wrongAnswers++;
         }
-      } else if (q.type === 'practical-html') {
-        // Evaluate HTML form task code layout
-        const userHtml = ans || q.codeTemplate || '';
-        if (userHtml.includes('<form') && userHtml.includes('<input') && userHtml.length > q.codeTemplate!.length + 20) {
+      } else if (q.type === 'sql-join') {
+        const isQuery1 = q.id === 'q_sql1' || q.questionText.includes('Student and Course');
+        const isCorrect = isQuery1 ? evaluateSqlJoin1(ans || '') : evaluateSqlJoin2(ans || '');
+        if (isCorrect) {
           correctAnswers++;
           marksObtained += q.marks;
         } else {
           wrongAnswers++;
         }
+      } else if (q.type === 'practical-html') {
+        const userHtml = ans || q.codeTemplate || '';
+        if (q.id === 'q_html_coding' || q.questionText.toLowerCase().includes('card') || q.questionText.toLowerCase().includes('profile')) {
+          const evalResult = evaluateHtmlCssCoding(userHtml);
+          if (evalResult.passed) {
+            correctAnswers++;
+            marksObtained += q.marks;
+          } else {
+            wrongAnswers++;
+            marksObtained += evalResult.marks;
+          }
+        } else {
+          if (userHtml.includes('<form') && userHtml.includes('<input') && userHtml.length > q.codeTemplate!.length + 20) {
+            correctAnswers++;
+            marksObtained += q.marks;
+          } else {
+            wrongAnswers++;
+          }
+        }
       } else if (q.type === 'coding' || q.type === 'practical-java') {
         const userCode = ans || q.codeTemplate || '';
         let passCount = 0;
-        
-        let transpiledJS = '';
-        try {
-          transpiledJS = transpileJavaToJS(userCode);
-        } catch (e) {}
-
-        if (transpiledJS) {
-          const methodName = extractMethodName(transpiledJS);
-          if (methodName) {
-            q.testCases?.forEach(tc => {
-              const { actual, error } = runTestCase(transpiledJS, methodName, tc.input);
-              if (!error && actual.replace(/"/g, '').trim().replace(/\s+/g, '') === tc.expected.trim().replace(/\s+/g, '')) {
-                passCount++;
-              }
-            });
-          }
-        }
-
         const totalCases = q.testCases?.length || 1;
+
+        q.testCases?.forEach(tc => {
+          let codeToTranspile = userCode;
+          let rawInput = tc.input.trim();
+          if (!rawInput.startsWith('"') && !rawInput.startsWith("'")) {
+            rawInput = `"${rawInput}"`;
+          }
+          codeToTranspile = userCode.replace(/String\s+s\s*=\s*(["'])(.*?)\1\s*;/g, `String s = ${rawInput};`);
+
+          let transpiledJS = '';
+          try {
+            transpiledJS = transpileJavaToJS(codeToTranspile);
+          } catch (e) {}
+
+          if (transpiledJS) {
+            const methodName = extractMethodName(transpiledJS);
+            if (methodName) {
+              const { actual, error } = runTestCase(transpiledJS, methodName, tc.input);
+              if (!error) {
+                const actualClean = actual.replace(/"/g, '').trim().replace(/\s+/g, '');
+                const expectedClean = tc.expected.trim().replace(/\s+/g, '').replace(/"/g, '');
+                if (actualClean === expectedClean) {
+                  passCount++;
+                }
+              }
+            }
+          }
+        });
+
         if (passCount === totalCases) {
           correctAnswers++;
           marksObtained += q.marks;
@@ -872,13 +1037,13 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
               </div>
             )}
 
-            {/* SHORT ANSWER TYPE */}
-            {activeQ.type === 'sa' && (
+            {/* SHORT ANSWER or SQL JOIN TYPE */}
+            {(activeQ.type === 'sa' || activeQ.type === 'sql-join') && (
               <div className="text-answer-container">
                 <textarea 
                   className="form-control text-area" 
                   rows={6}
-                  placeholder="Explain your answer in detail..."
+                  placeholder={activeQ.type === 'sql-join' ? "Write your SQL query here using INNER JOIN..." : "Explain your answer in detail..."}
                   value={activeAnswer}
                   onChange={(e) => handleSelectOption(activeQ.id, e.target.value)}
                   autoComplete="off"

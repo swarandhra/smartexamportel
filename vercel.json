@@ -3,6 +3,7 @@
     { "source": "/api/exams/:id", "destination": "/api/exams/[id]?id=:id" },
     { "source": "/api/results/:id/draft", "destination": "/api/results/[id]/draft?id=:id" },
     { "source": "/api/(.*)", "destination": "/api/$1" },
+    { "source": "/final-exam", "destination": "/api/final-exam" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

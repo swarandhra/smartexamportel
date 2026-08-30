@@ -95,15 +95,40 @@ export function extractMethodName(transpiledCode: string): string {
  */
 export function runTestCase(transpiledCode: string, methodName: string, input: string): { actual: string; error: string | null } {
   try {
-    // Clean Java-style inputs (e.g. new int[]{1, 2, 3} -> [1, 2, 3])
     let cleanInput = input.trim();
-    cleanInput = cleanInput.replace(/new\s+\w+\s*\[\s*\]\s*\{([^}]*)\}/g, '[$1]');
+    if (methodName === 'main') {
+      cleanInput = `[${cleanInput}]`;
+    } else {
+      cleanInput = cleanInput.replace(/new\s+\w+\s*\[\s*\]\s*\{([^}]*)\}/g, '[$1]');
+    }
 
-    // Wrap everything in a self-contained function scope
     const wrapper = `
       "use strict";
-      ${transpiledCode}
-      return JSON.stringify(${methodName}(${cleanInput}));
+      let __logs = [];
+      const customConsole = {
+        log: function(...args) {
+          __logs.push(args.map(x => (x === null || x === undefined) ? "" : String(x)).join(" "));
+        }
+      };
+      
+      const fn = (function(console) {
+        ${transpiledCode}
+        try {
+          const res = ${methodName}(${cleanInput});
+          return { res, logs: __logs };
+        } catch(e) {
+          return { error: e.message, logs: __logs };
+        }
+      })(customConsole);
+      
+      if (fn.error) {
+        throw new Error(fn.error);
+      }
+      
+      if (fn.res !== undefined) {
+        return JSON.stringify(fn.res);
+      }
+      return JSON.stringify(fn.logs.join("\\n"));
     `;
     // eslint-disable-next-line no-new-func
     const runner = new Function(wrapper);

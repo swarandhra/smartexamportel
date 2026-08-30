@@ -2,6 +2,8 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import { neon } from '@neondatabase/serverless';
+import fs from 'fs';
+import path from 'path';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -10,8 +12,62 @@ const PORT = process.env.PORT || 3001;
 const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://neondb_owner:npg_pYZa4K0hTPLD@ep-long-grass-azw38k3p.c-3.ap-southeast-1.aws.neon.tech/neondb?sslmode=require';
 const sql = neon(DATABASE_URL);
 
+async function ensureFinalExamSeeded() {
+  try {
+    let data;
+    try {
+      data = fs.readFileSync(path.resolve('./final-exam.json'), 'utf8');
+    } catch (e) {
+      data = fs.readFileSync(path.resolve('../final-exam.json'), 'utf8');
+    }
+    const exam = JSON.parse(data);
+    console.log('Seeding/Updating final-exam in database...');
+    const startDate = '2026-01-01T00:00:00Z';
+    const endDate = '2030-01-01T00:00:00Z';
+    await sql`
+      INSERT INTO exams (id, title, duration, passing_marks, start_date, end_date,
+        shuffle_questions, shuffle_options, show_result_to_student, resume_window, questions)
+      VALUES (
+        ${exam.id}, ${exam.title}, ${exam.duration}, ${exam.passingMarks},
+        ${startDate}, ${endDate}, ${exam.shuffleQuestions}, ${exam.shuffleOptions},
+        ${exam.showResultToStudent}, ${exam.resumeWindow || 60}, ${JSON.stringify(exam.questions)}
+      )
+      ON CONFLICT (id) DO UPDATE SET
+        title = EXCLUDED.title,
+        duration = EXCLUDED.duration,
+        passing_marks = EXCLUDED.passing_marks,
+        start_date = EXCLUDED.start_date,
+        end_date = EXCLUDED.end_date,
+        shuffle_questions = EXCLUDED.shuffle_questions,
+        shuffle_options = EXCLUDED.shuffle_options,
+        show_result_to_student = EXCLUDED.show_result_to_student,
+        resume_window = EXCLUDED.resume_window,
+        questions = EXCLUDED.questions
+    `;
+    console.log('✅ final-exam seeded/updated successfully!');
+  } catch (err) {
+    console.error('❌ Failed to seed final-exam:', err.message);
+  }
+}
+ensureFinalExamSeeded();
+
 app.use(cors({ origin: '*' }));
 app.use(express.json({ limit: '10mb' }));
+
+// Serve the Final Exam JSON directly at /final-exam
+app.get('/final-exam', (req, res) => {
+  try {
+    let data;
+    try {
+      data = fs.readFileSync(path.resolve('./final-exam.json'), 'utf8');
+    } catch (e) {
+      data = fs.readFileSync(path.resolve('../final-exam.json'), 'utf8');
+    }
+    res.json(JSON.parse(data));
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to read final-exam.json: ' + err.message });
+  }
+});
 
 // ─── Health Check ────────────────────────────────────────────────
 app.get('/health', async (req, res) => {

@@ -1,0 +1,703 @@
+{
+  "id": "final-exam",
+  "title": "Complete Intermediate-Level Practice Test",
+  "duration": 90,
+  "passingMarks": 50,
+  "resumeWindow": 60,
+  "shuffleQuestions": true,
+  "shuffleOptions": true,
+  "showResultToStudent": false,
+  "questions": [
+    {
+      "id": "q_apt_1",
+      "type": "mcq",
+      "questionText": "A and B can complete a work together in 12 days. A alone takes 20 days. How many days will B alone take?",
+      "options": ["24 days", "28 days", "30 days", "32 days"],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "id": "q_apt_2",
+      "type": "mcq",
+      "questionText": "A number is increased by 20% and then decreased by 20%. What is the net change?",
+      "options": ["4% increase", "4% decrease", "No change", "2% decrease"],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "id": "q_apt_3",
+      "type": "mcq",
+      "questionText": "A train 180 m long crosses a pole in 9 seconds. What is its speed?",
+      "options": ["60 km/h", "72 km/h", "80 km/h", "90 km/h"],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "id": "q_apt_4",
+      "type": "mcq",
+      "questionText": "The ratio of ages of A and B is 4:5. After 6 years it becomes 5:6. A's present age?",
+      "options": ["18", "20", "24", "30"],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "id": "q_apt_5",
+      "type": "mcq",
+      "questionText": "A shopkeeper marks an item 40% above cost and gives 15% discount. Profit %?",
+      "options": ["15%", "19%", "21%", "25%"],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "id": "q_apt_6",
+      "type": "mcq",
+      "questionText": "Average of 8 numbers is 24. If 18 is replaced by 34, new average?",
+      "options": ["25", "26", "27", "28"],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "id": "q_apt_7",
+      "type": "mcq",
+      "questionText": "A bag has 5 red, 4 blue, 3 green balls. Two are drawn without replacement. Probability both red?",
+      "options": ["5/33", "5/22", "10/33", "20/132"],
+      "correctOptionIndex": 0,
+      "marks": 1
+    },
+    {
+      "id": "q_apt_8",
+      "type": "mcq",
+      "questionText": "Find next: 3, 8, 18, 38, 78, ?",
+      "options": ["148", "156", "158", "160"],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "id": "q_apt_9",
+      "type": "mcq",
+      "questionText": "All engineers are graduates. Some graduates are programmers. Which is definitely valid?",
+      "options": [
+        "All engineers are programmers",
+        "Some engineers are programmers",
+        "All programmers are engineers",
+        "All engineers are graduates"
+      ],
+      "correctOptionIndex": 3,
+      "marks": 1
+    },
+    {
+      "id": "q_apt_10",
+      "type": "mcq",
+      "questionText": "A person walks 8 km north, 6 km east, then 8 km south. Distance from start?",
+      "options": ["2 km", "6 km", "8 km", "14 km"],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "id": "q_apt_11",
+      "type": "mcq",
+      "questionText": "Five people P,Q,R,S,T sit in a row. P is left of Q but right of R. S is right of Q. T is between Q and S. Who is in the middle?",
+      "options": ["P", "Q", "R", "T"],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "id": "q_apt_12",
+      "type": "mcq",
+      "questionText": "A can do a job in 15 days and B in 10 days. Together for 3 days. Fraction remaining?",
+      "options": ["1/5", "1/2", "1/3", "3/5"],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "id": "q_apt_13",
+      "type": "mcq",
+      "questionText": "A two-digit number has digit sum 11. Reversing it gives a number 27 less. Original?",
+      "options": ["47", "56", "65", "74"],
+      "correctOptionIndex": 3,
+      "marks": 1
+    },
+    {
+      "id": "q_apt_14",
+      "type": "mcq",
+      "questionText": "12 men complete a work in 18 days. How many men for 8 days?",
+      "options": ["24", "27", "30", "32"],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "id": "q_apt_15",
+      "type": "mcq",
+      "questionText": "A,B,C invest 6000, 8000, 10000 for same period. Total profit 4800. C's share?",
+      "options": ["1600", "1800", "2000", "2200"],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "id": "q_apt_16",
+      "type": "mcq",
+      "questionText": "A clock gains 5 minutes every hour. Correct at 8 AM. At actual 8 PM it shows?",
+      "options": ["8:45 PM", "9:00 PM", "8:55 PM", "9:05 PM"],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "id": "q_apt_17",
+      "type": "mcq",
+      "questionText": "60% passed English, 70% Mathematics and 50% both. Percentage passed at least one?",
+      "options": ["80%", "85%", "90%", "120%"],
+      "correctOptionIndex": 0,
+      "marks": 1
+    },
+    {
+      "id": "q_apt_18",
+      "type": "mcq",
+      "questionText": "Find missing: AZ, BY, CX, DW, ?",
+      "options": ["EU", "EV", "FU", "EW"],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "id": "q_apt_19",
+      "type": "mcq",
+      "questionText": "A committee of 3 from 5 men and 4 women. Exactly 2 women?",
+      "options": ["30", "40", "45", "50"],
+      "correctOptionIndex": 0,
+      "marks": 1
+    },
+    {
+      "id": "q_apt_20",
+      "type": "mcq",
+      "questionText": "840 divided in ratio 3:4. B's share?",
+      "options": ["320", "360", "420", "480"],
+      "correctOptionIndex": 3,
+      "marks": 1
+    },
+    {
+      "id": "q_apt_21",
+      "type": "mcq",
+      "questionText": "Find next: 2, 6, 12, 20, 30, ?",
+      "options": ["40", "42", "44", "46"],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "id": "q_apt_22",
+      "type": "mcq",
+      "questionText": "Find next: 81, 54, 36, 24, ?",
+      "options": ["12", "16", "18", "20"],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "id": "q_apt_23",
+      "type": "mcq",
+      "questionText": "Find next: 5, 11, 23, 47, ?",
+      "options": ["89", "91", "94", "95"],
+      "correctOptionIndex": 3,
+      "marks": 1
+    },
+    {
+      "id": "q_apt_24",
+      "type": "mcq",
+      "questionText": "Find next: 1, 4, 10, 22, 46, ?",
+      "options": ["88", "90", "92", "94"],
+      "correctOptionIndex": 3,
+      "marks": 1
+    },
+    {
+      "id": "q_apt_25",
+      "type": "mcq",
+      "questionText": "Boys:girls = 5:3. Total 64. Boys?",
+      "options": ["32", "36", "40", "44"],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "id": "q_apt_26",
+      "type": "mcq",
+      "questionText": "Two numbers are in ratio 7:9 and differ by 34. Find them.",
+      "options": ["98,126", "105,139", "119,153", "126,160"],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "id": "q_apt_27",
+      "type": "mcq",
+      "questionText": "x:y=4:7 and y:z=14:15. Find x:y:z.",
+      "options": ["4:7:15", "8:14:15", "8:7:15", "4:14:15"],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "id": "q_apt_28",
+      "type": "mcq",
+      "questionText": "Square paper folded vertically and horizontally; one hole punched away from folds. Opened holes?",
+      "options": ["1", "2", "3", "4"],
+      "correctOptionIndex": 3,
+      "marks": 1
+    },
+    {
+      "id": "q_apt_29",
+      "type": "mcq",
+      "questionText": "240 students: 60% Java, 45% HTML, 25% both. At least one?",
+      "options": ["180", "192", "204", "216"],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "id": "q_apt_30",
+      "type": "mcq",
+      "questionText": "Find next: 4, 9, 19, 39, 79, ?",
+      "options": ["149", "158", "159", "160"],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "id": "q_apt_31",
+      "type": "mcq",
+      "questionText": "If CAT is coded as DBU, how is DOG coded?",
+      "options": ["EPH", "EOG", "DPH", "FQI"],
+      "correctOptionIndex": 0,
+      "marks": 1
+    },
+    {
+      "id": "q_apt_32",
+      "type": "mcq",
+      "questionText": "Find next letter: B, E, I, N, T, ?",
+      "options": ["A", "B", "C", "D"],
+      "correctOptionIndex": 0,
+      "marks": 1
+    },
+    {
+      "id": "q_apt_33",
+      "type": "mcq",
+      "questionText": "Find next pair: AB, DE, GH, JK, ?",
+      "options": ["LM", "MN", "NO", "OP"],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "id": "q_apt_34",
+      "type": "mcq",
+      "questionText": "Simple interest on 8000 at 7.5% for 2 years?",
+      "options": ["1000", "1100", "1200", "1300"],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "id": "q_apt_35",
+      "type": "mcq",
+      "questionText": "10000 at 10% compound interest for 2 years. CI?",
+      "options": ["2000", "2100", "2200", "2400"],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "id": "q_apt_36",
+      "type": "mcq",
+      "questionText": "Some books are novels. All novels are stories. Which follows?",
+      "options": [
+        "Some books are stories",
+        "All stories are novels",
+        "No books are stories",
+        "All books are stories"
+      ],
+      "correctOptionIndex": 0,
+      "marks": 1
+    },
+    {
+      "id": "q_apt_37",
+      "type": "mcq",
+      "questionText": "No car is a bicycle. Some bicycles are electric. Which follows?",
+      "options": [
+        "Some electric things are not cars",
+        "No electric thing is a car",
+        "All cars are electric",
+        "Some cars are bicycles"
+      ],
+      "correctOptionIndex": 0,
+      "marks": 1
+    },
+    {
+      "id": "q_apt_38",
+      "type": "mcq",
+      "questionText": "A person faces east, turns right, then right again. Which direction now?",
+      "options": ["North", "South", "East", "West"],
+      "correctOptionIndex": 3,
+      "marks": 1
+    },
+    {
+      "id": "q_apt_39",
+      "type": "mcq",
+      "questionText": "A train travels 240 km in 4 hours. Average speed?",
+      "options": ["50 km/h", "60 km/h", "70 km/h", "80 km/h"],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "id": "q_apt_40",
+      "type": "mcq",
+      "questionText": "If a card is drawn from a well-shuffled pack of 52 cards, what is the probability of getting a king?",
+      "options": ["1/13", "1/26", "1/52", "4/13"],
+      "correctOptionIndex": 0,
+      "marks": 1
+    },
+    {
+      "id": "q_java_1",
+      "type": "mcq",
+      "questionText": "Output: int a=10; int b=3; System.out.println(a+b);",
+      "options": ["7", "13", "30", "Error"],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "id": "q_java_2",
+      "type": "mcq",
+      "questionText": "Which keyword prevents a class from being inherited?",
+      "options": ["static", "final", "private", "const"],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "id": "q_java_3",
+      "type": "mcq",
+      "questionText": "Output: int x=5; x++; System.out.println(x*2);",
+      "options": ["5", "6", "10", "12"],
+      "correctOptionIndex": 3,
+      "marks": 1
+    },
+    {
+      "id": "q_java_4",
+      "type": "mcq",
+      "questionText": "What is method overloading?",
+      "options": [
+        "Same method name with different parameter lists",
+        "Same method in different packages",
+        "Changing only the return type",
+        "Creating many objects"
+      ],
+      "correctOptionIndex": 0,
+      "marks": 1
+    },
+    {
+      "id": "q_java_5",
+      "type": "mcq",
+      "questionText": "Output: String s=\"Java\"; System.out.println(s.length());",
+      "options": ["3", "4", "5", "Error"],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "id": "q_java_6",
+      "type": "mcq",
+      "questionText": "Which keyword is used to inherit a class?",
+      "options": ["implements", "extends", "inherits", "super"],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "id": "q_java_7",
+      "type": "mcq",
+      "questionText": "Which collection does not allow duplicate elements?",
+      "options": ["ArrayList", "LinkedList", "HashSet", "Vector"],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "id": "q_java_8",
+      "type": "mcq",
+      "questionText": "Output: int[] a={2,4,6,8}; System.out.println(a[1]);",
+      "options": ["2", "4", "6", "8"],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "id": "q_java_9",
+      "type": "mcq",
+      "questionText": "What is the main difference between == and equals() for objects?",
+      "options": [
+        "Both always compare content",
+        "== compares references; equals() can compare logical equality",
+        "== compares strings only",
+        "equals() compares memory only"
+      ],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "id": "q_java_10",
+      "type": "mcq",
+      "questionText": "Output: int x=7; if(x>5) System.out.println(\"Yes\"); else System.out.println(\"No\");",
+      "options": ["Yes", "No", "7", "Error"],
+      "correctOptionIndex": 0,
+      "marks": 1
+    },
+    {
+      "id": "q_java_11",
+      "type": "mcq",
+      "questionText": "Which keyword refers to the current object?",
+      "options": ["self", "this", "current", "object"],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "id": "q_java_12",
+      "type": "mcq",
+      "questionText": "Which Java type stores key-value pairs?",
+      "options": ["Set", "List", "Map", "Queue"],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "id": "q_java_13",
+      "type": "mcq",
+      "questionText": "Output: int sum=0; for(int i=1;i<=3;i++) sum+=i; System.out.println(sum);",
+      "options": ["3", "5", "6", "7"],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "id": "q_java_14",
+      "type": "mcq",
+      "questionText": "What does StringBuilder mainly provide?",
+      "options": [
+        "A mutable sequence of characters",
+        "An immutable sequence of characters",
+        "A database connection",
+        "A thread"
+      ],
+      "correctOptionIndex": 0,
+      "marks": 1
+    },
+    {
+      "id": "q_java_15",
+      "type": "mcq",
+      "questionText": "Output: String s=\"Hello\"; System.out.println(s.charAt(1));",
+      "options": ["H", "e", "l", "o"],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "id": "q_html_1",
+      "type": "mcq",
+      "questionText": "Which HTML element is used for the main heading?",
+      "options": ["<head>", "<h1>", "<heading>", "<title>"],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "id": "q_html_2",
+      "type": "mcq",
+      "questionText": "Which attribute specifies the destination of an anchor link?",
+      "options": ["src", "href", "link", "url"],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "id": "q_html_3",
+      "type": "mcq",
+      "questionText": "Which HTML element displays an image?",
+      "options": ["<image>", "<pic>", "<img>", "<src>"],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "id": "q_html_4",
+      "type": "mcq",
+      "questionText": "Which attribute provides alternative text for an image?",
+      "options": ["title", "alt", "text", "description"],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "id": "q_html_5",
+      "type": "mcq",
+      "questionText": "Which element creates a numbered list?",
+      "options": ["<ul>", "<ol>", "<li>", "<list>"],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "id": "q_html_6",
+      "type": "mcq",
+      "questionText": "Which input type allows one selection from a group?",
+      "options": ["checkbox", "radio", "text", "range"],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "id": "q_html_7",
+      "type": "mcq",
+      "questionText": "Which element creates a table row?",
+      "options": ["<td>", "<tr>", "<th>", "<row>"],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "id": "q_html_8",
+      "type": "mcq",
+      "questionText": "Which semantic element is intended for navigation links?",
+      "options": ["<navigate>", "<links>", "<nav>", "<menu>"],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "id": "q_html_9",
+      "type": "mcq",
+      "questionText": "Which attribute makes an input mandatory?",
+      "options": ["validate", "required", "must", "needed"],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "id": "q_html_10",
+      "type": "mcq",
+      "questionText": "What is the usual difference between id and class?",
+      "options": [
+        "id is normally unique; class can be shared",
+        "class is always unique; id can be shared",
+        "Both must be unique",
+        "No difference"
+      ],
+      "correctOptionIndex": 0,
+      "marks": 1
+    },
+    {
+      "id": "q_html_11",
+      "type": "mcq",
+      "questionText": "Which CSS property changes text color?",
+      "options": ["font-color", "text-color", "color", "foreground"],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "id": "q_html_12",
+      "type": "mcq",
+      "questionText": "Which CSS property changes background color?",
+      "options": ["bgcolor", "background-color", "color-bg", "background-style"],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "id": "q_html_13",
+      "type": "mcq",
+      "questionText": "Which symbol selects an ID in CSS?",
+      "options": [".", "#", "*", "@"],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "id": "q_html_14",
+      "type": "mcq",
+      "questionText": "Which symbol selects a class in CSS?",
+      "options": ["#", ".", "*", "@"],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "id": "q_html_15",
+      "type": "mcq",
+      "questionText": "Which property controls space inside the border?",
+      "options": ["margin", "padding", "spacing", "outline"],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "id": "q_html_16",
+      "type": "mcq",
+      "questionText": "Which property controls space outside the border?",
+      "options": ["padding", "margin", "gap", "outline"],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "id": "q_html_17",
+      "type": "mcq",
+      "questionText": "Which declaration creates a Flexbox container?",
+      "options": ["display:flex", "position:flex", "flex:display", "layout:flex"],
+      "correctOptionIndex": 0,
+      "marks": 1
+    },
+    {
+      "id": "q_html_18",
+      "type": "mcq",
+      "questionText": "Which property controls main-axis distribution in Flexbox?",
+      "options": ["align-items", "justify-content", "align-content", "place-items"],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "id": "q_html_19",
+      "type": "mcq",
+      "questionText": "Which unit is relative to the root element's font size?",
+      "options": ["px", "em", "rem", "cm"],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "id": "q_html_20",
+      "type": "mcq",
+      "questionText": "Which media query applies at 600px or less?",
+      "options": [
+        "@media (min-width:600px)",
+        "@media (max-width:600px)",
+        "@screen (600px)",
+        "@media (width < 600)"
+      ],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "id": "q_sql1",
+      "type": "sql-join",
+      "questionText": "JOIN Query 1 — Student and Course\n\nGiven the tables:\n- Students(student_id, student_name, course_id)\n- Courses(course_id, course_name)\n\nWrite a SQL query using INNER JOIN to display each student's name and course name.",
+      "codeTemplate": "",
+      "marks": 5
+    },
+    {
+      "id": "q_sql2",
+      "type": "sql-join",
+      "questionText": "JOIN Query 2 — Student and Marks\n\nGiven the tables:\n- Students(student_id, student_name)\n- Marks(student_id, subject, marks)\n\nWrite a SQL query using INNER JOIN to display student name, subject and marks for every matching student record.",
+      "codeTemplate": "",
+      "marks": 5
+    },
+    {
+      "id": "q_java_coding_1",
+      "type": "coding",
+      "questionText": "Write a Java program to reverse a given string. The input string will be provided as a variable 's' in the main method. Your program must reverse the string and print the result using System.out.println.",
+      "codeTemplate": "public class Main {\n    public static void main(String[] args) {\n        String s = \"hello\";\n        // Write your code below to reverse string 's' and print it\n        \n    }\n}",
+      "testCases": [
+        { "input": "\"hello\"", "expected": "\"olleh\"" },
+        { "input": "\"world\"", "expected": "\"dlrow\"" },
+        { "input": "\"Java\"", "expected": "\"avaJ\"" },
+        { "input": "\"racecar\"", "expected": "\"racecar\"" },
+        { "input": "\"a\"", "expected": "\"a\"" },
+        { "input": "\"\"", "expected": "\"\"" }
+      ],
+      "marks": 10
+    },
+    {
+      "id": "q_java_coding_2",
+      "type": "coding",
+      "questionText": "Write a Java program to count the number of vowels (a, e, i, o, u - case insensitive) in a given string. The input string will be provided as a variable 's' in the main method. Your program must count the vowels and print the total count using System.out.println.",
+      "codeTemplate": "public class Main {\n    public static void main(String[] args) {\n        String s = \"education\";\n        // Write your code below to count the vowels in 's' and print the count\n        \n    }\n}",
+      "testCases": [
+        { "input": "\"education\"", "expected": "5" },
+        { "input": "\"hello\"", "expected": "2" },
+        { "input": "\"xyz\"", "expected": "0" },
+        { "input": "\"AEIOUaeiou\"", "expected": "10" },
+        { "input": "\"Beautiful Day\"", "expected": "5" },
+        { "input": "\"\"", "expected": "0" }
+      ],
+      "marks": 10
+    },
+    {
+      "id": "q_html_coding",
+      "type": "practical-html",
+      "questionText": "Create a simple responsive student profile card layout.\n\nRequirements:\n1. Must contain a heading (e.g. h1, h2, or h3).\n2. Must contain details: Student Name, Course Name, and Email Address.\n3. Must contain a button (e.g. button or styled button).\n4. All elements must be inside a card container card.\n5. Use CSS for padding, spacing, border, and centered margin.\n6. CSS must include a responsive @media query for mobile screens (e.g. width <= 500px).",
+      "codeTemplate": "<!DOCTYPE html>\n<html>\n<head>\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Student Card</title>\n    <style>\n        body {\n            font-family: Arial, sans-serif;\n            background: #f2f2f2;\n            margin: 0;\n            padding: 30px;\n        }\n        /* Write your CSS styling here */\n        \n    </style>\n</head>\n<body>\n    <!-- Write your HTML structure here -->\n    \n</body>\n</html>",
+      "marks": 10
+    }
+  ]
+}

@@ -1,990 +1,702 @@
 {
-  "title": " GGU Technical Assigenment 1",
-  "duration": 120,
-  "passingMarks": 30,
+  "title": "Swarnandhra Assigenment 1",
+  "duration": 90,
+  "passingMarks": 40,
   "resumeWindow": 60,
   "questions": [
     {
       "type": "mcq",
-      "questionText": "A train 120m long passes a telegraph post in 6 seconds. Find the speed of the train in km/h.",
+      "questionText": "A train covers 240 km in 4 hours. If it maintains the same speed, how far will it travel in 6 hours?",
       "options": [
-        "36 km/h",
-        "72 km/h",
-        "60 km/h",
-        "90 km/h"
-      ],
-      "correctOptionIndex": 1,
-      "marks": 1,
-      "id": "q_1"
-    },
-    {
-      "type": "mcq",
-      "questionText": "A can complete a piece of work in 12 days and B can complete the same work in 24 days. How many days will they take if they work together?",
-      "options": [
-        "6 days",
-        "8 days",
-        "10 days",
-        "12 days"
-      ],
-      "correctOptionIndex": 1,
-      "marks": 1,
-      "id": "q_2"
-    },
-    {
-      "type": "mcq",
-      "questionText": "What is the percentage change in the area of a rectangle if its length is increased by 20% and its width is decreased by 10%?",
-      "options": [
-        "8% increase",
-        "10% increase",
-        "5% decrease",
-        "No change"
-      ],
-      "correctOptionIndex": 0,
-      "marks": 1,
-      "id": "q_3"
-    },
-    {
-      "type": "mcq",
-      "questionText": "A sum of money triples itself in 10 years at simple interest. What is the rate of interest per annum?",
-      "options": [
-        "10%",
-        "15%",
-        "20%",
-        "25%"
+        "300 km",
+        "320 km",
+        "360 km",
+        "400 km"
       ],
       "correctOptionIndex": 2,
-      "marks": 1,
-      "id": "q_4"
+      "marks": 1
     },
     {
       "type": "mcq",
-      "questionText": "A bag contains 5 red and 7 blue balls. If a ball is drawn at random, what is the probability that it is red?",
+      "questionText": "A can finish a piece of work in 12 days. B can finish the same work in 6 days. Working together, they complete the work in:",
       "options": [
-        "5/12",
-        "7/12",
-        "1/5",
-        "1/7"
-      ],
-      "correctOptionIndex": 0,
-      "marks": 1,
-      "id": "q_5"
-    },
-    {
-      "type": "mcq",
-      "questionText": "Find the average of the first 50 natural numbers.",
-      "options": [
-        "25",
-        "25.5",
-        "50",
-        "50.5"
+        "3 days",
+        "4 days",
+        "5 days",
+        "6 days"
       ],
       "correctOptionIndex": 1,
-      "marks": 1,
-      "id": "q_6"
+      "marks": 1
     },
     {
       "type": "mcq",
-      "questionText": "The ratio of ages of A and B is 3:4. If the sum of their ages is 28 years, find B's age.",
+      "questionText": "Find the next number in the sequence: 3, 7, 15, 31, ?",
       "options": [
-        "12 years",
-        "16 years",
-        "20 years",
-        "24 years"
+        "45",
+        "57",
+        "63",
+        "64"
       ],
-      "correctOptionIndex": 1,
-      "marks": 1,
-      "id": "q_7"
+      "correctOptionIndex": 2,
+      "marks": 1
     },
     {
       "type": "mcq",
-      "questionText": "An article is sold for $180 at a loss of 10%. What is its cost price?",
+      "questionText": "If SOUTH is written as HTUOS, then COMPUTER is written as:",
       "options": [
-        "$200",
-        "$210",
-        "$190",
-        "$220"
+        "RETUPMOC",
+        "RETUPOMC",
+        "RETUPMCO",
+        "RETUMPOC"
       ],
       "correctOptionIndex": 0,
-      "marks": 1,
-      "id": "q_8"
+      "marks": 1
     },
     {
       "type": "mcq",
-      "questionText": "Find the Highest Common Factor (HCF) of 48 and 72.",
+      "questionText": "Choose the synonym of 'Meticulous'",
       "options": [
+        "Careless",
+        "Honest",
+        "Very careful and precise",
+        "Brave"
+      ],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Choose the antonym of 'Reluctant'",
+      "options": [
+        "Hesitant",
+        "Fearful",
+        "Lazy",
+        "Willing"
+      ],
+      "correctOptionIndex": 3,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Choose the correctly spelled word.",
+      "options": [
+        "Accomodation",
+        "Accommodation",
+        "Acommodation",
+        "Accommadation"
+      ],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Pointing to a woman, Ravi said, 'She is the daughter of my grandfather's only son.' The woman is Ravi's:",
+      "options": [
+        "Mother",
+        "Aunt",
+        "Sister",
+        "Cousin"
+      ],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "What is the output of the following Java code?\n\nint x = 8;\nif(x % 3 == 2)\n System.out.print(\"Java\");\nelse\n System.out.print(\"Spring\");",
+      "options": [
+        "Error",
+        "Spring",
+        "Java",
+        "Nothing"
+      ],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "What is the output of the following Java code?\n\nint sum = 0;\nfor(int i = 1; i <= 4; i++)\n sum += i;\nSystem.out.println(sum);",
+      "options": [
+        "8",
+        "9",
+        "10",
+        "11"
+      ],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "What is the output of the following Java code?\n\nint a = 5;\nSystem.out.println(a++ + ++a);",
+      "options": [
+        "10",
+        "11",
         "12",
-        "24",
-        "6",
-        "8"
+        "13"
       ],
-      "correctOptionIndex": 1,
-      "marks": 1,
-      "id": "q_9"
+      "correctOptionIndex": 2,
+      "marks": 1
     },
     {
       "type": "mcq",
-      "questionText": "In how many different ways can the letters of the word 'CAT' be arranged?",
+      "questionText": "What is the output of the following Java code?\n\nint[] arr = {2, 4, 6, 8};\nSystem.out.println(arr[arr.length - 2]);",
       "options": [
-        "3",
+        "8",
         "6",
+        "4",
+        "Error"
+      ],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "What is the output when input is 'TechWing AI'?\n\nScanner sc = new Scanner(System.in);\nString name = sc.next();\nSystem.out.print(name);",
+      "options": [
+        "TechWing AI",
+        "TechWing",
+        "AI",
+        "Error"
+      ],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which Scanner method should be used instead of next() to read the entire line including spaces?",
+      "options": [
+        "nextWord()",
+        "read()",
+        "getline()",
+        "nextLine()"
+      ],
+      "correctOptionIndex": 3,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "What is the output of the following Java code?\n\nfor(int i = 5; i >= 1; i--)\n System.out.print(i + \" \");",
+      "options": [
+        "1 2 3 4 5",
+        "5 4 3 2 1",
+        "5 4 3 2",
+        "Error"
+      ],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "What is the output of the following Java code?\n\nint a = 12;\nwhile(a > 8) {\n a--;\n}\nSystem.out.print(a);",
+      "options": [
+        "7",
+        "8",
         "9",
         "12"
       ],
       "correctOptionIndex": 1,
-      "marks": 1,
-      "id": "q_10"
+      "marks": 1
     },
     {
       "type": "mcq",
-      "questionText": "Find the missing number in the sequence: 2, 5, 10, 17, 26, ?",
+      "questionText": "Which HTML input type provides a calendar for selecting a date?",
       "options": [
-        "35",
-        "37",
-        "39",
-        "41"
-      ],
-      "correctOptionIndex": 1,
-      "marks": 1,
-      "id": "q_11"
-    },
-    {
-      "type": "mcq",
-      "questionText": "If RED is coded as 360, how is BLUE coded?",
-      "options": [
-        "480",
-        "320",
-        "240",
-        "180"
-      ],
-      "correctOptionIndex": 1,
-      "marks": 1,
-      "id": "q_12"
-    },
-    {
-      "type": "mcq",
-      "questionText": "Pointing to a photograph, a man said, 'I have no brother or sister but that man's father is my father's son.' Who is in the photograph?",
-      "options": [
-        "His son",
-        "His father",
-        "Himself",
-        "His uncle"
-      ],
-      "correctOptionIndex": 0,
-      "marks": 1,
-      "id": "q_13"
-    },
-    {
-      "type": "mcq",
-      "questionText": "Find the odd one out among the following shapes:",
-      "options": [
-        "Square",
-        "Triangle",
-        "Circle",
-        "Rectangle"
+        "time",
+        "datetime",
+        "date",
+        "calendar"
       ],
       "correctOptionIndex": 2,
-      "marks": 1,
-      "id": "q_14"
+      "marks": 1
     },
     {
       "type": "mcq",
-      "questionText": "Find the missing letters in the pattern: AZ, BY, CX, ?",
+      "questionText": "What is the purpose of the placeholder attribute?",
       "options": [
-        "DW",
-        "EV",
-        "DU",
-        "FU"
-      ],
-      "correctOptionIndex": 0,
-      "marks": 1,
-      "id": "q_15"
-    },
-    {
-      "type": "mcq",
-      "questionText": "A man walks 5 km East, turns right and walks 4 km, then turns left and walks 5 km. In which direction is he from his starting point?",
-      "options": [
-        "North-East",
-        "South-East",
-        "South-West",
-        "North-West"
-      ],
-      "correctOptionIndex": 1,
-      "marks": 1,
-      "id": "q_16"
-    },
-    {
-      "type": "mcq",
-      "questionText": "Identify the logical conclusion: 'All men are mortal. Socrates is a man.'",
-      "options": [
-        "Socrates is mortal",
-        "Socrates is immortal",
-        "All mortals are Socrates",
-        "Socrates is a man"
-      ],
-      "correctOptionIndex": 0,
-      "marks": 1,
-      "id": "q_17"
-    },
-    {
-      "type": "mcq",
-      "questionText": "If '+' means 'x', '-' means '+', 'x' means '/' and '/' means '-', then what is: 10 + 5 - 3 / 2?",
-      "options": [
-        "51",
-        "48",
-        "53",
-        "45"
-      ],
-      "correctOptionIndex": 0,
-      "marks": 1,
-      "id": "q_18"
-    },
-    {
-      "type": "mcq",
-      "questionText": "Which number replaces the question mark in the sequence? 1, 8, 27, 64, ?",
-      "options": [
-        "125",
-        "100",
-        "81",
-        "144"
-      ],
-      "correctOptionIndex": 0,
-      "marks": 1,
-      "id": "q_19"
-    },
-    {
-      "type": "mcq",
-      "questionText": "In a row of 20 students, A is 8th from the left. What is A's position from the right?",
-      "options": [
-        "12th",
-        "13th",
-        "14th",
-        "11th"
-      ],
-      "correctOptionIndex": 1,
-      "marks": 1,
-      "id": "q_20"
-    },
-    {
-      "type": "mcq",
-      "questionText": "Choose the synonym of 'Candid'.",
-      "options": [
-        "Frank",
-        "Dishonest",
-        "Secretive",
-        "Soft"
-      ],
-      "correctOptionIndex": 0,
-      "marks": 1,
-      "id": "q_21"
-    },
-    {
-      "type": "mcq",
-      "questionText": "Choose the antonym of 'Giant'.",
-      "options": [
-        "Dwarf",
-        "Huge",
-        "Large",
-        "Strong"
-      ],
-      "correctOptionIndex": 0,
-      "marks": 1,
-      "id": "q_22"
-    },
-    {
-      "type": "mcq",
-      "questionText": "Identify the grammatical error in this sentence: 'Each of the students have submitted their assignment.'",
-      "options": [
-        "Each of",
-        "the students",
-        "have submitted",
-        "their assignment"
+        "Makes input mandatory",
+        "Changes the input type",
+        "Displays hint text inside the input field",
+        "Creates a label"
       ],
       "correctOptionIndex": 2,
-      "marks": 1,
-      "id": "q_23"
+      "marks": 1
     },
     {
       "type": "mcq",
-      "questionText": "Complete the sentence: 'She is ________ of dogs.'",
+      "questionText": "If the email field is left empty and the user clicks Submit, what happens?\n\n<form>\n <input type=\"email\" required>\n <input type=\"submit\">\n</form>",
       "options": [
-        "afraid",
-        "fear",
-        "scaring",
-        "frighten"
-      ],
-      "correctOptionIndex": 0,
-      "marks": 1,
-      "id": "q_24"
-    },
-    {
-      "type": "mcq",
-      "questionText": "What is the meaning of the idiom 'Burn the midnight oil'?",
-      "options": [
-        "Work late into the night",
-        "Waste time",
-        "Sleep early",
-        "Cook food"
-      ],
-      "correctOptionIndex": 0,
-      "marks": 1,
-      "id": "q_25"
-    },
-    {
-      "type": "mcq",
-      "questionText": "Which component of Java is responsible for running the compiled bytecode?",
-      "options": [
-        "JDK",
-        "JVM",
-        "JRE",
-        "Compiler"
-      ],
-      "correctOptionIndex": 1,
-      "marks": 1,
-      "id": "q_26"
-    },
-    {
-      "type": "mcq",
-      "questionText": "Which data type is used to store fractional numbers in Java by default?",
-      "options": [
-        "float",
-        "double",
-        "int",
-        "long"
-      ],
-      "correctOptionIndex": 1,
-      "marks": 1,
-      "id": "q_27"
-    },
-    {
-      "type": "mcq",
-      "questionText": "Which keyword is used to prevent method overriding in Java?",
-      "options": [
-        "static",
-        "final",
-        "abstract",
-        "private"
-      ],
-      "correctOptionIndex": 1,
-      "marks": 1,
-      "id": "q_28"
-    },
-    {
-      "type": "mcq",
-      "questionText": "What is the size of the int data type in Java?",
-      "options": [
-        "8-bit",
-        "16-bit",
-        "32-bit",
-        "64-bit"
+        "Form is submitted",
+        "Browser ignores the field",
+        "Browser prevents submission until a valid email is entered",
+        "Compilation error"
       ],
       "correctOptionIndex": 2,
-      "marks": 1,
-      "id": "q_29"
+      "marks": 1
     },
     {
       "type": "mcq",
-      "questionText": "Which of the following is NOT an Object-Oriented Programming (OOP) concept in Java?",
+      "questionText": "Which HTML tag is most appropriate for emphasizing text semantically?",
       "options": [
-        "Polymorphism",
-        "Compilation",
-        "Encapsulation",
-        "Inheritance"
+        "<b> (bold - visual only)",
+        "<strong> (strong emphasis - semantic)",
+        "<font> (deprecated)",
+        "<big> (deprecated)"
       ],
       "correctOptionIndex": 1,
-      "marks": 1,
-      "id": "q_30"
+      "marks": 1
     },
     {
       "type": "mcq",
-      "questionText": "Which memory area stores local variables in Java?",
+      "questionText": "What is the time complexity of finding the largest element in an unsorted array of size N?",
       "options": [
-        "Heap memory",
-        "Stack memory",
-        "Method area",
-        "Register memory"
-      ],
-      "correctOptionIndex": 1,
-      "marks": 1,
-      "id": "q_31"
-    },
-    {
-      "type": "mcq",
-      "questionText": "What is the return type of the hashCode() method in the Object class?",
-      "options": [
-        "String",
-        "int",
-        "double",
-        "boolean"
-      ],
-      "correctOptionIndex": 1,
-      "marks": 1,
-      "id": "q_32"
-    },
-    {
-      "type": "mcq",
-      "questionText": "Which package is automatically imported by default in every Java program?",
-      "options": [
-        "java.io",
-        "java.util",
-        "java.lang",
-        "java.net"
+        "O(1)",
+        "O(log N)",
+        "O(N)",
+        "O(N²)"
       ],
       "correctOptionIndex": 2,
-      "marks": 1,
-      "id": "q_33"
+      "marks": 1
     },
     {
       "type": "mcq",
-      "questionText": "What happens when a thread's sleep() method is called?",
+      "questionText": "In the Two Pointer technique, two indices are typically used to:",
       "options": [
-        "Thread terminates",
-        "Thread yields execution",
-        "Thread pauses for specified duration",
-        "Thread blocks indefinitely"
+        "Sort the array automatically",
+        "Traverse or compare elements efficiently from different positions",
+        "Reduce array size",
+        "Store duplicate values"
+      ],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which HTML tag is used to merge two columns in a table?",
+      "options": [
+        "rowspan",
+        "colspan",
+        "merge",
+        "colspanmerge"
+      ],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "What is the output of the following Java code?\n\nclass Demo {\n public static void show() {\n System.out.print(\"Hello\");\n }\n public static void main(String[] args) {\n show();\n }\n}",
+      "options": [
+        "Hello World",
+        "Error",
+        "Hello",
+        "Nothing"
       ],
       "correctOptionIndex": 2,
-      "marks": 1,
-      "id": "q_34"
+      "marks": 1
     },
     {
       "type": "mcq",
-      "questionText": "Which exception is thrown when an array is accessed with an invalid index?",
+      "questionText": "Which statement about the main() method is correct?",
       "options": [
-        "NullPointerException",
-        "ArithmeticException",
-        "ArrayIndexOutOfBoundsException",
-        "IllegalArgumentException"
-      ],
-      "correctOptionIndex": 2,
-      "marks": 1,
-      "id": "q_35"
-    },
-    {
-      "type": "mcq",
-      "questionText": "Which keyword is used to inherit a class in Java?",
-      "options": [
-        "implements",
-        "extends",
-        "inherits",
-        "import"
-      ],
-      "correctOptionIndex": 1,
-      "marks": 1,
-      "id": "q_36"
-    },
-    {
-      "type": "mcq",
-      "questionText": "Can we overload the main method in Java?",
-      "options": [
-        "Yes",
-        "No",
-        "Only if it is static",
-        "Only inside abstract classes"
-      ],
-      "correctOptionIndex": 0,
-      "marks": 1,
-      "id": "q_37"
-    },
-    {
-      "type": "mcq",
-      "questionText": "Which interface from the Java Collections Framework does NOT allow duplicate elements?",
-      "options": [
-        "List",
-        "Set",
-        "Map",
-        "Queue"
-      ],
-      "correctOptionIndex": 1,
-      "marks": 1,
-      "id": "q_38"
-    },
-    {
-      "type": "mcq",
-      "questionText": "Which class is used to create mutable strings in Java?",
-      "options": [
-        "String",
-        "StringBuilder",
-        "Character",
-        "Integer"
-      ],
-      "correctOptionIndex": 1,
-      "marks": 1,
-      "id": "q_39"
-    },
-    {
-      "type": "mcq",
-      "questionText": "What is the default value of a boolean instance variable in Java?",
-      "options": [
-        "true",
-        "false",
-        "null",
-        "0"
-      ],
-      "correctOptionIndex": 1,
-      "marks": 1,
-      "id": "q_40"
-    },
-    {
-      "type": "mcq",
-      "questionText": "Which operator is used to check if an object is of a specific class type?",
-      "options": [
-        "instanceof",
-        "typeof",
-        "is",
-        "check"
-      ],
-      "correctOptionIndex": 0,
-      "marks": 1,
-      "id": "q_41"
-    },
-    {
-      "type": "mcq",
-      "questionText": "What is a default constructor of a class?",
-      "options": [
-        "Created by programmer",
-        "Automatically generated if no other constructor is defined",
-        "Constructor with parameters",
-        "A constructor with an empty body only"
-      ],
-      "correctOptionIndex": 1,
-      "marks": 1,
-      "id": "q_42"
-    },
-    {
-      "type": "mcq",
-      "questionText": "Which statement is true about interface variables in Java?",
-      "options": [
-        "They are private and final",
-        "They are public, static, and final",
-        "They are protected",
-        "They can be modified by implementing classes"
-      ],
-      "correctOptionIndex": 1,
-      "marks": 1,
-      "id": "q_43"
-    },
-    {
-      "type": "mcq",
-      "questionText": "Which block is guaranteed to execute whether an exception is caught or not?",
-      "options": [
-        "try",
-        "catch",
-        "finally",
-        "throw"
-      ],
-      "correctOptionIndex": 2,
-      "marks": 1,
-      "id": "q_44"
-    },
-    {
-      "type": "mcq",
-      "questionText": "What is the purpose of garbage collection in Java?",
-      "options": [
-        "Deleting source files",
-        "Freeing unreferenced heap memory",
-        "Clearing system temp folders",
-        "Reclaiming stack frames"
-      ],
-      "correctOptionIndex": 1,
-      "marks": 1,
-      "id": "q_45"
-    },
-    {
-      "type": "mcq",
-      "questionText": "What does HTML stand for?",
-      "options": [
-        "Hyper Text Markup Language",
-        "Home Tool Markup Language",
-        "Hyperlinks and Text Markup Language",
-        "High Text Machine Language"
-      ],
-      "correctOptionIndex": 0,
-      "marks": 1,
-      "id": "q_46"
-    },
-    {
-      "type": "mcq",
-      "questionText": "Which HTML element is used for the largest heading?",
-      "options": [
-        "<h6>",
-        "<heading>",
-        "<h1>",
-        "<head>"
-      ],
-      "correctOptionIndex": 2,
-      "marks": 1,
-      "id": "q_47"
-    },
-    {
-      "type": "mcq",
-      "questionText": "Which tag is used to create a hyperlink in HTML?",
-      "options": [
-        "<link>",
-        "<a>",
-        "<href>",
-        "<anchor>"
-      ],
-      "correctOptionIndex": 1,
-      "marks": 1,
-      "id": "q_48"
-    },
-    {
-      "type": "mcq",
-      "questionText": "What is the correct HTML element for inserting a line break?",
-      "options": [
-        "<lb>",
-        "<break>",
-        "<br>",
-        "<ln>"
-      ],
-      "correctOptionIndex": 2,
-      "marks": 1,
-      "id": "q_49"
-    },
-    {
-      "type": "mcq",
-      "questionText": "Which attribute is used to provide alternative text for an image if it cannot be displayed?",
-      "options": [
-        "title",
-        "src",
-        "alt",
-        "longdesc"
-      ],
-      "correctOptionIndex": 2,
-      "marks": 1,
-      "id": "q_50"
-    },
-    {
-      "type": "mcq",
-      "questionText": "Which element is used to define an unordered list in HTML?",
-      "options": [
-        "<ol>",
-        "<ul>",
-        "<li>",
-        "<list>"
-      ],
-      "correctOptionIndex": 1,
-      "marks": 1,
-      "id": "q_51"
-    },
-    {
-      "type": "mcq",
-      "questionText": "In CSS, what does 'CSS' stand for?",
-      "options": [
-        "Creative Style Sheets",
-        "Cascading Style Sheets",
-        "Computer Style Sheets",
-        "Colorful Style Sheets"
-      ],
-      "correctOptionIndex": 1,
-      "marks": 1,
-      "id": "q_52"
-    },
-    {
-      "type": "mcq",
-      "questionText": "Which CSS property is used to change the background color of an element?",
-      "options": [
-        "color",
-        "bg-color",
-        "background-color",
-        "bgcolor"
-      ],
-      "correctOptionIndex": 2,
-      "marks": 1,
-      "id": "q_53"
-    },
-    {
-      "type": "mcq",
-      "questionText": "How do you select an element with the ID 'header' in CSS?",
-      "options": [
-        ".header",
-        "#header",
-        "header",
-        "*header"
-      ],
-      "correctOptionIndex": 1,
-      "marks": 1,
-      "id": "q_54"
-    },
-    {
-      "type": "mcq",
-      "questionText": "Which CSS property controls the text size?",
-      "options": [
-        "font-style",
-        "text-size",
-        "font-size",
-        "text-style"
-      ],
-      "correctOptionIndex": 2,
-      "marks": 1,
-      "id": "q_55"
-    },
-    {
-      "type": "mcq",
-      "questionText": "What is the default value of the position property in CSS?",
-      "options": [
-        "absolute",
-        "relative",
-        "static",
-        "fixed"
-      ],
-      "correctOptionIndex": 2,
-      "marks": 1,
-      "id": "q_56"
-    },
-    {
-      "type": "mcq",
-      "questionText": "Which CSS property is used to create space inside an element's border?",
-      "options": [
-        "margin",
-        "padding",
-        "border-width",
-        "spacing"
-      ],
-      "correctOptionIndex": 1,
-      "marks": 1,
-      "id": "q_57"
-    },
-    {
-      "type": "mcq",
-      "questionText": "How do you center a block-level element horizontally using margins?",
-      "options": [
-        "margin: 0 auto;",
-        "margin: auto 0;",
-        "margin: center;",
-        "margin: 10px;"
-      ],
-      "correctOptionIndex": 0,
-      "marks": 1,
-      "id": "q_58"
-    },
-    {
-      "type": "mcq",
-      "questionText": "Which CSS flexbox property aligns items vertically when flex-direction is row?",
-      "options": [
-        "justify-content",
-        "align-items",
-        "flex-wrap",
-        "align-content"
-      ],
-      "correctOptionIndex": 1,
-      "marks": 1,
-      "id": "q_59"
-    },
-    {
-      "type": "mcq",
-      "questionText": "What is the correct HTML for adding a background color to a web page?",
-      "options": [
-        "<body bg=\"yellow\">",
-        "<body style=\"background-color: yellow;\">",
-        "<background>yellow</background>",
-        "<body color=\"yellow\">"
-      ],
-      "correctOptionIndex": 1,
-      "marks": 1,
-      "id": "q_60"
-    },
-    {
-      "type": "mcq",
-      "questionText": "Which HTML tag is used to define an internal style sheet?",
-      "options": [
-        "<css>",
-        "<script>",
-        "<style>",
-        "<link>"
-      ],
-      "correctOptionIndex": 2,
-      "marks": 1,
-      "id": "q_61"
-    },
-    {
-      "type": "mcq",
-      "questionText": "Which CSS property is used to make text bold?",
-      "options": [
-        "font-style",
-        "font-weight",
-        "text-bold",
-        "font-variant"
-      ],
-      "correctOptionIndex": 1,
-      "marks": 1,
-      "id": "q_62"
-    },
-    {
-      "type": "mcq",
-      "questionText": "How do you display hyperlinks without an underline in CSS?",
-      "options": [
-        "a {text-decoration:none;}",
-        "a {text-style:no-underline;}",
-        "a {underline:none;}",
-        "a {decoration:no-underline;}"
-      ],
-      "correctOptionIndex": 0,
-      "marks": 1,
-      "id": "q_63"
-    },
-    {
-      "type": "mcq",
-      "questionText": "Which HTML5 element is used to represent self-contained content, like a blog post or news article?",
-      "options": [
-        "<section>",
-        "<article>",
-        "<aside>",
-        "<div>"
-      ],
-      "correctOptionIndex": 1,
-      "marks": 1,
-      "id": "q_64"
-    },
-    {
-      "type": "mcq",
-      "questionText": "What is the correct CSS syntax to make all <p> elements uppercase?",
-      "options": [
-        "p {text-transform: uppercase;}",
-        "p {text-align: uppercase;}",
-        "p {font-case: uppercase;}",
-        "p {text-style: uppercase;}"
-      ],
-      "correctOptionIndex": 0,
-      "marks": 1,
-      "id": "q_65"
-    },
-    {
-      "type": "mcq",
-      "questionText": "Which property specifies the stack order of an element (which element should be placed in front of or behind others)?",
-      "options": [
-        "x-index",
-        "y-index",
-        "z-index",
-        "stack-order"
-      ],
-      "correctOptionIndex": 2,
-      "marks": 1,
-      "id": "q_66"
-    },
-    {
-      "type": "mcq",
-      "questionText": "Which HTML element is used to group inline-elements?",
-      "options": [
-        "<div>",
-        "<span>",
-        "<section>",
-        "<p>"
-      ],
-      "correctOptionIndex": 1,
-      "marks": 1,
-      "id": "q_67"
-    },
-    {
-      "type": "mcq",
-      "questionText": "What does the CSS Grid property 'grid-template-columns: repeat(3, 1fr);' do?",
-      "options": [
-        "Creates 3 columns of equal width",
-        "Repeats the grid 3 times",
-        "Creates 3 rows",
-        "Merges 3 columns"
-      ],
-      "correctOptionIndex": 0,
-      "marks": 1,
-      "id": "q_68"
-    },
-    {
-      "type": "mcq",
-      "questionText": "Which of the following CSS selectors has the highest specificity?",
-      "options": [
-        "Class selector",
-        "Element selector",
-        "ID selector",
-        "Inline style"
+        "It can return an integer",
+        "It must be private",
+        "It is optional in every Java application",
+        "It is the entry point from which the JVM starts program execution"
       ],
       "correctOptionIndex": 3,
-      "marks": 1,
-      "id": "q_69"
+      "marks": 1
     },
     {
       "type": "mcq",
-      "questionText": "How do you write a comment in CSS?",
+      "questionText": "What will be the output?\n\nint[] arr = {5, 10, 15, 20};\nSystem.out.println(arr[arr.length - 1]);",
       "options": [
-        "// this is a comment",
-        "/* this is a comment */",
-        "<!-- this is a comment -->",
-        "' this is a comment"
+        "15",
+        "10",
+        "20",
+        "Compilation Error"
+      ],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Consider the following program. What is the output?\n\npublic class Demo {\n static int add(int a, int b) {\n return a + b;\n }\n public static void main(String[] args) {\n System.out.println(add(5, 7));\n }\n}",
+      "options": [
+        "5",
+        "7",
+        "10",
+        "12"
+      ],
+      "correctOptionIndex": 3,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which Scanner method should be used to read a decimal value?",
+      "options": [
+        "next()",
+        "nextLine()",
+        "nextDouble()",
+        "nextString()"
+      ],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which statement is TRUE about Java methods?",
+      "options": [
+        "A method cannot return a value",
+        "Every method must accept parameters",
+        "A method may or may not return a value",
+        "A method can only be called once"
+      ],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "How many times is 'AI' printed?\n\nfor(int i = 1; i <= 2; i++) {\n for(int j = 1; j <= 3; j++) {\n System.out.print(\"AI \");\n }\n}",
+      "options": [
+        "3",
+        "4",
+        "5",
+        "6"
+      ],
+      "correctOptionIndex": 3,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "What will be the output?\n\nint[] arr = {10, 20, 30, 40};\nfor(int i = 1; i < arr.length; i++) {\n System.out.print(arr[i] + \" \");\n}",
+      "options": [
+        "10 20 30",
+        "20 30 40",
+        "10 20 30 40",
+        "30 40"
       ],
       "correctOptionIndex": 1,
-      "marks": 1,
-      "id": "q_70"
+      "marks": 1
     },
     {
-      "type": "coding",
-      "questionText": "Write a Java method that takes a string as input and returns the reversed string.\nMethod Signature: public String reverse(String str)",
-      "codingLanguage": "java",
-      "codeTemplate": "public class Solution {\n    public String reverse(String str) {\n        // Write your code here\n        \n    }\n}",
-      "testCases": [
-        {
-          "input": "\"hello\"",
-          "expected": "olleh"
-        },
-        {
-          "input": "\"Java\"",
-          "expected": "avaJ"
-        }
+      "type": "mcq",
+      "questionText": "Which statement correctly creates an object?",
+      "options": [
+        "Student();",
+        "Student s = Student();",
+        "new Student();",
+        "Student s = new Student();"
       ],
-      "marks": 1,
-      "id": "q_71"
+      "correctOptionIndex": 3,
+      "marks": 1
     },
     {
-      "type": "coding",
-      "questionText": "Write a Java method that returns true if a given integer n is prime, and false otherwise. Assume n > 1.\nMethod Signature: public boolean isPrime(int n)",
-      "codingLanguage": "java",
-      "codeTemplate": "public class Solution {\n    public boolean isPrime(int n) {\n        // Write your code here\n        \n    }\n}",
-      "testCases": [
-        {
-          "input": "7",
-          "expected": "true"
-        },
-        {
-          "input": "10",
-          "expected": "false"
-        }
+      "type": "mcq",
+      "questionText": "What will be the output?\n\nString s = \"Placement\";\nSystem.out.println(s.charAt(3));",
+      "options": [
+        "p",
+        "l",
+        "c",
+        "e"
       ],
-      "marks": 1,
-      "id": "q_72"
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which HTML element is used to group related form controls with a caption?",
+      "options": [
+        "<section>",
+        "<legend>",
+        "<fieldset>",
+        "<group>"
+      ],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which attribute displays a short hint describing the expected value of an input field?",
+      "options": [
+        "value",
+        "required",
+        "id",
+        "placeholder"
+      ],
+      "correctOptionIndex": 3,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "What will be the output?\n\nint x = 10;\nif(x > 5) {\n if(x > 15)\n System.out.print(\"Java\");\n else\n System.out.print(\"Spring\");\n}",
+      "options": [
+        "Java",
+        "Spring",
+        "Java Spring",
+        "Error"
+      ],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "What is the output?\n\nint a = 2;\nwhile(a <= 8) {\n System.out.print(a + \" \");\n a += 2;\n}",
+      "options": [
+        "2 4 6",
+        "2 4 6 8",
+        "2 4 6 8 10",
+        "2 4 6 8 10 12"
+      ],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "What is the output?\n\nint[] arr = {2, 4, 6};\nint sum = 0;\nfor(int x : arr)\n sum += x;\nSystem.out.println(sum);",
+      "options": [
+        "8",
+        "10",
+        "12",
+        "14"
+      ],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which HTML tag is used to display a video?",
+      "options": [
+        "<movie>",
+        "<media>",
+        "<play>",
+        "<video>"
+      ],
+      "correctOptionIndex": 3,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which HTML tag creates a drop-down list?",
+      "options": [
+        "<option>",
+        "<select>",
+        "<choice>",
+        "<dropdown>"
+      ],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which of the following operations takes O(N) time in the worst case?",
+      "options": [
+        "Accessing an array element by index",
+        "Finding the maximum element in an unsorted array",
+        "Reading the first element",
+        "Updating an element at a known index"
+      ],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "The Two Pointer technique is commonly used for:",
+      "options": [
+        "Creating arrays",
+        "Searching or rearranging elements efficiently",
+        "Reducing array size",
+        "Storing duplicate values"
+      ],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "What is the purpose of the <label> tag?",
+      "options": [
+        "Creates a button",
+        "Creates a heading",
+        "Associates descriptive text with a form control",
+        "Makes a field mandatory"
+      ],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "What is the output?\n\nint a = 5;\nSystem.out.println(++a + 2);",
+      "options": [
+        "6",
+        "7",
+        "8",
+        "9"
+      ],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Which of the following is the correct method declaration?",
+      "options": [
+        "public add(int a, int b)",
+        "public int add(int a, int b)",
+        "int public add(int a, int b)",
+        "add(int a, int b)"
+      ],
+      "correctOptionIndex": 1,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Find the next number: 1, 4, 9, 16, 25, ?",
+      "options": [
+        "30",
+        "32",
+        "36",
+        "49"
+      ],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Pointing to a man, Anita said, 'He is the son of my mother's only brother.' The man is Anita's:",
+      "options": [
+        "Brother",
+        "Uncle",
+        "Cousin",
+        "Nephew"
+      ],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Choose the synonym of 'Resilient'",
+      "options": [
+        "Weak",
+        "Lazy",
+        "Flexible",
+        "Able to recover quickly from difficulties"
+      ],
+      "correctOptionIndex": 3,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Choose the antonym of 'Scarce'",
+      "options": [
+        "Rare",
+        "Limited",
+        "Abundant",
+        "Insufficient"
+      ],
+      "correctOptionIndex": 2,
+      "marks": 1
+    },
+    {
+      "type": "mcq",
+      "questionText": "Choose the correctly spelled word.",
+      "options": [
+        "Priviledge",
+        "Privilege",
+        "Privelage",
+        "Privillige"
+      ],
+      "correctOptionIndex": 1,
+      "marks": 1
     },
     {
       "type": "coding",
-      "questionText": "Write a Java method that finds and returns the largest element in an integer array.\nMethod Signature: public int findMax(int[] arr)",
+      "questionText": "Given an array of N integers, move all the 0's to the end of the array while maintaining the relative order of the non-zero elements.\nYou must modify the array such that all non-zero elements appear first in their original order, followed by all the zeroes.\nDo not return anything, modify the array in-place.",
+      "marks": 15,
       "codingLanguage": "java",
-      "codeTemplate": "public class Solution {\n    public int findMax(int[] arr) {\n        // Write your code here\n        \n    }\n}",
+      "codeTemplate": "public class Solution {\n  public void moveZeroes(int[] nums) {\n    // Write your Java code here\n  }\n}",
       "testCases": [
         {
-          "input": "new int[]{1, 5, 3, 9, 2}",
-          "expected": "9"
+          "input": "[0,1,0,3,12,0,5]",
+          "expected": "[1,3,12,5,0,0,0]"
         },
         {
-          "input": "new int[]{-3, -1, -7, -2}",
+          "input": "[1,2,3,4,5]",
+          "expected": "[1,2,3,4,5]"
+        },
+        {
+          "input": "[0,0,0,2,4,6]",
+          "expected": "[2,4,6,0,0,0]"
+        },
+        {
+          "input": "[0,0,0,0]",
+          "expected": "[0,0,0,0]"
+        },
+        {
+          "input": "[1,0,2,0,3,0,4,0]",
+          "expected": "[1,2,3,4,0,0,0,0]"
+        }
+      ]
+    },
+    {
+      "type": "coding",
+      "questionText": "Given an array of N integers, find and print the second largest distinct element in the array.\nIf there is no second largest distinct element (for example, when all elements are the same, or there's only one unique element), print -1.",
+      "marks": 15,
+      "codingLanguage": "java",
+      "codeTemplate": "public class Solution {\n  public int findSecondLargest(int[] arr) {\n    // Write your Java code here\n  }\n}",
+      "testCases": [
+        {
+          "input": "[12,45,8,67,32,55]",
+          "expected": "55"
+        },
+        {
+          "input": "[10,10,10,10,10]",
           "expected": "-1"
-        }
-      ],
-      "marks": 1,
-      "id": "q_73"
-    },
-    {
-      "type": "coding",
-      "questionText": "Write a Java method that returns the factorial of a given non-negative integer n.\nMethod Signature: public int factorial(int n)",
-      "codingLanguage": "java",
-      "codeTemplate": "public class Solution {\n    public int factorial(int n) {\n        // Write your code here\n        \n    }\n}",
-      "testCases": [
-        {
-          "input": "5",
-          "expected": "120"
         },
         {
-          "input": "0",
-          "expected": "1"
+          "input": "[5,18,9,18,12,7,15]",
+          "expected": "15"
+        },
+        {
+          "input": "[100,50,100,50]",
+          "expected": "50"
+        },
+        {
+          "input": "[-5,-10,-3]",
+          "expected": "-5"
         }
-      ],
-      "marks": 1,
-      "id": "q_74"
+      ]
+    },
+    {
+      "type": "practical-html",
+      "questionText": "Create a comprehensive HTML form for student registration with elements like Name (text), Email (email), Password (password), Mobile Number (tel), Date of Birth (date), Gender (radio), Skills (checkbox), Department (select), and Address (textarea). Connect them using labels.",
+      "marks": 10,
+      "codeTemplate": "<!DOCTYPE html>\n<html>\n<head>\n <title>Student Registration Form</title>\n <style>\n  body { font-family: Arial, sans-serif; max-width: 600px; margin: 30px auto; padding: 20px; }\n  form { border: 1px solid #ccc; padding: 20px; border-radius: 5px; }\n  label { display: block; margin-top: 10px; font-weight: bold; }\n  input, select, textarea { width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }\n  button { margin-top: 20px; padding: 10px 20px; margin-right: 10px; cursor: pointer; }\n </style>\n</head>\n<body>\n <h1>Student Registration Form</h1>\n <form>\n  <!-- Add form fields here -->\n </form>\n</body>\n</html>",
+      "correctAnswer": "form"
+    },
+    {
+      "type": "practical-java",
+      "questionText": "Create a Java program that calculates student marks and displays results. Read marks for 3 subjects using Scanner (each subject 0-100). Implement calculateTotal(mark1, mark2, mark3), calculateAverage(total), and displayResult(total, average). Output PASS if average >= 40, else FAIL.",
+      "marks": 10,
+      "codingLanguage": "java",
+      "codeTemplate": "import java.util.Scanner;\n\npublic class StudentMarksCalculator {\n  public static int calculateTotal(int mark1, int mark2, int mark3) {\n    return mark1 + mark2 + mark3;\n  }\n\n  public static double calculateAverage(int total) {\n    return total / 3.0;\n  }\n\n  public static void displayResult(int total, double average) {\n    System.out.println(\"========== RESULT ==========\");\n    System.out.println(\"Total Marks: \" + total);\n    System.out.printf(\"Average Marks: %.2f%n\", average);\n    if (average >= 40) {\n      System.out.println(\"Status: PASS\");\n    } else {\n      System.out.println(\"Status: FAIL\");\n    }\n    System.out.println(\"===========================\");\n  }\n\n  public static void main(String[] args) {\n    Scanner sc = new Scanner(System.in);\n    int mark1 = sc.nextInt();\n    int mark2 = sc.nextInt();\n    int mark3 = sc.nextInt();\n    int total = calculateTotal(mark1, mark2, mark3);\n    double avg = calculateAverage(total);\n    displayResult(total, avg);\n  }\n}",
+      "testCases": [
+        {
+          "input": "85, 90, 78",
+          "expected": "PASS"
+        },
+        {
+          "input": "35, 40, 38",
+          "expected": "FAIL"
+        },
+        {
+          "input": "100, 100, 100",
+          "expected": "PASS"
+        },
+        {
+          "input": "40, 40, 40",
+          "expected": "PASS"
+        },
+        {
+          "input": "30, 35, 39",
+          "expected": "FAIL"
+        }
+      ]
     }
   ]
 }
