@@ -7,7 +7,7 @@ const API_URL = import.meta.env.VITE_API_URL
 
 export interface Question {
   id: string;
-  type: 'mcq' | 'tf' | 'fib' | 'sa' | 'coding' | 'practical-html' | 'practical-java';
+  type: 'mcq' | 'tf' | 'fib' | 'sa' | 'coding' | 'practical-html' | 'practical-java' | 'sql-join';
   questionText: string;
   options?: string[];
   correctOptionIndex?: number;
