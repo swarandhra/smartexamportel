@@ -182,6 +182,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
   
   // Search query
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedExamFilter, setSelectedExamFilter] = useState<string>('All');
 
   // Exam Creator Form state
   const [examTitle, setExamTitle] = useState('');
@@ -605,7 +606,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
 
   // CSV download trigger
   const handleExportCSV = () => {
-    downloadResultsCSV(results);
+    downloadResultsCSV(filteredResults);
   };
 
   // PDF Print trigger
@@ -617,11 +618,13 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
   };
 
   // Filtered Results
-  const filteredResults = results.filter(r => 
-    r.studentName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    r.rollNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    r.examName.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredResults = results.filter(r => {
+    const matchesSearch = r.studentName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          r.rollNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          r.examName.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesExam = selectedExamFilter === 'All' || r.examName === selectedExamFilter;
+    return matchesSearch && matchesExam;
+  });
 
   // SVG Analytics definitions
   const totalSubmissions = results.filter(r => r.isSubmitted).length;
@@ -1350,7 +1353,18 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                 <h2>Data Results Summary (Database Sync)</h2>
                 <p>Review logs, marks, cheating violations, and download sheets.</p>
               </div>
-              <div className="results-toolbar">
+              <div className="results-toolbar" style={{ display: 'flex', gap: '12px' }}>
+                <select 
+                  className="form-control" 
+                  style={{ maxWidth: '200px' }}
+                  value={selectedExamFilter}
+                  onChange={(e) => setSelectedExamFilter(e.target.value)}
+                >
+                  <option value="All">All Exams</option>
+                  {Array.from(new Set(results.map(r => r.examName))).map(exam => (
+                    <option key={exam} value={exam}>{exam}</option>
+                  ))}
+                </select>
                 <input 
                   type="text" 
                   className="form-control filter-input" 
