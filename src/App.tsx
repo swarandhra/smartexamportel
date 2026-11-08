@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import Auth from './components/Auth';
 import AdminLogin from './components/AdminLogin';
 import StudentDashboard from './components/StudentDashboard';
@@ -6,7 +6,7 @@ import VerificationScreen from './components/VerificationScreen';
 import InstructionsScreen from './components/InstructionsScreen';
 import ExamEngine from './components/ExamEngine';
 import OutcomeScreen from './components/OutcomeScreen';
-import AdminDashboard from './components/AdminDashboard';
+const AdminDashboard = lazy(() => import('./components/AdminDashboard'));
 import type { Exam, Result } from './utils/db';
 import { syncOfflineResults } from './utils/helpers';
 
@@ -95,7 +95,11 @@ export default function App() {
   // ─── ADMIN ROUTE (/admin) ───────────────────────────────────────────────────
   if (isAdminRoute) {
     if (role === 'admin') {
-      return <AdminDashboard onLogout={handleLogout} />;
+      return (
+        <Suspense fallback={null}>
+          <AdminDashboard onLogout={handleLogout} />
+        </Suspense>
+      );
     }
     return <AdminLogin onLoginSuccess={handleAdminLoginSuccess} />;
   }

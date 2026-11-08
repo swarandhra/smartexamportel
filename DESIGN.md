@@ -1,7 +1,6 @@
 # Design system
 
-Status: all student screens and the exam are migrated; auth and admin login share the dark `au-*` shell.
-Pending: admin workspace.
+Status: all screens are migrated (student flow, exam, auth/admin login, admin workspace).
 
 ## Tokens (`src/styles/tokens.css`)
 - Semantic colours `--c-*` (indigo primary, slate neutrals, emerald/amber/rose/sky status). Light by default; `[data-theme="dark"]` overrides.
@@ -23,3 +22,9 @@ Dark is applied by putting `data-theme` on a migrated screen's root, so unmigrat
 - Palette is docked >=1100px for non-code questions, a drawer otherwise, a bottom sheet <=640px.
 - Shortcuts (1-4/A-D, arrows, M) are bubble-phase listeners that skip `defaultPrevented` events and any Alt/Ctrl/Meta/Shift combo, so the proctoring capture handlers always run first.
 - Code workspace is always dark; editor is a plain textarea with a synced line-number gutter.
+
+## Admin workspace (`AdminDashboard.tsx`, `styles/admin.css`)
+- Sidebar collapses to icons (new key `ui-admin-sidebar`), theme toggle in the sidebar, page title + actions in a sticky top bar.
+- Integrity report is a right-side drawer that keeps the legacy `modal-*` class names so the print/PDF styles in `index.css` still apply.
+- Delete uses a styled dialog; confirming runs the original delete + resync body.
+- The admin bundle is lazy-loaded from `App.tsx` (`React.lazy` + `Suspense`).

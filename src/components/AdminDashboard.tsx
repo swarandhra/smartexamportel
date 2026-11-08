@@ -2,8 +2,37 @@ import { useState, useEffect } from 'react';
 import { getExams, addExam, deleteExam, getResults, getSettings, saveSettings } from '../utils/db';
 import type { Exam, Question, Result } from '../utils/db';
 import { downloadResultsCSV } from '../utils/helpers';
-import { showToast, showModal, showConfirm } from '../utils/notifications';
+import { showToast, showModal } from '../utils/notifications';
 import { transpileJavaToJS, extractMethodName, runTestCase } from '../utils/javaTranspiler'; 
+import {
+  LayoutGrid, SquarePlus, ClipboardList, BarChart3, Settings, LogOut, PanelLeftClose, PanelLeftOpen, Moon, Sun, Plus, Download, Search, Trash2,
+  EllipsisVertical, Clock, HelpCircle, Trophy, Target, RotateCcw, CalendarRange, ChevronDown, ChevronRight, GripVertical, X, Upload, CheckCircle2,
+  XCircle, ListChecks, Code2, Globe, FileCode2, ToggleLeft, TextCursorInput, AlignLeft, Printer, ShieldCheck, Users, Percent, TrendingUp,
+  AlertTriangle, FileQuestion, FileText, FileSearch, Save,
+} from 'lucide-react';
+import { useTheme } from '../utils/theme';
+import '../styles/admin.css';
+
+// UI-only: derive validation hints from the pasted/uploaded JSON (never used to gate the import itself)
+function jsonChecks(content: string): { ok: boolean; label: string }[] {
+  if (!content.trim()) return [];
+  try {
+    const parsed = JSON.parse(content.trim());
+    if (Array.isArray(parsed)) return [{ ok: true, label: 'Valid JSON' }, { ok: false, label: 'Contains only a questions array. Wrap it in an exam object with a "title".' }];
+    const out: { ok: boolean; label: string }[] = [{ ok: true, label: 'Valid JSON' }];
+    out.push({ ok: !!parsed.title, label: parsed.title ? `Title: ${parsed.title}` : 'Missing "title"' });
+    const qs = Array.isArray(parsed.questions) ? parsed.questions : null;
+    out.push({ ok: !!qs && qs.length > 0, label: qs ? `${qs.length} question(s) found` : 'Missing "questions" list' });
+    if (qs) {
+      const total = qs.reduce((sum: number, q: any) => sum + (q.marks || 1), 0);
+      const pass = parsed.passingMarks !== undefined ? parsed.passingMarks : Math.round(total * 0.4);
+      out.push({ ok: pass <= total, label: `Total ${total} marks, passing ${pass}${pass > total ? ' (exceeds total)' : ''}` });
+    }
+    return out;
+  } catch (err: any) {
+    return [{ ok: false, label: 'Invalid JSON: ' + err.message }];
+  }
+}
 
 function cleanSql(sql: string): string {
   return sql
@@ -208,6 +237,14 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
   const [dragOver, setDragOver] = useState(false);
   const [fileName, setFileName] = useState('');
 
+  // UI-only state
+  const [theme, toggleTheme] = useTheme();
+  const [collapsed, setCollapsed] = useState<boolean>(() => { try { return localStorage.getItem('ui-admin-sidebar') === '1'; } catch { return false; } });
+  const toggleCollapsed = () => setCollapsed(c => { const n = !c; try { localStorage.setItem('ui-admin-sidebar', n ? '1' : '0'); } catch { /* ignore */ } return n; });
+  const [qCollapsed, setQCollapsed] = useState<Record<string, boolean>>({});
+  const [menuFor, setMenuFor] = useState<string | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<string | null>(null);
+
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -261,24 +298,20 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
     setExamEnd(new Date(now.getTime() + 86400000).toISOString().slice(0, 16));
   }, []);
 
-  const handleDeleteExam = async (id: string) => {
-    showConfirm(
-      'Delete Exam?',
-      'Are you sure you want to permanently delete this exam from the database? This action cannot be undone.',
-      async () => {
-        setLoading(true);
-        const res = await deleteExam(id);
-        if (res.success) {
-          showToast('Exam deleted successfully.', 'success');
-        } else {
-          showToast('Failed to delete: ' + (res.error || 'Unknown network or database error'), 'error');
-        }
-        await syncData();
-      },
-      undefined,
-      'Delete Permanently',
-      'Cancel'
-    );
+  const handleDeleteExam = (id: string) => {
+    setPendingDelete(id);
+  };
+
+  const confirmDeleteExam = async (id: string) => {
+    setPendingDelete(null);
+    setLoading(true);
+    const res = await deleteExam(id);
+    if (res.success) {
+      showToast('Exam deleted successfully.', 'success');
+    } else {
+      showToast('Failed to delete: ' + (res.error || 'Unknown network or database error'), 'error');
+    }
+    await syncData();
   };
 
   // Add Question to Form
@@ -665,8 +698,12 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
 
   if (loading && exams.length === 0) {
     return (
-      <div className="admin-workspace" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh' }}>
-        <div className="loading-state">Syncing secure database records...</div>
+      <div className="ui-shell" data-theme={theme}>
+        <div className="ui-container" aria-busy="true" aria-label="Syncing secure database records">
+          <div className="ui-skeleton" style={{ height: 56, marginBottom: 24 }} />
+          <div className="ui-skeleton" style={{ height: 160, marginBottom: 16 }} />
+          <div className="ui-skeleton" style={{ height: 160 }} />
+        </div>
       </div>
     );
   }
@@ -795,950 +832,666 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
     });
   }
 
+  const titles: Record<typeof activeTab, [string, string]> = {
+    exams: ['Manage exams', 'Create, update, and review exams available in the database.'],
+    create: ['Create new exam', 'Build custom exams manually or perform a JSON bulk import.'],
+    results: ['Student results', 'Review logs, marks, cheating violations, and download sheets.'],
+    analytics: ['Portal analytics', 'A summary of exam statistics, pass rates, and security health.'],
+    settings: ['System settings', 'Manage Apps Script webhooks, credentials, and database integration status.'],
+  };
+  const navItems = [
+    { key: 'exams', label: 'Manage Exams', icon: LayoutGrid },
+    { key: 'create', label: 'Create Exam', icon: SquarePlus },
+    { key: 'results', label: 'Student Results', icon: ClipboardList },
+    { key: 'analytics', label: 'Portal Analytics', icon: BarChart3 },
+    { key: 'settings', label: 'System Settings', icon: Settings },
+  ] as const;
+  const qTypes = [
+    { k: 'mcq', label: 'MCQ', icon: ListChecks },
+    { k: 'coding', label: 'Coding', icon: Code2 },
+    { k: 'practical-html', label: 'HTML task', icon: Globe },
+    { k: 'practical-java', label: 'Java task', icon: FileCode2 },
+    { k: 'tf', label: 'True / False', icon: ToggleLeft },
+    { k: 'fib', label: 'Fill blank', icon: TextCursorInput },
+    { k: 'sa', label: 'Short answer', icon: AlignLeft },
+  ] as const;
+  const nowMs = Date.now();
+  const examStatus = (e: Exam) => {
+    const s = new Date(e.startDate).getTime(), en = new Date(e.endDate).getTime();
+    return nowMs < s ? ['Scheduled', 'ui-badge--info'] : nowMs > en ? ['Ended', 'ui-badge--warning'] : ['Live', 'ui-badge--success'];
+  };
+  const liveTotalMarks = currentQuestions.reduce((sum, q) => sum + q.marks, 0);
+  const isOverflow = examPassingMarks > liveTotalMarks;
+  const checks = jsonChecks(jsonExamContent);
+  const violationBadge = (n: number) => (n === 0 ? 'ui-badge--success' : n < 3 ? 'ui-badge--warning' : 'ui-badge--danger');
+  const maxAvg = 100;
+
   return (
-    <div className="admin-workspace">
-      {/* Sidebar navigation */}
-      <div className="admin-sidebar">
-        <div className="sidebar-brand">
-          <h2>Smart Exam Portal</h2>
-          <span>Teacher Dashboard</span>
+    <div className={`ad ${collapsed ? 'is-collapsed' : ''}`} data-theme={theme}>
+      <aside className="ad-side" aria-label="Admin navigation">
+        <div className="ad-brand">
+          <div className="ad-brand__logo"><ShieldCheck size={22} strokeWidth={1.75} /></div>
+          <div className="ad-label"><b>Smart Exam Portal</b><span>Teacher Dashboard</span></div>
         </div>
-        <nav className="sidebar-nav">
-          <button className={`nav-btn ${activeTab === 'exams' ? 'active' : ''}`} onClick={() => setActiveTab('exams')}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
-            Manage Exams
-          </button>
-          <button className={`nav-btn ${activeTab === 'create' ? 'active' : ''}`} onClick={() => { setCurrentQuestions([]); setActiveTab('create'); }}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            Create Exam
-          </button>
-          <button className={`nav-btn ${activeTab === 'results' ? 'active' : ''}`} onClick={() => setActiveTab('results')}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-            Student Results
-          </button>
-          <button className={`nav-btn ${activeTab === 'analytics' ? 'active' : ''}`} onClick={() => setActiveTab('analytics')}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-            Portal Analytics
-          </button>
-          <button className={`nav-btn ${activeTab === 'settings' ? 'active' : ''}`} onClick={() => setActiveTab('settings')}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-            System Settings
-          </button>
+        <nav className="ad-nav">
+          {navItems.map(n => (
+            <button key={n.key} className={`ad-nav__btn ${activeTab === n.key ? 'is-active' : ''}`} aria-current={activeTab === n.key ? 'page' : undefined} title={n.label}
+              onClick={() => { if (n.key === 'create') setCurrentQuestions([]); setActiveTab(n.key); }}>
+              <n.icon size={20} strokeWidth={1.75} /><span className="ad-label">{n.label}</span>
+            </button>
+          ))}
         </nav>
-        <button className="btn btn-secondary logout-btn" onClick={onLogout}>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
-          Exit Admin
-        </button>
-      </div>
+        <div className="ad-side__foot">
+          <button className="ui-btn ui-btn--ghost ad-collapse" onClick={toggleCollapsed} aria-pressed={collapsed} title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}>
+            {collapsed ? <PanelLeftOpen size={18} strokeWidth={1.75} /> : <PanelLeftClose size={18} strokeWidth={1.75} />}<span className="ad-label">Collapse</span>
+          </button>
+          <button className="ui-btn ui-btn--ghost" onClick={toggleTheme} title="Toggle theme">
+            {theme === 'dark' ? <Sun size={18} strokeWidth={1.75} /> : <Moon size={18} strokeWidth={1.75} />}<span className="ad-label">{theme === 'dark' ? 'Light theme' : 'Dark theme'}</span>
+          </button>
+          <button className="ui-btn ui-btn--secondary logout-btn" onClick={onLogout} title="Exit Admin">
+            <LogOut size={18} strokeWidth={1.75} /><span className="ad-label">Exit Admin</span>
+          </button>
+        </div>
+      </aside>
 
-      <div className="admin-content" id="admin-workspace-pane">
-        {/* =================== TAB 1: EXAMS LIST =================== */}
-        {activeTab === 'exams' && (
-          <div className="tab-pane animate-fade-in">
-            <div className="pane-header">
-              <div>
-                <h2>Manage Scheduled Examinations</h2>
-                <p>Create, update, and review exams available in the database.</p>
+      <div className="ad-main" id="admin-workspace-pane">
+        <header className="ad-top">
+          <div><h1>{titles[activeTab][0]}</h1><p>{titles[activeTab][1]}</p></div>
+          <div className="ad-actions">
+            {activeTab === 'exams' && <button className="ui-btn ui-btn--primary" onClick={() => setActiveTab('create')}><Plus size={18} strokeWidth={1.75} /> Create new exam</button>}
+            {activeTab === 'create' && (
+              <div className="ad-seg" role="tablist" aria-label="Creation mode">
+                <button role="tab" aria-selected={creationMode === 'manual'} className={creationMode === 'manual' ? 'is-on' : ''} onClick={() => setCreationMode('manual')}>Manual builder</button>
+                <button role="tab" aria-selected={creationMode === 'json'} className={creationMode === 'json' ? 'is-on' : ''} onClick={() => setCreationMode('json')}>JSON bulk import</button>
               </div>
-              <button className="btn btn-primary" onClick={() => setActiveTab('create')}>+ Create New Exam</button>
-            </div>
+            )}
+            {activeTab === 'results' && <button className="ui-btn ui-btn--secondary" onClick={handleExportCSV}><Download size={18} strokeWidth={1.75} /> Download CSV</button>}
+          </div>
+        </header>
 
-            <div className="exams-grid">
+        <div className="ad-body" key={activeTab}>
+          {/* =================== EXAMS =================== */}
+          {activeTab === 'exams' && (
+            <div className="ad-exams ui-stagger">
               {exams.length === 0 ? (
-                <div className="empty-state card-full">
+                <div className="ad-empty ad-card">
+                  <FileQuestion size={40} strokeWidth={1.5} />
+                  <b>No exams yet</b>
                   <p>No exams configured in the database yet. Click 'Create Exam' to get started.</p>
                 </div>
-              ) : (
-                exams.map(exam => (
-                  <div key={exam.id} className="admin-exam-card animate-slide-up">
-                    <div className="card-body">
-                      <h3>{exam.title}</h3>
-                      <div className="exam-meta-details">
-                        <div><strong>Duration:</strong> {exam.duration} Minutes</div>
-                        <div><strong>Questions:</strong> {exam.questions.length}</div>
-                        <div><strong>Total Marks:</strong> {exam.questions.reduce((s: number, q: any) => s + (q.marks || 0), 0)}</div>
-                        <div><strong>Passing Marks:</strong> {exam.passingMarks}</div>
-                        <div><strong>Resume Window:</strong> {exam.resumeWindow} mins</div>
-                        <div><strong>Start:</strong> {new Date(exam.startDate).toLocaleString()}</div>
-                        <div><strong>End:</strong> {new Date(exam.endDate).toLocaleString()}</div>
+              ) : exams.map(exam => {
+                const [stLabel, stCls] = examStatus(exam);
+                return (
+                  <article key={exam.id} className="ad-exam ad-card">
+                    <div className="ad-exam__head">
+                      <div>
+                        <span className={`ui-badge ${stCls}`} style={{ marginBottom: 8 }}>{stLabel}</span>
+                        <h3>{exam.title}</h3>
                       </div>
-                      <div className="exam-status-pills">
-                        <span className={`badge ${exam.shuffleQuestions ? 'badge-primary' : 'badge-secondary'}`}>Shuffle Qs</span>
-                        <span className={`badge ${exam.shuffleOptions ? 'badge-primary' : 'badge-secondary'}`}>Shuffle Options</span>
-                        <span className={`badge ${exam.showResultToStudent ? 'badge-success' : 'badge-warning'}`}>
-                          {exam.showResultToStudent ? 'Results Public' : 'Results Hidden'}
-                        </span>
+                      <div className="ad-menu">
+                        <button className="ui-btn ui-btn--ghost ui-btn--icon" aria-label={`Actions for ${exam.title}`} aria-expanded={menuFor === exam.id} onClick={() => setMenuFor(menuFor === exam.id ? null : exam.id)}>
+                          <EllipsisVertical size={18} strokeWidth={1.75} />
+                        </button>
+                        {menuFor === exam.id && (
+                          <div className="ad-menu__list" role="menu">
+                            <button role="menuitem" className="ad-menu__item" onClick={() => { setMenuFor(null); handleDeleteExam(exam.id); }}>
+                              <Trash2 size={16} strokeWidth={1.75} /> Delete exam
+                            </button>
+                          </div>
+                        )}
                       </div>
                     </div>
-                    <div className="card-actions">
-                      <button className="btn btn-danger btn-sm" onClick={() => handleDeleteExam(exam.id)}>Delete</button>
+                    <div className="ad-chips">
+                      <span className="ui-chip"><Clock size={14} strokeWidth={1.75} /> {exam.duration} min</span>
+                      <span className="ui-chip"><HelpCircle size={14} strokeWidth={1.75} /> {exam.questions.length} questions</span>
+                      <span className="ui-chip"><Trophy size={14} strokeWidth={1.75} /> {exam.questions.reduce((s: number, q: any) => s + (q.marks || 0), 0)} marks</span>
+                      <span className="ui-chip"><Target size={14} strokeWidth={1.75} /> Pass {exam.passingMarks}</span>
+                      <span className="ui-chip"><RotateCcw size={14} strokeWidth={1.75} /> Resume {exam.resumeWindow} min</span>
                     </div>
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* =================== TAB 2: CREATE EXAM =================== */}
-        {activeTab === 'create' && (
-          <div className="tab-pane animate-fade-in">
-            <div className="pane-header">
-              <div>
-                <h2>Create New Examination</h2>
-                <p>Build custom exams manually or perform a JSON bulk import.</p>
-              </div>
-              
-              {/* Creator Mode switches */}
-              <div style={{ display: 'flex', gap: '8px', background: '#e2e8f0', padding: '4px', borderRadius: '8px' }}>
-                <button 
-                  className="btn btn-sm" 
-                  onClick={() => setCreationMode('manual')}
-                  style={{ background: creationMode === 'manual' ? '#fff' : 'transparent', color: '#1e293b' }}
-                >
-                  Manual Builder
-                </button>
-                <button 
-                  className="btn btn-sm" 
-                  onClick={() => setCreationMode('json')}
-                  style={{ background: creationMode === 'json' ? '#fff' : 'transparent', color: '#1e293b' }}
-                >
-                  JSON Bulk Import
-                </button>
-              </div>
-            </div>
-
-            {creationMode === 'json' ? (
-              <div className="form-container animate-fade-in">
-                <div className="dashboard-card">
-                  <div className="card-header">
-                    <h3>JSON / CSV Bulk Upload</h3>
-                  </div>
-                  <div className="card-body" style={{ padding: '24px' }}>
-                    
-                    {/* Drag and Drop Uploader */}
-                    <div 
-                      className={`drag-drop-zone ${dragOver ? 'drag-over' : ''}`}
-                      onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
-                      onDragLeave={() => setDragOver(false)}
-                      onDrop={(e) => { e.preventDefault(); setDragOver(false); if (e.dataTransfer.files?.[0]) processFile(e.dataTransfer.files[0]); }}
-                      style={{
-                        border: '2px dashed #cbd5e1',
-                        borderRadius: '8px',
-                        padding: '30px',
-                        textAlign: 'center',
-                        background: dragOver ? '#f1f5f9' : '#fff',
-                        cursor: 'pointer',
-                        marginBottom: '20px',
-                        transition: 'all 0.2s ease'
-                      }}
-                    >
-                      <input 
-                        type="file" 
-                        accept=".csv,.json" 
-                        onChange={handleFileUpload} 
-                        style={{ display: 'none' }}
-                        id="bulk-file-input" 
-                      />
-                      <label htmlFor="bulk-file-input" style={{ cursor: 'pointer', display: 'block', fontWeight: '500' }}>
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--dark-blue)" strokeWidth="2" style={{ margin: '0 auto 8px', display: 'block' }}>
-                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
-                        </svg>
-                        {fileName ? `Loaded File: ${fileName}` : 'Drag & Drop CSV / JSON File or Click to Browse'}
-                      </label>
+                    <div className="ad-sched">
+                      <CalendarRange size={16} strokeWidth={1.75} />
+                      <span>{new Date(exam.startDate).toLocaleString()}<br />to {new Date(exam.endDate).toLocaleString()}</span>
                     </div>
+                    <div className="ad-chips">
+                      <span className={`ui-badge ${exam.shuffleQuestions ? 'ui-badge--primary' : ''}`} style={exam.shuffleQuestions ? undefined : { background: 'var(--c-surface-2)', color: 'var(--c-text-muted)' }}>Shuffle Qs</span>
+                      <span className={`ui-badge ${exam.shuffleOptions ? 'ui-badge--primary' : ''}`} style={exam.shuffleOptions ? undefined : { background: 'var(--c-surface-2)', color: 'var(--c-text-muted)' }}>Shuffle Options</span>
+                      <span className={`ui-badge ${exam.showResultToStudent ? 'ui-badge--success' : 'ui-badge--warning'}`}>{exam.showResultToStudent ? 'Results Public' : 'Results Hidden'}</span>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          )}
 
-                    <p className="field-tip" style={{ marginBottom: '16px' }}>
-                      Alternatively, paste structured exam JSON definitions. You can import large exam sets (e.g. 50 MCQs and 4 coding rounds) instantly.
-                    </p>
-                    <textarea 
-                      className="form-control" 
-                      rows={12} 
-                      placeholder={`{\n  "title": "Placement Coding & MCQ Round",\n  "duration": 90,\n  "passingMarks": 40,\n  "resumeWindow": 60,\n  "questions": [\n    {\n      "type": "mcq",\n      "questionText": "What is the complexity of binary search?",\n      "options": ["O(N)", "O(log N)", "O(N log N)", "O(1)"],\n      "correctOptionIndex": 1,\n      "marks": 1\n    },\n    {\n      "type": "coding",\n      "questionText": "Write a function sum(a,b)...",\n      "marks": 15,\n      "codingLanguage": "javascript",\n      "codeTemplate": "function sum(a,b) {\\n}",\n      "testCases": [\n        { "input": "1,2", "expected": "3" }\n      ]\n    }\n  ]\n}`}
-                      value={jsonExamContent}
-                      onChange={(e) => setJsonExamContent(e.target.value)}
-                      style={{ fontFamily: 'monospace', fontSize: '13px' }}
-                    ></textarea>
-                    
-                    <button className="btn btn-primary" onClick={handleJSONBulkImport} style={{ marginTop: '16px' }}>
-                      Verify & Import Exam
-                    </button>
+          {/* =================== CREATE =================== */}
+          {activeTab === 'create' && creationMode === 'json' && (
+            <div className="ad-stack" style={{ maxWidth: 860 }}>
+              <section className="ad-card">
+                <div className="ad-card__head"><div><h2>JSON / CSV bulk upload</h2><p>Import large exam sets instantly.</p></div></div>
+                <div className="ad-card__body">
+                  <div
+                    className={`ad-drop ${dragOver ? 'is-over' : ''}`}
+                    onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+                    onDragLeave={() => setDragOver(false)}
+                    onDrop={(e) => { e.preventDefault(); setDragOver(false); if (e.dataTransfer.files?.[0]) processFile(e.dataTransfer.files[0]); }}
+                  >
+                    <input type="file" accept=".csv,.json" onChange={handleFileUpload} style={{ display: 'none' }} id="bulk-file-input" />
+                    <label htmlFor="bulk-file-input" style={{ cursor: 'pointer', display: 'grid', justifyItems: 'center', gap: 6 }}>
+                      <Upload size={28} strokeWidth={1.75} />
+                      <b>{dragOver ? 'Drop to upload' : 'Drag & drop a CSV / JSON file, or click to browse'}</b>
+                      <span className="ad-tip">.csv or .json</span>
+                    </label>
+                    {fileName && <span className="ui-badge ui-badge--primary ad-file"><FileText size={14} strokeWidth={1.75} /> Loaded file: {fileName}</span>}
                   </div>
+
+                  <p className="ad-tip">Alternatively, paste structured exam JSON definitions. You can import large exam sets (e.g. 50 MCQs and 4 coding rounds) instantly.</p>
+                  <textarea
+                    className="ad-textarea ad-mono"
+                    rows={12}
+                    aria-label="Exam JSON"
+                    placeholder={`{\n  "title": "Placement Coding & MCQ Round",\n  "duration": 90,\n  "passingMarks": 40,\n  "resumeWindow": 60,\n  "questions": [\n    {\n      "type": "mcq",\n      "questionText": "What is the complexity of binary search?",\n      "options": ["O(N)", "O(log N)", "O(N log N)", "O(1)"],\n      "correctOptionIndex": 1,\n      "marks": 1\n    },\n    {\n      "type": "coding",\n      "questionText": "Write a function sum(a,b)...",\n      "marks": 15,\n      "codingLanguage": "javascript",\n      "codeTemplate": "function sum(a,b) {\\n}",\n      "testCases": [\n        { "input": "1,2", "expected": "3" }\n      ]\n    }\n  ]\n}`}
+                    value={jsonExamContent}
+                    onChange={(e) => setJsonExamContent(e.target.value)}
+                  ></textarea>
+
+                  {checks.length > 0 && (
+                    <ul className="ad-checks-list" aria-label="Validation results">
+                      {checks.map((c, i) => (
+                        <li key={i} className={c.ok ? 'ok' : 'bad'}>{c.ok ? <CheckCircle2 size={16} strokeWidth={1.75} /> : <XCircle size={16} strokeWidth={1.75} />}<span style={{ color: 'var(--c-text)' }}>{c.label}</span></li>
+                      ))}
+                    </ul>
+                  )}
+
+                  <div><button className="ui-btn ui-btn--primary" onClick={handleJSONBulkImport}><Upload size={18} strokeWidth={1.75} /> Verify &amp; import exam</button></div>
                 </div>
-              </div>
-            ) : (
-              <div className="form-container animate-fade-in">
-                <div className="dashboard-card">
-                  <div className="card-header"><h3>General Details</h3></div>
-                  <div className="card-body form-grid">
-                    <div className="form-group col-span-2">
+              </section>
+            </div>
+          )}
+
+          {activeTab === 'create' && creationMode !== 'json' && (
+            <div className="ad-build">
+              <div className="ad-stack">
+                <section className="ad-card">
+                  <div className="ad-card__head"><h2>General details</h2></div>
+                  <div className="ad-card__body ad-grid2">
+                    <div className="ad-field span2">
                       <label htmlFor="exam-title-input">Exam Title *</label>
-                      <input 
-                        type="text" 
-                        id="exam-title-input" 
-                        className="form-control" 
-                        value={examTitle}
-                        onChange={(e) => setExamTitle(e.target.value)}
-                        placeholder="e.g. Midterm Placement Assessment" 
-                        required 
-                      />
+                      <input type="text" id="exam-title-input" className="ad-input" value={examTitle} onChange={(e) => setExamTitle(e.target.value)} placeholder="e.g. Midterm Placement Assessment" required />
                     </div>
-                    
-                    <div className="form-group">
+                    <div className="ad-field">
                       <label htmlFor="exam-duration-input">Duration (Minutes) *</label>
-                      <input 
-                        type="number" 
-                        id="exam-duration-input" 
-                        className="form-control" 
-                        value={examDuration}
-                        onChange={(e) => setExamDuration(parseInt(e.target.value) || 1)}
-                        placeholder="90" 
-                        min="1" 
-                        required 
-                      />
+                      <input type="number" id="exam-duration-input" className="ad-input" value={examDuration} onChange={(e) => setExamDuration(parseInt(e.target.value) || 1)} placeholder="90" min="1" required />
                     </div>
-
-                    <div className="form-group">
+                    <div className="ad-field">
                       <label htmlFor="exam-passing-input">Passing Marks *</label>
-                      <input 
-                        type="number" 
-                        id="exam-passing-input" 
-                        className="form-control" 
-                        value={examPassingMarks}
-                        onChange={(e) => setExamPassingMarks(parseInt(e.target.value) || 0)}
-                        placeholder="40" 
-                        min="0" 
-                        required 
-                      />
+                      <input type="number" id="exam-passing-input" className="ad-input" value={examPassingMarks} onChange={(e) => setExamPassingMarks(parseInt(e.target.value) || 0)} placeholder="40" min="0" required />
                     </div>
-
-                    <div className="form-group">
+                    <div className="ad-field">
                       <label htmlFor="exam-resume-input">Resumption Window (Minutes) *</label>
-                      <input 
-                        type="number" 
-                        id="exam-resume-input" 
-                        className="form-control" 
-                        value={examResumeWindow}
-                        onChange={(e) => setExamResumeWindow(parseInt(e.target.value) || 1)}
-                        placeholder="60" 
-                        min="1" 
-                        required 
-                      />
+                      <input type="number" id="exam-resume-input" className="ad-input" value={examResumeWindow} onChange={(e) => setExamResumeWindow(parseInt(e.target.value) || 1)} placeholder="60" min="1" required />
                     </div>
-
-                    <div className="form-group">
-                      <label htmlFor="exam-start-input">Start Date & Time *</label>
-                      <input 
-                        type="datetime-local" 
-                        id="exam-start-input" 
-                        className="form-control" 
-                        value={examStart}
-                        onChange={(e) => setExamStart(e.target.value)}
-                        required 
-                      />
+                    <div className="ad-field" />
+                    <div className="ad-field">
+                      <label htmlFor="exam-start-input">Start Date &amp; Time *</label>
+                      <input type="datetime-local" id="exam-start-input" className="ad-input" value={examStart} onChange={(e) => setExamStart(e.target.value)} required />
                     </div>
-
-                    <div className="form-group">
-                      <label htmlFor="exam-end-input">End Date & Time *</label>
-                      <input 
-                        type="datetime-local" 
-                        id="exam-end-input" 
-                        className="form-control" 
-                        value={examEnd}
-                        onChange={(e) => setExamEnd(e.target.value)}
-                        required 
-                      />
+                    <div className="ad-field">
+                      <label htmlFor="exam-end-input">End Date &amp; Time *</label>
+                      <input type="datetime-local" id="exam-end-input" className="ad-input" value={examEnd} onChange={(e) => setExamEnd(e.target.value)} required />
                     </div>
-
-                    <div className="form-group col-span-2 checkbox-grid">
-                      <label className="checkbox-label">
-                        <input type="checkbox" checked={shuffleQs} onChange={(e) => setShuffleQs(e.target.checked)} /> Shuffle Questions Order
-                      </label>
-                      <label className="checkbox-label">
-                        <input type="checkbox" checked={shuffleOpts} onChange={(e) => setShuffleOpts(e.target.checked)} /> Shuffle Options
-                      </label>
-                      <label className="checkbox-label">
-                        <input type="checkbox" checked={showRes} onChange={(e) => setShowRes(e.target.checked)} /> Show Results to Student Immediately
-                      </label>
+                    <div className="span2 ad-checks">
+                      <label className="ad-check"><input type="checkbox" checked={shuffleQs} onChange={(e) => setShuffleQs(e.target.checked)} /> Shuffle questions order</label>
+                      <label className="ad-check"><input type="checkbox" checked={shuffleOpts} onChange={(e) => setShuffleOpts(e.target.checked)} /> Shuffle options</label>
+                      <label className="ad-check"><input type="checkbox" checked={showRes} onChange={(e) => setShowRes(e.target.checked)} /> Show results to student immediately</label>
                     </div>
                   </div>
-                </div>
+                </section>
 
-                {/* Question Manual Builder */}
-                <div className="dashboard-card" style={{ marginTop: '24px' }}>
-                  <div className="card-header flex-header">
-                    <h3>Add Questions Manually</h3>
-                    <div className="builder-actions" style={{ display: 'flex', gap: '8px' }}>
-                      <select 
-                        className="form-control inline-select"
-                        value={selectedQType}
-                        onChange={(e: any) => setSelectedQType(e.target.value)}
-                      >
-                        <option value="mcq">Multiple Choice (MCQ)</option>
-                        <option value="coding">Coding Round Question</option>
-                        <option value="practical-html">Practical Task (HTML Form)</option>
-                        <option value="practical-java">Practical Task (Java Program)</option>
-                        <option value="tf">True / False</option>
-                        <option value="fib">Fill in the Blank</option>
-                        <option value="sa">Short Answer</option>
-                      </select>
-                      <button className="btn btn-primary" onClick={handleAddQuestion}>+ Add Question</button>
-                    </div>
+                <section className="ad-card">
+                  <div className="ad-card__head"><div><h2>Add questions</h2><p>Pick a type, then add it to the exam.</p></div>
+                    <button className="ui-btn ui-btn--primary" onClick={handleAddQuestion}><Plus size={18} strokeWidth={1.75} /> Add question</button>
                   </div>
-                  
-                  <div className="card-body">
-                    <div className="question-builder-list">
-                      {currentQuestions.length === 0 ? (
-                        <div className="empty-state">
-                          <p>No questions added yet. Choose a question type and click '+ Add Question'.</p>
-                        </div>
-                      ) : (
-                        currentQuestions.map((q, qIdx) => (
-                          <div key={q.id} className="builder-question-card animate-fade-in">
-                            <div className="card-head">
-                              <h4>Question {qIdx + 1} ({q.type.toUpperCase()})</h4>
-                              <button className="btn-icon" onClick={() => handleDeleteQuestion(qIdx)}>&times;</button>
-                            </div>
-                            
-                            <div className="card-body">
-                              <div className="form-group">
+                  <div className="ad-card__body">
+                    <div className="ad-types" role="radiogroup" aria-label="Question type">
+                      {qTypes.map(t => (
+                        <button key={t.k} type="button" role="radio" aria-checked={selectedQType === t.k} className={`ad-type ${selectedQType === t.k ? 'is-on' : ''}`} onClick={() => setSelectedQType(t.k)}>
+                          <t.icon size={22} strokeWidth={1.75} />{t.label}
+                        </button>
+                      ))}
+                    </div>
+
+                    {currentQuestions.length === 0 ? (
+                      <div className="ad-empty"><p>No questions added yet. Choose a question type and click '+ Add Question'.</p></div>
+                    ) : currentQuestions.map((q, qIdx) => {
+                      const open = !qCollapsed[q.id];
+                      return (
+                        <div key={q.id} className="ad-q">
+                          <div className="ad-q__head">
+                            <GripVertical size={18} strokeWidth={1.75} className="ad-q__grip" aria-hidden="true" />
+                            <button type="button" className="ad-q__toggle" aria-expanded={open} onClick={() => setQCollapsed(c => ({ ...c, [q.id]: open }))}>
+                              {open ? <ChevronDown size={18} strokeWidth={1.75} /> : <ChevronRight size={18} strokeWidth={1.75} />}
+                              Question {qIdx + 1}
+                              <span className="ui-badge ui-badge--info">{q.type.toUpperCase()}</span>
+                              {!open && <span className="t">{q.questionText || 'No description yet'}</span>}
+                            </button>
+                            <button className="ui-btn ui-btn--ghost ui-btn--icon" onClick={() => handleDeleteQuestion(qIdx)} aria-label={`Delete question ${qIdx + 1}`}><Trash2 size={18} strokeWidth={1.75} /></button>
+                          </div>
+                          {open && (
+                            <div className="ad-q__body">
+                              <div className="ad-field">
                                 <label>Question Text / Description *</label>
-                                <textarea 
-                                  className="form-control" 
-                                  value={q.questionText} 
-                                  onChange={(e) => handleUpdateQuestionText(qIdx, e.target.value)}
-                                  placeholder="Enter question description..." 
-                                  required 
-                                />
+                                <textarea className="ad-textarea" value={q.questionText} onChange={(e) => handleUpdateQuestionText(qIdx, e.target.value)} placeholder="Enter question description..." required />
                               </div>
-                              
-                              <div className="form-group inline-marks">
+                              <div className="ad-field" style={{ maxWidth: 140 }}>
                                 <label>Question Marks *</label>
-                                <input 
-                                  type="number" 
-                                  className="form-control" 
-                                  value={q.marks} 
-                                  onChange={(e) => handleUpdateQuestionMarks(qIdx, parseInt(e.target.value) || 1)}
-                                  min="1" 
-                                  style={{ width: '100px' }} 
-                                  required 
-                                />
+                                <input type="number" className="ad-input" value={q.marks} onChange={(e) => handleUpdateQuestionMarks(qIdx, parseInt(e.target.value) || 1)} min="1" required />
                               </div>
 
-                              {/* TYPE MCQ */}
                               {q.type === 'mcq' && q.options && (
-                                <div className="mcq-options-builder">
-                                  <label>Options (Check correct one) *</label>
-                                  <div className="options-inputs-list">
-                                    {q.options.map((opt, optIdx) => (
-                                      <div key={optIdx} className="option-row">
-                                        <input 
-                                          type="radio" 
-                                          name={`correct_${q.id}`} 
-                                          value={optIdx} 
-                                          checked={q.correctOptionIndex === optIdx}
-                                          onChange={() => handleSelectMCQCorrect(qIdx, optIdx)}
-                                        />
-                                        <input 
-                                          type="text" 
-                                          className="form-control" 
-                                          value={opt} 
-                                          onChange={(e) => handleUpdateMCQOption(qIdx, optIdx, e.target.value)}
-                                          placeholder="Option text..." 
-                                          required 
-                                        />
-                                        <button className="btn-icon" onClick={() => handleDeleteMCQOption(qIdx, optIdx)}>&times;</button>
-                                      </div>
-                                    ))}
-                                  </div>
-                                  <button className="btn btn-secondary btn-sm" onClick={() => handleAddMCQOption(qIdx)} style={{ marginTop: '8px' }}>
-                                    + Add Option
-                                  </button>
+                                <div className="ad-field">
+                                  <label>Options (select the correct one) *</label>
+                                  {q.options.map((opt, optIdx) => (
+                                    <div key={optIdx} className="ad-opt">
+                                      <input type="radio" name={`correct_${q.id}`} value={optIdx} checked={q.correctOptionIndex === optIdx} onChange={() => handleSelectMCQCorrect(qIdx, optIdx)} aria-label={`Option ${optIdx + 1} is correct`} />
+                                      <input type="text" className="ad-input" value={opt} onChange={(e) => handleUpdateMCQOption(qIdx, optIdx, e.target.value)} placeholder="Option text..." required />
+                                      <button className="ui-btn ui-btn--ghost ui-btn--icon" onClick={() => handleDeleteMCQOption(qIdx, optIdx)} aria-label={`Remove option ${optIdx + 1}`}><X size={18} strokeWidth={1.75} /></button>
+                                    </div>
+                                  ))}
+                                  <div><button className="ui-btn ui-btn--secondary ui-btn--sm" onClick={() => handleAddMCQOption(qIdx)}><Plus size={16} strokeWidth={1.75} /> Add option</button></div>
                                 </div>
                               )}
 
-                              {/* TYPE CODING & PRACTICAL JAVA QUESTIONS */}
                               {(q.type === 'coding' || q.type === 'practical-java') && (
-                                <div className="coding-question-builder" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                                  <div className="form-group">
+                                <>
+                                  <div className="ad-field">
                                     <label>Execution Target Language *</label>
-                                    <select 
-                                      className="form-control" 
-                                      value={q.codingLanguage || 'javascript'}
-                                      onChange={(e) => handleUpdateCodingLang(qIdx, e.target.value)}
-                                    >
+                                    <select className="ad-select" value={q.codingLanguage || 'javascript'} onChange={(e) => handleUpdateCodingLang(qIdx, e.target.value)}>
                                       <option value="javascript">JavaScript (Executable Browser Sandbox)</option>
                                       <option value="python">Python (Syntax Mocking)</option>
                                       <option value="cpp">C++ (Syntax Mocking)</option>
                                       <option value="java">Java (Syntax Mocking)</option>
                                     </select>
                                   </div>
-
-                                  <div className="form-group">
+                                  <div className="ad-field">
                                     <label>Starter Code Template *</label>
-                                    <textarea 
-                                      className="form-control" 
-                                      rows={4}
-                                      value={q.codeTemplate || ''}
-                                      onChange={(e) => handleUpdateCodingTemplate(qIdx, e.target.value)}
-                                      placeholder="e.g. function solution() {\n  \n}"
-                                      style={{ fontFamily: 'monospace' }}
-                                    ></textarea>
+                                    <textarea className="ad-textarea ad-mono" rows={4} value={q.codeTemplate || ''} onChange={(e) => handleUpdateCodingTemplate(qIdx, e.target.value)} placeholder="e.g. function solution() {\n  \n}" />
                                   </div>
-
-                                  <div className="test-cases-section" style={{ border: '1px solid #e2e8f0', padding: '12px', borderRadius: '8px' }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                                      <h5>Test Cases (Required for validation)</h5>
-                                      <button className="btn btn-secondary btn-sm" onClick={() => handleAddTestCase(qIdx)}>+ Add Test Case</button>
+                                  <div className="ad-tcs">
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                      <b style={{ fontSize: 13.5 }}>Test cases (required for validation)</b>
+                                      <button className="ui-btn ui-btn--secondary ui-btn--sm" onClick={() => handleAddTestCase(qIdx)}><Plus size={16} strokeWidth={1.75} /> Add test case</button>
                                     </div>
-                                    
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                      {q.testCases?.map((tc, tcIdx) => (
-                                        <div key={tcIdx} style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                                          <div style={{ flex: 1 }}>
-                                            <input 
-                                              type="text" 
-                                              className="form-control form-control-sm" 
-                                              placeholder="Input arguments (e.g. 2, 3)" 
-                                              value={tc.input}
-                                              onChange={(e) => handleUpdateTestCase(qIdx, tcIdx, 'input', e.target.value)}
-                                            />
-                                          </div>
-                                          <div style={{ flex: 1 }}>
-                                            <input 
-                                              type="text" 
-                                              className="form-control form-control-sm" 
-                                              placeholder="Expected Return (e.g. 5)" 
-                                              value={tc.expected}
-                                              onChange={(e) => handleUpdateTestCase(qIdx, tcIdx, 'expected', e.target.value)}
-                                            />
-                                          </div>
-                                          <button className="btn-icon" onClick={() => handleDeleteTestCase(qIdx, tcIdx)}>&times;</button>
-                                        </div>
-                                      ))}
-                                    </div>
+                                    {q.testCases?.map((tc, tcIdx) => (
+                                      <div key={tcIdx} className="ad-tc">
+                                        <input type="text" className="ad-input ad-mono" placeholder="Input arguments (e.g. 2, 3)" value={tc.input} onChange={(e) => handleUpdateTestCase(qIdx, tcIdx, 'input', e.target.value)} />
+                                        <input type="text" className="ad-input ad-mono" placeholder="Expected return (e.g. 5)" value={tc.expected} onChange={(e) => handleUpdateTestCase(qIdx, tcIdx, 'expected', e.target.value)} />
+                                        <button className="ui-btn ui-btn--ghost ui-btn--icon" onClick={() => handleDeleteTestCase(qIdx, tcIdx)} aria-label={`Remove test case ${tcIdx + 1}`}><X size={18} strokeWidth={1.75} /></button>
+                                      </div>
+                                    ))}
                                   </div>
-                                </div>
+                                </>
                               )}
 
-                              {/* PRACTICAL HTML TYPE */}
                               {q.type === 'practical-html' && (
-                                <div className="html-practical-builder" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                                  <div className="form-group">
-                                    <label>Starter HTML/CSS Template *</label>
-                                    <textarea 
-                                      className="form-control" 
-                                      rows={6}
-                                      value={q.codeTemplate || ''}
-                                      onChange={(e) => handleUpdateCodingTemplate(qIdx, e.target.value)}
-                                      placeholder="Starter HTML layouts..."
-                                      style={{ fontFamily: 'monospace' }}
-                                    ></textarea>
-                                  </div>
+                                <div className="ad-field">
+                                  <label>Starter HTML/CSS Template *</label>
+                                  <textarea className="ad-textarea ad-mono" rows={6} value={q.codeTemplate || ''} onChange={(e) => handleUpdateCodingTemplate(qIdx, e.target.value)} placeholder="Starter HTML layouts..." />
                                 </div>
                               )}
 
-                              {/* TYPE TRUE FALSE */}
                               {q.type === 'tf' && (
-                                <div className="tf-options-builder">
+                                <div className="ad-field">
                                   <label>Correct Answer *</label>
-                                  <div className="radio-group-horizontal">
-                                    <label>
-                                      <input 
-                                        type="radio" 
-                                        name={`tf_correct_${q.id}`} 
-                                        value="true" 
-                                        checked={q.correctAnswer === 'true'} 
-                                        onChange={() => handleSelectTFCorrect(qIdx, 'true')} 
-                                      /> 
-                                      True
-                                    </label>
-                                    <label>
-                                      <input 
-                                        type="radio" 
-                                        name={`tf_correct_${q.id}`} 
-                                        value="false" 
-                                        checked={q.correctAnswer === 'false'} 
-                                        onChange={() => handleSelectTFCorrect(qIdx, 'false')} 
-                                      /> 
-                                      False
-                                    </label>
+                                  <div className="ad-checks">
+                                    <label className="ad-check"><input type="radio" name={`tf_correct_${q.id}`} value="true" checked={q.correctAnswer === 'true'} onChange={() => handleSelectTFCorrect(qIdx, 'true')} /> True</label>
+                                    <label className="ad-check"><input type="radio" name={`tf_correct_${q.id}`} value="false" checked={q.correctAnswer === 'false'} onChange={() => handleSelectTFCorrect(qIdx, 'false')} /> False</label>
                                   </div>
                                 </div>
                               )}
 
-                              {/* TYPE FIB */}
                               {q.type === 'fib' && (
-                                <div className="fib-builder">
+                                <div className="ad-field">
                                   <label>Correct Phrase *</label>
-                                  <input 
-                                    type="text" 
-                                    className="form-control" 
-                                    value={q.correctAnswer || ''} 
-                                    onChange={(e) => handleUpdateTextCorrect(qIdx, e.target.value)}
-                                    placeholder="Exact answer expected..." 
-                                    required 
-                                  />
+                                  <input type="text" className="ad-input" value={q.correctAnswer || ''} onChange={(e) => handleUpdateTextCorrect(qIdx, e.target.value)} placeholder="Exact answer expected..." required />
                                 </div>
                               )}
 
-                              {/* TYPE SHORT ANSWER */}
                               {q.type === 'sa' && (
-                                <div className="sa-builder">
+                                <div className="ad-field">
                                   <label>Correct Answer Guidelines / Key Phrases *</label>
-                                  <textarea 
-                                    className="form-control" 
-                                    value={q.correctAnswer || ''} 
-                                    onChange={(e) => handleUpdateTextCorrect(qIdx, e.target.value)}
-                                    rows={3} 
-                                    placeholder="Reference answer guidelines for grading..." 
-                                    required
-                                  ></textarea>
+                                  <textarea className="ad-textarea" value={q.correctAnswer || ''} onChange={(e) => handleUpdateTextCorrect(qIdx, e.target.value)} rows={3} placeholder="Reference answer guidelines for grading..." required></textarea>
                                 </div>
                               )}
                             </div>
-                          </div>
-                        ))
-                      )}
-                    </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </section>
+
+                <div className={`ad-save ${isOverflow && currentQuestions.length > 0 ? 'is-bad' : ''}`}>
+                  <div className="ad-save__stats">
+                    <span>Questions <b>{currentQuestions.length}</b></span>
+                    <span>Total marks <b>{liveTotalMarks}</b></span>
+                    <span>Passing marks <b>{examPassingMarks}</b></span>
+                    {isOverflow && currentQuestions.length > 0 && <span className="ad-save__warn"><AlertTriangle size={16} strokeWidth={1.75} /> Passing marks ({examPassingMarks}) exceeds total ({liveTotalMarks})!</span>}
+                  </div>
+                  <div className="ad-actions">
+                    <button className="ui-btn ui-btn--secondary" onClick={() => setActiveTab('exams')}>Cancel</button>
+                    <button className="ui-btn ui-btn--primary" onClick={handleSaveExam}><Save size={18} strokeWidth={1.75} /> Save &amp; schedule exam</button>
                   </div>
                 </div>
+              </div>
 
-                {/* Live Total Marks Summary */}
-                {currentQuestions.length > 0 && (() => {
-                  const liveTotalMarks = currentQuestions.reduce((sum, q) => sum + q.marks, 0);
-                  const isOverflow = examPassingMarks > liveTotalMarks;
-                  return (
-                    <div style={{
-                      marginTop: '24px',
-                      padding: '16px 20px',
-                      borderRadius: '10px',
-                      background: isOverflow ? '#fef2f2' : '#f0fdf4',
-                      border: `1px solid ${isOverflow ? '#fecaca' : '#bbf7d0'}`,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      gap: '16px',
-                      flexWrap: 'wrap'
-                    }}>
-                      <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap', fontSize: '14px', fontWeight: 600 }}>
-                        <span>📝 Questions: <strong>{currentQuestions.length}</strong></span>
-                        <span>📊 Total Marks: <strong>{liveTotalMarks}</strong></span>
-                        <span>✅ Passing Marks: <strong>{examPassingMarks}</strong></span>
-                      </div>
-                      {isOverflow && (
-                        <span style={{ color: '#dc2626', fontSize: '13px', fontWeight: 600 }}>
-                          ⚠️ Passing marks ({examPassingMarks}) exceeds total ({liveTotalMarks})!
-                        </span>
-                      )}
+              <aside className="ad-card ad-preview" aria-label="Live preview">
+                <div className="ad-card__head"><div><h2>Live preview</h2><p>{examTitle || 'Untitled exam'}</p></div><span className="ui-badge ui-badge--primary">{currentQuestions.length} Q</span></div>
+                <div className="ad-card__body" style={{ gap: 0 }}>
+                  {currentQuestions.length === 0 ? <p className="ad-tip">Questions you add appear here as students will see them.</p> : currentQuestions.map((q, i) => (
+                    <div key={q.id} className="ad-pq">
+                      <div className="ad-chips"><span className="ui-badge ui-badge--primary">Q{i + 1}</span><span className="ui-badge ui-badge--success">{q.marks} marks</span></div>
+                      <p>{q.questionText || <span className="ad-tip">No description yet</span>}</p>
+                      {q.type === 'mcq' && q.options?.map((o, oi) => (
+                        <div key={oi} className={`ad-pq__o ${q.correctOptionIndex === oi ? 'is-correct' : ''}`}><b className="ui-mono">{String.fromCharCode(65 + oi)}</b> {o || '…'}</div>
+                      ))}
+                      {q.type === 'tf' && <div className="ad-chips"><span className="ui-chip">Answer: {q.correctAnswer}</span></div>}
+                      {(q.type === 'coding' || q.type === 'practical-java' || q.type === 'practical-html') && q.codeTemplate && <pre>{q.codeTemplate}</pre>}
+                      {q.testCases && <span className="ad-tip">{q.testCases.length} test case(s)</span>}
                     </div>
-                  );
-                })()}
-
-                <div className="form-actions" style={{ marginTop: '24px', display: 'flex', gap: '12px' }}>
-                  <button className="btn btn-secondary" onClick={() => setActiveTab('exams')}>Cancel</button>
-                  <button className="btn btn-primary" onClick={handleSaveExam}>Save & Schedule Exam</button>
+                  ))}
                 </div>
-              </div>
-            )}
-          </div>
-        )}
+              </aside>
+            </div>
+          )}
 
-        {/* =================== TAB 3: STUDENT RESULTS =================== */}
-        {activeTab === 'results' && (
-          <div className="tab-pane animate-fade-in">
-            <div className="pane-header">
-              <div>
-                <h2>Data Results Summary (Database Sync)</h2>
-                <p>Review logs, marks, cheating violations, and download sheets.</p>
-              </div>
-              <div className="results-toolbar" style={{ display: 'flex', gap: '12px' }}>
-                <select 
-                  className="form-control" 
-                  style={{ maxWidth: '200px' }}
-                  value={selectedExamFilter}
-                  onChange={(e) => setSelectedExamFilter(e.target.value)}
-                >
+          {/* =================== RESULTS =================== */}
+          {activeTab === 'results' && (
+            <>
+              <div className="ad-tools">
+                <div className="ad-search">
+                  <Search size={18} strokeWidth={1.75} aria-hidden="true" />
+                  <input type="text" className="ad-input" placeholder="Search student, roll, or exam..." aria-label="Search results" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+                </div>
+                <select className="ad-select" style={{ maxWidth: 220 }} aria-label="Filter by exam" value={selectedExamFilter} onChange={(e) => setSelectedExamFilter(e.target.value)}>
                   <option value="All">All Exams</option>
                   {Array.from(new Set(results.map(r => r.examName))).map(exam => (
                     <option key={exam} value={exam}>{exam}</option>
                   ))}
                 </select>
-                <input 
-                  type="text" 
-                  className="form-control filter-input" 
-                  placeholder="Search student, roll, or exam..." 
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-                <button className="btn btn-secondary" onClick={handleExportCSV}>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-                  Download CSV
-                </button>
+                <span className="ad-tip">{filteredResults.length} record(s)</span>
               </div>
-            </div>
-
-            <div className="results-table-container">
-              <table className="results-table">
-                <thead>
-                  <tr>
-                    <th>Student Name</th>
-                    <th>Roll Number</th>
-                    <th>Exam Name</th>
-                    <th>Total Score</th>
-                    <th>Percentage</th>
-                    <th>Status</th>
-                    <th>Violations</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredResults.length === 0 ? (
-                    <tr>
-                      <td colSpan={8} style={{ textAlign: 'center' }}>No student records found in the database.</td>
-                    </tr>
-                  ) : (
-                    filteredResults.map(res => (
+              <div className="ad-tablewrap">
+                <table className="ad-table">
+                  <thead>
+                    <tr><th>Student Name</th><th>Roll Number</th><th>Exam Name</th><th>Total Score</th><th>Percentage</th><th>Status</th><th>Violations</th><th>Actions</th></tr>
+                  </thead>
+                  <tbody>
+                    {filteredResults.length === 0 ? (
+                      <tr><td colSpan={8} style={{ textAlign: 'center', color: 'var(--c-text-muted)', padding: 40 }}>No student records found in the database.</td></tr>
+                    ) : filteredResults.map(res => (
                       <tr key={res.id}>
                         <td><strong>{res.studentName}</strong></td>
-                        <td>{res.rollNumber}</td>
+                        <td className="num">{res.rollNumber}</td>
                         <td>{res.examName}</td>
-                        <td>{res.marksObtained} / {res.totalMarks}</td>
-                        <td>{res.percentage.toFixed(1)}%</td>
-                        <td><span className={`status-badge ${res.status === 'Pass' ? 'pass' : 'fail'}`}>{res.status}</span></td>
-                        <td>
-                          <span className={`badge ${res.totalViolations > 0 ? 'badge-danger' : 'badge-success'}`}>
-                            {res.totalViolations} Violations
-                          </span>
-                        </td>
-                        <td>
-                          <button className="btn btn-secondary btn-sm" onClick={() => setSelectedResult(res)}>
-                            Integrity Report
-                          </button>
-                        </td>
+                        <td className="num">{res.marksObtained} / {res.totalMarks}</td>
+                        <td className="num">{res.percentage.toFixed(1)}%</td>
+                        <td><span className={`ui-badge ${res.status === 'Pass' ? 'ui-badge--success' : 'ui-badge--danger'}`}>{res.status}</span></td>
+                        <td><span className={`ui-badge ${violationBadge(res.totalViolations)}`}>{res.totalViolations} {res.totalViolations === 1 ? 'violation' : 'violations'}</span></td>
+                        <td><button className="ui-btn ui-btn--secondary ui-btn--sm" onClick={() => setSelectedResult(res)}><FileSearch size={16} strokeWidth={1.75} /> Integrity report</button></td>
                       </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
-
-        {/* =================== TAB 4: PORTAL ANALYTICS =================== */}
-        {activeTab === 'analytics' && (
-          <div className="tab-pane animate-fade-in">
-            <div className="pane-header">
-              <h2>System Performance & Analytics</h2>
-              <p>A summary of exam statistics, pass rates, and security health.</p>
-            </div>
-
-            {totalSubmissions === 0 ? (
-              <div className="empty-state card-full">
-                <p>Analytics require student results. Once students submit exams, charts will generate here.</p>
+                    ))}
+                  </tbody>
+                </table>
               </div>
-            ) : (
-              <>
-                <div className="analytics-stats-grid">
-                  <div className="stat-card">
-                    <span className="s-label">Total Submissions</span>
-                    <span className="s-val">{totalSubmissions}</span>
-                  </div>
-                  <div className="stat-card">
-                    <span className="s-label">Average Score</span>
-                    <span className="s-val">{avgPercentage.toFixed(1)}%</span>
-                  </div>
-                  <div className="stat-card">
-                    <span className="s-label">Class Pass Rate</span>
-                    <span className="s-val">{passRate.toFixed(1)}%</span>
-                  </div>
-                  <div className="stat-card">
-                    <span className="s-label">Total Integrity Alerts</span>
-                    <span className="s-val red-text">{totalViolationsCount}</span>
-                  </div>
-                </div>
+            </>
+          )}
 
-                <div className="analytics-charts-grid" style={{ marginTop: '24px' }}>
-                  {/* Pie Outcomes */}
-                  <div className="dashboard-card">
-                    <div className="card-header"><h3>Completion Outcomes (Pass vs Fail)</h3></div>
-                    <div className="card-body flex-center flex-column" style={{ padding: '24px' }}>
-                      <svg width="200" height="200" viewBox="0 0 120 120" style={{ transform: 'rotate(-90deg)' }}>
-                        <circle cx="60" cy="60" r={pieRadius} fill="transparent" stroke="#f1f5f9" strokeWidth="12" />
-                        <circle cx="60" cy="60" r={pieRadius} fill="transparent" stroke="#10b981" strokeWidth="12" 
-                          strokeDasharray={`${passStrokeDash} ${pieCircum}`} />
-                        <circle cx="60" cy="60" r={pieRadius} fill="transparent" stroke="#ef4444" strokeWidth="12" 
-                          strokeDasharray={`${failStrokeDash} ${pieCircum}`} strokeDashoffset={`-${passStrokeDash}`} />
-                      </svg>
-                      <div className="chart-legend" style={{ marginTop: '16px', display: 'flex', gap: '24px', fontSize: '13px' }}>
-                        <div><span className="legend-box pass"></span> Pass: {passCount} ({passRate.toFixed(0)}%)</div>
-                        <div><span className="legend-box fail"></span> Fail: {failCount} ({(100 - passRate).toFixed(0)}%)</div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Bar Violations */}
-                  <div className="dashboard-card">
-                    <div className="card-header"><h3>Integrity Violation Breakdown</h3></div>
-                    <div className="card-body">
-                      <div className="analytics-bar-chart">
-                        <div className="analytics-row">
-                          <div className="row-label">Tab Switches ({tabCount})</div>
-                          <div className="row-bar-track">
-                            <div className="row-bar-fill red" style={{ width: `${totalViolationsCount > 0 ? (tabCount / totalViolationsCount) * 100 : 0}%` }}></div>
-                          </div>
-                        </div>
-                        <div className="analytics-row">
-                          <div className="row-label">Fullscreen Exit ({fsCount})</div>
-                          <div className="row-bar-track">
-                            <div className="row-bar-fill red" style={{ width: `${totalViolationsCount > 0 ? (fsCount / totalViolationsCount) * 100 : 0}%` }}></div>
-                          </div>
-                        </div>
-                        <div className="analytics-row">
-                          <div className="row-label">Mic Activity ({micCount})</div>
-                          <div className="row-bar-track">
-                            <div className="row-bar-fill red" style={{ width: `${totalViolationsCount > 0 ? (micCount / totalViolationsCount) * 100 : 0}%` }}></div>
-                          </div>
-                        </div>
-                        <div className="analytics-row">
-                          <div className="row-label">Cam Disabled ({camCount})</div>
-                          <div className="row-bar-track">
-                            <div className="row-bar-fill red" style={{ width: `${totalViolationsCount > 0 ? (camCount / totalViolationsCount) * 100 : 0}%` }}></div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="dashboard-card" style={{ marginTop: '24px' }}>
-                  <div className="card-header"><h3>Performance by Exam Title</h3></div>
-                  <div className="card-body">
-                    <div className="custom-bar-grid">
-                      <div className="bar-chart-y-axis">
-                        <span>100%</span>
-                        <span>75%</span>
-                        <span>50%</span>
-                        <span>25%</span>
-                        <span>0%</span>
-                      </div>
-                      <div className="bar-chart-columns">
-                        {chartExams.map(ce => (
-                          <div key={ce.name} className="chart-col">
-                            <div className="col-fill-box">
-                              <div className="fill-bar" style={{ height: `${ce.avg}%` }} title={`${ce.avg.toFixed(1)}%`}></div>
-                            </div>
-                            <span className="col-title">{ce.name}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </>
-            )}
-          </div>
-        )}
-
-        {/* =================== TAB 5: SYSTEM SETTINGS =================== */}
-        {activeTab === 'settings' && (
-          <div className="tab-pane animate-fade-in">
-            <div className="pane-header">
-              <h2>System Configuration</h2>
-              <p>Manage Apps Script webhooks, credentials, and database integration status.</p>
+          {/* =================== ANALYTICS =================== */}
+          {activeTab === 'analytics' && (totalSubmissions === 0 ? (
+            <div className="ad-empty ad-card">
+              <BarChart3 size={40} strokeWidth={1.5} />
+              <b>No analytics yet</b>
+              <p>Analytics require student results. Once students submit exams, charts will generate here.</p>
             </div>
+          ) : (
+            <>
+              <div className="ad-stats ui-stagger">
+                <div className="ad-stat ad-card"><div className="ad-stat__icon"><Users size={22} strokeWidth={1.75} /></div><div><span>Total Submissions</span><b>{totalSubmissions}</b></div></div>
+                <div className="ad-stat ad-card"><div className="ad-stat__icon"><Percent size={22} strokeWidth={1.75} /></div><div><span>Average Score</span><b>{avgPercentage.toFixed(1)}%</b></div></div>
+                <div className="ad-stat ad-card"><div className="ad-stat__icon"><TrendingUp size={22} strokeWidth={1.75} /></div><div><span>Class Pass Rate</span><b>{passRate.toFixed(1)}%</b></div></div>
+                <div className="ad-stat ad-card"><div className="ad-stat__icon is-danger"><AlertTriangle size={22} strokeWidth={1.75} /></div><div><span>Total Integrity Alerts</span><b>{totalViolationsCount}</b></div></div>
+              </div>
 
-            <div className="form-container" style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '24px' }}>
-              <div className="dashboard-card">
-                <div className="card-header"><h3>Configuration Details</h3></div>
-                <div className="card-body" style={{ padding: '24px' }}>
-                  <div className="form-group">
+              <div className="ad-charts">
+                <section className="ad-card">
+                  <div className="ad-card__head"><h2>Completion outcomes (pass vs fail)</h2></div>
+                  <div className="ad-card__body ad-donut">
+                    <svg width="200" height="200" viewBox="0 0 120 120" role="img" aria-label={`Pass ${passCount}, fail ${failCount}`}>
+                      <circle cx="60" cy="60" r={pieRadius} fill="transparent" stroke="var(--c-surface-2)" strokeWidth="12" />
+                      <circle cx="60" cy="60" r={pieRadius} fill="transparent" stroke="#10b981" strokeWidth="12" strokeDasharray={`${passStrokeDash} ${pieCircum}`} />
+                      <circle cx="60" cy="60" r={pieRadius} fill="transparent" stroke="#f43f5e" strokeWidth="12" strokeDasharray={`${failStrokeDash} ${pieCircum}`} strokeDashoffset={`-${passStrokeDash}`} />
+                    </svg>
+                    <div className="ad-legend">
+                      <span><i style={{ background: '#10b981' }}></i>Pass: {passCount} ({passRate.toFixed(0)}%)</span>
+                      <span><i style={{ background: '#f43f5e' }}></i>Fail: {failCount} ({(100 - passRate).toFixed(0)}%)</span>
+                    </div>
+                  </div>
+                </section>
+
+                <section className="ad-card">
+                  <div className="ad-card__head"><h2>Integrity violation breakdown</h2></div>
+                  <div className="ad-card__body ad-hbar">
+                    {[['Tab switches', tabCount], ['Fullscreen exit', fsCount], ['Mic activity', micCount], ['Cam disabled', camCount]].map(([label, n]) => (
+                      <div key={label as string} className="ad-hbar__row">
+                        <span>{label}</span>
+                        <div className="ad-hbar__track"><div className="ad-hbar__fill" style={{ width: `${totalViolationsCount > 0 ? ((n as number) / totalViolationsCount) * 100 : 0}%` }}></div></div>
+                        <span className="ad-hbar__val">{n}</span>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              </div>
+
+              <section className="ad-card" style={{ marginTop: 'var(--sp-4)' }}>
+                <div className="ad-card__head"><h2>Performance by exam title</h2><span className="ad-tip">Average score (%)</span></div>
+                <div className="ad-card__body">
+                  <div className="ad-vbar">
+                    <div className="ad-vbar__y"><span>100%</span><span>75%</span><span>50%</span><span>25%</span><span>0%</span></div>
+                    <div className="ad-vbar__plot">
+                      <div className="ad-vbar__grid"></div>
+                      {chartExams.map(ce => (
+                        <div key={ce.name} className="ad-vbar__col">
+                          <div className="ad-vbar__area">
+                            <div className="ad-vbar__bar" style={{ height: `${Math.min(ce.avg, maxAvg)}%` }}>
+                              <span className="ad-vbar__val">{ce.avg.toFixed(0)}%</span>
+                              <span className="ad-vbar__tip" role="tooltip">{ce.name}: {ce.avg.toFixed(1)}%</span>
+                            </div>
+                          </div>
+                          <span className="ad-vbar__name" title={ce.name}>{ce.name}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </section>
+            </>
+          ))}
+
+          {/* =================== SETTINGS =================== */}
+          {activeTab === 'settings' && (
+            <div className="ad-settings">
+              <section className="ad-card">
+                <div className="ad-card__head"><div><h2>Configuration details</h2><p>Webhook endpoint and portal credentials.</p></div></div>
+                <div className="ad-card__body">
+                  <div className="ad-field">
                     <label htmlFor="settings-script-url">Google Apps Script Web App URL</label>
-                    <input 
-                      type="url" 
-                      id="settings-script-url" 
-                      className="form-control" 
-                      defaultValue={settings.googleAppsScriptUrl} 
-                      placeholder="https://script.google.com/macros/s/..." 
+                    <input
+                      type="url"
+                      id="settings-script-url"
+                      className="ad-input"
+                      defaultValue={settings.googleAppsScriptUrl}
+                      placeholder="https://script.google.com/macros/s/..."
                       ref={(el) => { if (el) (el as any)._scriptUrl = el.value; }}
                       onBlur={(e) => { (e.target as any)._scriptUrl = e.target.value; }}
                     />
-                    <p className="field-tip">All student responses will automatically post to this endpoint when exams are completed.</p>
+                    <p className="ad-tip">All student responses will automatically post to this endpoint when exams are completed.</p>
                   </div>
 
-                  <div className="form-group" style={{ marginTop: '16px' }}>
+                  <div className="ad-field">
                     <label htmlFor="settings-admin-pass">Admin/Teacher Portal Password</label>
-                    <input 
-                      type="password" 
-                      id="settings-admin-pass" 
-                      className="form-control" 
-                      defaultValue={settings.adminPassword} 
+                    <input
+                      type="password"
+                      id="settings-admin-pass"
+                      className="ad-input"
+                      defaultValue={settings.adminPassword}
                       ref={(el) => { if (el) (el as any)._adminPass = el.value; }}
                       onBlur={(e) => { (e.target as any)._adminPass = e.target.value; }}
-                      placeholder="Enter new admin password" 
+                      placeholder="Enter new admin password"
                     />
+                    <p className="ad-tip">Used to sign in at /admin.</p>
                   </div>
 
-                  <button 
-                    className="btn btn-primary" 
-                    onClick={(e) => {
-                      const container = e.currentTarget.parentElement;
-                      const urlInput = container?.querySelector('#settings-script-url') as HTMLInputElement;
-                      const passInput = container?.querySelector('#settings-admin-pass') as HTMLInputElement;
-                      if (urlInput && passInput) {
-                        handleUpdateSettings(urlInput.value, passInput.value);
-                      }
-                    }} 
-                    style={{ marginTop: '16px' }}
-                  >
-                    Update Configurations
-                  </button>
+                  <div>
+                    <button
+                      className="ui-btn ui-btn--primary"
+                      onClick={(e) => {
+                        const container = e.currentTarget.parentElement?.parentElement;
+                        const urlInput = container?.querySelector('#settings-script-url') as HTMLInputElement;
+                        const passInput = container?.querySelector('#settings-admin-pass') as HTMLInputElement;
+                        if (urlInput && passInput) {
+                          handleUpdateSettings(urlInput.value, passInput.value);
+                        }
+                      }}
+                    >
+                      <Save size={18} strokeWidth={1.75} /> Update configurations
+                    </button>
+                  </div>
                 </div>
+              </section>
 
-                {/* Supabase debug panel intentionally not rendered; client code kept. */}
-              </div>
-
-              <div className="dashboard-card">
-                <div className="card-header"><h3>Google Spreadsheet Deployment Guide</h3></div>
-                <div className="card-body docs-body">
-                  <p>To view submissions in your Google Sheet, configure the connection as follows:</p>
-                  <ol>
-                    <li>Create a new Google Sheet.</li>
-                    <li>Go to <strong>Extensions &gt; Apps Script</strong>.</li>
-                    <li>Delete any existing code and copy-paste the template file contents from <code>google_script_template.js</code>.</li>
-                    <li>Click <strong>Deploy &gt; New Deployment</strong>.</li>
-                    <li>Set <em>Select type</em> to <strong>Web App</strong>.</li>
-                    <li>Set <em>Execute as</em> to <strong>Me</strong>.</li>
-                    <li>Set <em>Who has access</em> to <strong>Anyone</strong> (necessary for client-side API requests).</li>
-                    <li>Click <strong>Deploy</strong>, authorize the permissions, and copy the generated <strong>Web App URL</strong>.</li>
-                    <li>Paste the URL into the settings box and click "Update Configurations".</li>
+              <section className="ad-card">
+                <div className="ad-card__head"><div><h2>Google Spreadsheet deployment guide</h2><p>To view submissions in your Google Sheet:</p></div></div>
+                <div className="ad-card__body">
+                  <ol className="ad-steps">
+                    <li><span>Create a new Google Sheet.</span></li>
+                    <li><span>Go to <strong>Extensions &gt; Apps Script</strong>.</span></li>
+                    <li><span>Delete any existing code and copy-paste the template file contents from <code>google_script_template.js</code>.</span></li>
+                    <li><span>Click <strong>Deploy &gt; New Deployment</strong>.</span></li>
+                    <li><span>Set <em>Select type</em> to <strong>Web App</strong>.</span></li>
+                    <li><span>Set <em>Execute as</em> to <strong>Me</strong>.</span></li>
+                    <li><span>Set <em>Who has access</em> to <strong>Anyone</strong> (necessary for client-side API requests).</span></li>
+                    <li><span>Click <strong>Deploy</strong>, authorize the permissions, and copy the generated <strong>Web App URL</strong>.</span></li>
+                    <li><span>Paste the URL into the settings box and click "Update configurations".</span></li>
                   </ol>
                 </div>
-              </div>
+              </section>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
-      {/* Audit Modal Overlay */}
-      {selectedResult && (
-        <div className="modal-overlay" style={{ display: 'flex' }}>
-          <div className="modal-card animate-scale-up">
-            <div className="modal-header">
-              <h3>Audit Report: {selectedResult.studentName} ({selectedResult.rollNumber})</h3>
-              <button className="btn-icon close-modal-btn" onClick={() => setSelectedResult(null)}>&times;</button>
+      {/* Delete confirmation */}
+      {pendingDelete && (
+        <div className="ad-scrim ad-scrim--center modal-overlay" role="presentation" onClick={() => setPendingDelete(null)}>
+          <div className="ad-dialog" role="alertdialog" aria-modal="true" aria-labelledby="ad-del-title" onClick={(e) => e.stopPropagation()}>
+            <h3 id="ad-del-title">Delete exam?</h3>
+            <p>Are you sure you want to permanently delete this exam from the database? This action cannot be undone.</p>
+            <div className="ad-dialog__actions">
+              <button className="ui-btn ui-btn--secondary" onClick={() => setPendingDelete(null)} autoFocus>Cancel</button>
+              <button className="ui-btn ui-btn--danger" onClick={() => confirmDeleteExam(pendingDelete)}><Trash2 size={18} strokeWidth={1.75} /> Delete permanently</button>
             </div>
-            
+          </div>
+        </div>
+      )}
+
+      {/* Integrity report drawer (legacy modal-* classes kept for print styles) */}
+      {selectedResult && (
+        <div className="ad-scrim modal-overlay" role="presentation" onClick={() => setSelectedResult(null)}>
+          <aside className="ad-drawer modal-card" role="dialog" aria-modal="true" aria-label="Integrity report" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Audit report: {selectedResult.studentName} ({selectedResult.rollNumber})</h3>
+              <button className="ui-btn ui-btn--ghost ui-btn--icon close-modal-btn" onClick={() => setSelectedResult(null)} aria-label="Close report"><X size={20} strokeWidth={1.75} /></button>
+            </div>
+
             <div className="modal-body">
               <div className="print-printable-area">
                 <div className="print-only print-header-block">
-                  <h2>Smart Exam Portal - Student Certificate & Audit Report</h2>
+                  <h2>Smart Exam Portal - Student Certificate &amp; Audit Report</h2>
                   <p>Generated: {new Date().toLocaleString()}</p>
-                  <hr/>
+                  <hr />
                 </div>
 
-                <div className="modal-info-summary">
-                  <div className="summary-item"><strong>Exam Name:</strong> {selectedResult.examName}</div>
-                  <div className="summary-item"><strong>Completion Date:</strong> {selectedResult.date}</div>
-                  <div className="summary-item"><strong>Time taken:</strong> {selectedResult.timeTaken}</div>
-                  <div className="summary-item"><strong>Final Score:</strong> {selectedResult.marksObtained} / {selectedResult.totalMarks} ({selectedResult.percentage.toFixed(1)}%)</div>
-                  <div className="summary-item"><strong>Status:</strong> {selectedResult.status}</div>
-                  <div className="summary-item"><strong>Total Violations:</strong> {selectedResult.totalViolations}</div>
+                <div className="modal-info-summary ad-sum">
+                  <div>Exam name<b>{selectedResult.examName}</b></div>
+                  <div>Completion date<b>{selectedResult.date}</b></div>
+                  <div>Time taken<b className="ui-mono">{selectedResult.timeTaken}</b></div>
+                  <div>Final score<b className="ui-mono">{selectedResult.marksObtained} / {selectedResult.totalMarks} ({selectedResult.percentage.toFixed(1)}%)</b></div>
+                  <div>Status<b><span className={`ui-badge ${selectedResult.status === 'Pass' ? 'ui-badge--success' : 'ui-badge--danger'}`}>{selectedResult.status}</span></b></div>
+                  <div>Total violations<b><span className={`ui-badge ${violationBadge(selectedResult.totalViolations)}`}>{selectedResult.totalViolations}</span></b></div>
                 </div>
 
-                {/* Score Breakdown Panel */}
                 {matchingExam && (
-                  <div className="report-section" style={{ background: '#f8fafc', padding: '16px', borderRadius: '8px', border: '1px solid #e2e8f0', marginBottom: '24px' }}>
-                    <h4 style={{ marginTop: 0, marginBottom: '12px', borderBottom: '1px solid #cbd5e1', paddingBottom: '6px' }}>Detailed Sectional Grade Breakdown</h4>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', fontSize: '13px' }}>
+                  <div className="report-section ad-sec">
+                    <h4>Detailed sectional grade breakdown</h4>
+                    <div className="ad-grade">
                       {isFinalExam ? (
                         <>
-                          <div>
-                            <strong>1. Aptitude & Reasoning (MCQs):</strong> <span className="highlight" style={{ fontSize: '14px', fontWeight: 'bold' }}>{aptObtained} / {aptTotal}</span> marks
-                          </div>
-                          <div>
-                            <strong>2. Technical Core (Java/HTML MCQs):</strong> <span className="highlight" style={{ fontSize: '14px', fontWeight: 'bold' }}>{techObtained} / {techTotal}</span> marks
-                          </div>
-                          <div>
-                            <strong>3. SQL JOIN Queries (Written):</strong> <span className="highlight" style={{ fontSize: '14px', fontWeight: 'bold' }}>{sqlObtained} / {sqlTotal}</span> marks
-                          </div>
-                          <div>
-                            <strong>4. Coding & Practical Round (Java & HTML):</strong> <span className="highlight" style={{ fontSize: '14px', fontWeight: 'bold' }}>{codingObtained} / {codingTotal}</span> marks
-                          </div>
+                          <div>1. Aptitude &amp; Reasoning (MCQs)<b>{aptObtained} / {aptTotal}</b></div>
+                          <div>2. Technical Core (Java/HTML MCQs)<b>{techObtained} / {techTotal}</b></div>
+                          <div>3. SQL JOIN Queries (Written)<b>{sqlObtained} / {sqlTotal}</b></div>
+                          <div>4. Coding &amp; Practical Round (Java &amp; HTML)<b>{codingObtained} / {codingTotal}</b></div>
                         </>
                       ) : (
                         <>
-                          <div>
-                            <strong>1. Aptitude & Verbal (MCQs):</strong> <span className="highlight" style={{ fontSize: '14px', fontWeight: 'bold' }}>{aptObtained} / {aptTotal}</span> marks
-                          </div>
-                          <div>
-                            <strong>2. Technical Core (Java/HTML/DSA):</strong> <span className="highlight" style={{ fontSize: '14px', fontWeight: 'bold' }}>{techObtained} / {techTotal}</span> marks
-                          </div>
-                          <div>
-                            <strong>3. Coding Round (Leetcode Problems):</strong> <span className="highlight" style={{ fontSize: '14px', fontWeight: 'bold' }}>{codingObtained} / {codingTotal}</span> marks
-                          </div>
-                          <div>
-                            <strong>4. Practical Tasks (HTML Form/Calculator):</strong> <span className="highlight" style={{ fontSize: '14px', fontWeight: 'bold' }}>{pracObtained} / {pracTotal}</span> marks
-                          </div>
+                          <div>1. Aptitude &amp; Verbal (MCQs)<b>{aptObtained} / {aptTotal}</b></div>
+                          <div>2. Technical Core (Java/HTML/DSA)<b>{techObtained} / {techTotal}</b></div>
+                          <div>3. Coding Round (Leetcode Problems)<b>{codingObtained} / {codingTotal}</b></div>
+                          <div>4. Practical Tasks (HTML Form/Calculator)<b>{pracObtained} / {pracTotal}</b></div>
                         </>
                       )}
                     </div>
                   </div>
                 )}
 
-                <div className="report-section">
-                  <h4>Anti-Cheating Log</h4>
+                <div className="report-section ad-sec">
+                  <h4>Anti-cheating log</h4>
                   {selectedResult.violationLog.length === 0 ? (
-                    <div className="clean-audit">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> 
-                      Perfect Integrity. No browser violations detected.
-                    </div>
+                    <div className="clean-audit ad-clean"><CheckCircle2 size={18} strokeWidth={1.75} /> Perfect Integrity. No browser violations detected.</div>
                   ) : (
-                    <div className="violations-table-mini">
-                      <div className="v-header">
-                        <span>Time</span>
-                        <span>Violation Type</span>
-                        <span>Warning #</span>
-                      </div>
-                      <div className="v-body">
-                        {selectedResult.violationLog.map((v, index) => (
-                          <div key={index} className="v-row">
-                            <span>{v.time}</span>
-                            <span className="v-type">{v.type}</span>
-                            <span>{v.warningNumber || '-'}</span>
-                          </div>
-                        ))}
-                      </div>
+                    <div className="violations-table-mini ad-vlog">
+                      <div className="v-header"><span>Time</span><span>Violation type</span><span>Warning #</span></div>
+                      {selectedResult.violationLog.map((v, index) => (
+                        <div key={index} className="v-row"><span>{v.time}</span><span className="vt v-type">{v.type}</span><span>{v.warningNumber || '-'}</span></div>
+                      ))}
                     </div>
                   )}
                 </div>
 
                 {selectedResult.cameraCaptures && selectedResult.cameraCaptures.length > 0 && (
-                  <div className="report-section">
-                    <h4>Webcam Audits ({selectedResult.cameraCaptures.length})</h4>
-                    <div className="scrolling-captures" style={{ display: 'flex', gap: '12px', overflowX: 'auto' }}>
+                  <div className="report-section ad-sec">
+                    <h4>Webcam audits ({selectedResult.cameraCaptures.length})</h4>
+                    <div className="scrolling-captures" style={{ display: 'flex', gap: 12, overflowX: 'auto' }}>
                       {selectedResult.cameraCaptures.map((snap, idx) => (
                         <div key={idx} className="capture-card" style={{ flexShrink: 0 }}>
-                          <img src={snap.image} alt={`Cap @ ${snap.timestamp}`} style={{ borderRadius: '6px' }} />
-                          <span style={{ fontSize: '10px', textAlign: 'center', color: 'var(--text-muted)' }}>{snap.timestamp}</span>
+                          <img src={snap.image} alt={`Cap @ ${snap.timestamp}`} style={{ borderRadius: 6 }} />
+                          <span style={{ fontSize: 10, textAlign: 'center', color: 'var(--c-text-muted)' }}>{snap.timestamp}</span>
                         </div>
                       ))}
                     </div>
                   </div>
                 )}
 
-                {/* SHOWING STUDENT ANSWERS AND CODING CODE DIRECTLY IN THE INTEGRITY REPORT */}
                 {selectedResult.answers && Object.keys(selectedResult.answers).length > 0 && (
-                  <div className="report-section" style={{ marginTop: '24px' }}>
-                    <h4>Submitted Answers Summary</h4>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <div className="report-section ad-sec">
+                    <h4>Submitted answers summary</h4>
+                    <div style={{ display: 'grid', gap: 12 }}>
                       {Object.entries(selectedResult.answers).map(([qId, ans]) => (
-                        <div key={qId} style={{ background: '#f8fafc', padding: '12px', borderRadius: '6px', border: '1px solid #e2e8f0' }}>
-                          <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '4px' }}>Question ID: {qId}</div>
+                        <div key={qId} className="ad-ans">
+                          <small>Question ID: {qId}</small>
                           {ans.startsWith('//') || ans.includes('function') || ans.includes('def ') || ans.includes('<html') ? (
-                            <pre style={{ margin: 0, padding: '8px', background: '#0f172a', color: '#cbd5e1', borderRadius: '4px', fontSize: '11px', overflowX: 'auto' }}>{ans}</pre>
+                            <pre>{ans}</pre>
                           ) : (
-                            <div style={{ fontSize: '13px', fontWeight: '500' }}>{ans}</div>
+                            <div style={{ fontSize: 13, fontWeight: 500 }}>{ans}</div>
                           )}
                         </div>
                       ))}
@@ -1749,10 +1502,10 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
             </div>
 
             <div className="modal-footer">
-              <button className="btn btn-secondary" onClick={handlePrintResult}>Print Report / Save PDF</button>
-              <button className="btn btn-primary" onClick={() => setSelectedResult(null)}>Close</button>
+              <button className="ui-btn ui-btn--secondary" onClick={handlePrintResult}><Printer size={18} strokeWidth={1.75} /> Print report / Save PDF</button>
+              <button className="ui-btn ui-btn--primary" onClick={() => setSelectedResult(null)}>Close</button>
             </div>
-          </div>
+          </aside>
         </div>
       )}
     </div>
