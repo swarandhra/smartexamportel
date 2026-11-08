@@ -1,0 +1,11 @@
+.oc-shell { display: grid; place-items: center; padding: var(--sp-4); }
+.oc-card { width: 100%; max-width: 520px; padding: var(--sp-10) var(--sp-8); text-align: center; display: grid; justify-items: center; gap: var(--sp-4); }
+.oc-check__ring { stroke: var(--c-success); stroke-width: 4; fill: var(--c-success-tint); }
+.oc-check__tick { stroke: var(--c-success); stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 48; stroke-dashoffset: 48; animation: ui-draw 400ms var(--ease) 200ms forwards; }
+.oc-title { font-size: 24px; font-weight: 800; }
+.oc-sub { color: var(--c-text-muted); line-height: 1.6; }
+.oc-sync { padding: 8px 14px; font-size: 13px; }
+.oc-note { display: flex; gap: var(--sp-3); text-align: left; background: var(--c-surface-2); border: 1px solid var(--c-border); border-radius: var(--r-md); padding: var(--sp-4); color: var(--c-text-muted); font-size: 13.5px; line-height: 1.6; }
+.oc-note svg { flex: none; color: var(--c-primary-text); margin-top: 2px; }
+.oc-done { width: 100%; margin-top: var(--sp-2); }
+@media (prefers-reduced-motion: reduce) { .oc-check__tick { animation: none; stroke-dashoffset: 0; } }
