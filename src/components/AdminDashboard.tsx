@@ -906,7 +906,8 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
           <div className="ad-actions">
             {activeTab === 'exams' && <button className="ui-btn ui-btn--primary" onClick={() => setActiveTab('create')}><Plus size={18} strokeWidth={1.75} /> Create new exam</button>}
             {activeTab === 'create' && (
-              <div className="ad-seg" role="tablist" aria-label="Creation mode">
+              <div className="ad-seg" role="tablist" aria-label="Creation mode" data-i={creationMode === 'manual' ? 0 : 1}>
+                <span className="ad-seg__pill" aria-hidden="true" />
                 <button role="tab" aria-selected={creationMode === 'manual'} className={creationMode === 'manual' ? 'is-on' : ''} onClick={() => setCreationMode('manual')}>Manual builder</button>
                 <button role="tab" aria-selected={creationMode === 'json'} className={creationMode === 'json' ? 'is-on' : ''} onClick={() => setCreationMode('json')}>JSON bulk import</button>
               </div>

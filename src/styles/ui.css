@@ -24,7 +24,7 @@
 /* Buttons */
 .ui-btn {
   display: inline-flex; align-items: center; justify-content: center; gap: var(--sp-2);
-  min-height: 44px; padding: 0 var(--sp-5); border-radius: var(--r-md);
+  min-height: 44px; padding: 0 var(--sp-6); border-radius: var(--r-full);
   border: 1px solid transparent; font: 600 14px var(--font); cursor: pointer;
   transition: background-color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
 }

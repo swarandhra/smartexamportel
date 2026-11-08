@@ -157,7 +157,7 @@ export default function Auth({ onLoginSuccess }: AuthProps) {
               <div className="au-row">
                 <TextField id="reg-name" label="Full Name" placeholder="Your full name" icon={User} value={regName} onChange={setRegName}
                   onBlur={() => touch('regName')} autoComplete="name" autoFocus error={req('regName', regName)} />
-                <TextField id="reg-roll" label="Roll Number" placeholder="e.g. 23a91a0501" icon={IdCard} mono value={regRoll} onChange={setRegRoll}
+                <TextField id="reg-roll" label="Roll Number" placeholder="23a91a0501" icon={IdCard} mono value={regRoll} onChange={setRegRoll}
                   onBlur={() => touch('regRoll')} error={req('regRoll', regRoll)} />
               </div>
               <TextField id="reg-branch" label="College Branch / Department" placeholder="e.g. cse, ece, it" icon={GraduationCap} mono value={regBranch}
