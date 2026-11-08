@@ -24,6 +24,9 @@ export default async function handler(req, res) {
     if (student.password !== password.trim()) {
       return res.json({ success: false, error: 'Invalid password. Please check your credentials.' });
     }
+    try {
+      await sql`UPDATE students SET last_login_at = now(), last_seen_at = now() WHERE roll_number = ${rollNumber.trim().toUpperCase()}`;
+    } catch (_) { /* activity tracking must never break login */ }
     res.json({ success: true, student: { name: student.name, rollNumber: student.roll_number } });
   } catch (e) {
     res.json({ success: false, error: e.message });
