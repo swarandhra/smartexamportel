@@ -69,7 +69,7 @@ export default function StudentDashboard({ student, onStartExam, onLogout }: Stu
 
   if (loading) {
     return (
-      <div className="ui-shell" data-theme={theme}>
+      <div className="ui-shell">
         <div className="ui-container" aria-busy="true" aria-label="Loading dashboard">
           <div className="ui-skeleton" style={{ height: 88, marginBottom: 24, borderRadius: 16 }} />
           <div className="ui-skeleton" style={{ height: 120, marginBottom: 16, borderRadius: 16 }} />
@@ -80,7 +80,7 @@ export default function StudentDashboard({ student, onStartExam, onLogout }: Stu
   }
 
   return (
-    <div className="ui-shell" data-theme={theme}>
+    <div className="ui-shell">
       <div className="ui-container ui-page">
         <header className="sd-header ui-card">
           <div className="sd-profile">

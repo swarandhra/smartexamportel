@@ -1,6 +1,5 @@
 import type { Result } from '../utils/db';
 import { CloudCheck, CloudOff, ShieldCheck, ArrowLeft, Clock } from 'lucide-react';
-import { useTheme } from '../utils/theme';
 import '../styles/outcome.css';
 
 interface OutcomeScreenProps {
@@ -10,9 +9,8 @@ interface OutcomeScreenProps {
 }
 
 export default function OutcomeScreen({ result, uploadSuccess, onDone }: OutcomeScreenProps) {
-  const [theme] = useTheme();
   return (
-    <div className="ui-shell oc-shell" data-theme={theme}>
+    <div className="ui-shell oc-shell">
       <div className="oc-card ui-card ui-page">
         <div className="oc-check" aria-hidden="true">
           <svg width="72" height="72" viewBox="0 0 72 72" fill="none">

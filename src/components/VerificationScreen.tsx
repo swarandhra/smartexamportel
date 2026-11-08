@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 import type { Exam } from '../utils/db';
 import { Camera, CameraOff, Maximize, Eye, Ban, ClipboardX, AlertTriangle, Loader2, CheckCircle2, XCircle } from 'lucide-react';
 import Stepper from './Stepper';
-import { useTheme } from '../utils/theme';
 import '../styles/setup.css';
 
 interface VerificationScreenProps {
@@ -13,7 +12,6 @@ interface VerificationScreenProps {
 
 export default function VerificationScreen({ exam, onVerifySuccess, onCancel }: VerificationScreenProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [theme] = useTheme();
   const [camStatus, setCamStatus] = useState<'checking' | 'success' | 'error'>('checking');
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
 
@@ -67,7 +65,7 @@ export default function VerificationScreen({ exam, onVerifySuccess, onCancel }: 
   ];
 
   return (
-    <div className="ui-shell" data-theme={theme}>
+    <div className="ui-shell">
       <div className="su-wrap ui-page">
         <Stepper current={1} />
         <div className="su-head">

@@ -917,7 +917,7 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
 
   if (questions.length === 0) {
     return (
-      <div className="ui-shell" data-theme={theme} style={{ display: 'grid', placeItems: 'center' }} role="status" aria-live="polite">
+      <div className="ui-shell" style={{ display: 'grid', placeItems: 'center' }} role="status" aria-live="polite">
         <div className="loading-state">Configuring exam environment…</div>
       </div>
     );
@@ -948,7 +948,7 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
   );
 
   return (
-    <div className={`xm ui-shell ${isCodeQ ? 'xm--code' : ''}`} data-theme={theme}>
+    <div className={`xm ui-shell ${isCodeQ ? 'xm--code' : ''}`}>
       {/* Top Header */}
       <header className="xm-top">
         <div className="xm-title">
@@ -1157,7 +1157,7 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
                           <div>
                             <div><span style={{ color: 'var(--ws-muted)' }}>Test case {idx + 1}:</span> input <code>{tc.input}</code></div>
                             <div><span style={{ color: 'var(--ws-muted)' }}>Expected:</span> <code>{tc.expected}</code></div>
-                            <div><span style={{ color: 'var(--ws-muted)' }}>Returned:</span> <code style={{ color: tc.passed ? '#6ee7b7' : '#fda4af' }}>{tc.actual}</code></div>
+                            <div><span style={{ color: 'var(--ws-muted)' }}>Returned:</span> <code style={{ color: tc.passed ? 'var(--code-ok)' : 'var(--code-bad)' }}>{tc.actual}</code></div>
                           </div>
                           <span className={`ui-badge ${tc.passed ? 'ui-badge--success' : 'ui-badge--danger'}`}>{tc.passed ? 'PASSED' : 'FAILED'}</span>
                         </div>

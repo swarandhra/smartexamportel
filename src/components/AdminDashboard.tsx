@@ -698,7 +698,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
 
   if (loading && exams.length === 0) {
     return (
-      <div className="ui-shell" data-theme={theme}>
+      <div className="ui-shell">
         <div className="ui-container" aria-busy="true" aria-label="Syncing secure database records">
           <div className="ui-skeleton" style={{ height: 56, marginBottom: 24 }} />
           <div className="ui-skeleton" style={{ height: 160, marginBottom: 16 }} />
@@ -867,7 +867,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
   const maxAvg = 100;
 
   return (
-    <div className={`ad ${collapsed ? 'is-collapsed' : ''}`} data-theme={theme}>
+    <div className={`ad ${collapsed ? 'is-collapsed' : ''}`}>
       <aside className="ad-side" aria-label="Admin navigation">
         <div className="ad-brand">
           <div className="ad-brand__logo"><ShieldCheck size={22} strokeWidth={1.75} /></div>
@@ -1268,12 +1268,12 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   <div className="ad-card__body ad-donut">
                     <svg width="200" height="200" viewBox="0 0 120 120" role="img" aria-label={`Pass ${passCount}, fail ${failCount}`}>
                       <circle cx="60" cy="60" r={pieRadius} fill="transparent" stroke="var(--c-surface-2)" strokeWidth="12" />
-                      <circle cx="60" cy="60" r={pieRadius} fill="transparent" stroke="#10b981" strokeWidth="12" strokeDasharray={`${passStrokeDash} ${pieCircum}`} />
-                      <circle cx="60" cy="60" r={pieRadius} fill="transparent" stroke="#f43f5e" strokeWidth="12" strokeDasharray={`${failStrokeDash} ${pieCircum}`} strokeDashoffset={`-${passStrokeDash}`} />
+                      <circle cx="60" cy="60" r={pieRadius} fill="transparent" stroke="var(--chart-success)" strokeWidth="12" strokeDasharray={`${passStrokeDash} ${pieCircum}`} />
+                      <circle cx="60" cy="60" r={pieRadius} fill="transparent" stroke="var(--chart-danger)" strokeWidth="12" strokeDasharray={`${failStrokeDash} ${pieCircum}`} strokeDashoffset={`-${passStrokeDash}`} />
                     </svg>
                     <div className="ad-legend">
-                      <span><i style={{ background: '#10b981' }}></i>Pass: {passCount} ({passRate.toFixed(0)}%)</span>
-                      <span><i style={{ background: '#f43f5e' }}></i>Fail: {failCount} ({(100 - passRate).toFixed(0)}%)</span>
+                      <span><i style={{ background: 'var(--chart-success)' }}></i>Pass: {passCount} ({passRate.toFixed(0)}%)</span>
+                      <span><i style={{ background: 'var(--chart-danger)' }}></i>Fail: {failCount} ({(100 - passRate).toFixed(0)}%)</span>
                     </div>
                   </div>
                 </section>

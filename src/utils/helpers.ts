@@ -192,11 +192,11 @@ function showSyncNotification(count: number): void {
   banner.style.position = 'fixed';
   banner.style.bottom = '20px';
   banner.style.right = '20px';
-  banner.style.backgroundColor = '#10b981';
-  banner.style.color = '#ffffff';
+  banner.style.backgroundColor = 'var(--solid-success)';
+  banner.style.color = 'var(--text-on-accent)';
   banner.style.padding = '12px 24px';
   banner.style.borderRadius = '8px';
-  banner.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.1)';
+  banner.style.boxShadow = 'var(--sh-md)';
   banner.style.zIndex = '99999';
   banner.style.fontFamily = 'Plus Jakarta Sans, sans-serif';
   banner.style.fontSize = '14px';

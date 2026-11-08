@@ -1,7 +1,6 @@
 import type { Exam } from '../utils/db';
 import { Layers, ListChecks, Code2, Monitor, Award, FileText } from 'lucide-react';
 import Stepper from './Stepper';
-import { useTheme } from '../utils/theme';
 import '../styles/setup.css';
 
 interface InstructionsScreenProps {
@@ -11,7 +10,6 @@ interface InstructionsScreenProps {
 }
 
 export default function InstructionsScreen({ exam, onProceed, onCancel }: InstructionsScreenProps) {
-  const [theme] = useTheme();
   const mcqs = exam.questions.filter(q => !q.type.includes('coding') && !q.type.includes('practical'));
   const coding = exam.questions.filter(q => q.type === 'coding');
   const practical = exam.questions.filter(q => q.type.startsWith('practical'));
@@ -23,7 +21,7 @@ export default function InstructionsScreen({ exam, onProceed, onCancel }: Instru
   const pct = (m: number) => (totalMarks ? (m / totalMarks) * 100 : 0);
 
   return (
-    <div className="ui-shell" data-theme={theme}>
+    <div className="ui-shell">
       <div className="su-wrap ui-page">
         <Stepper current={0} />
         <div className="su-head">

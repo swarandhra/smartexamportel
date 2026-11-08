@@ -46,11 +46,11 @@ export default function TodoPage() {
   }
 
   return (
-    <div className="supabase-todos-preview" style={{ padding: '16px', background: '#f8fafc', borderRadius: '8px' }}>
+    <div className="supabase-todos-preview" style={{ padding: '16px', background: 'var(--surface-2)', borderRadius: '8px' }}>
       <h4 style={{ color: 'var(--dark-blue)', marginBottom: '12px', fontSize: '14px' }}>Supabase Todos Table Sync</h4>
       <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '8px' }}>
         {todos.map((todo) => (
-          <li key={todo.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', background: '#fff', padding: '8px 12px', borderRadius: '6px', border: '1px solid #e2e8f0' }}>
+          <li key={todo.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', background: 'var(--surface-1)', padding: '8px 12px', borderRadius: '6px', border: '1px solid var(--border)' }}>
             <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', backgroundColor: 'var(--success)' }}></span>
             {todo.name}
           </li>

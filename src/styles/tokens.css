@@ -1,103 +1,174 @@
-/* Design tokens — single source of truth. See DESIGN.md. */
-:root {
-  /* Palette */
-  --indigo-50: #eef2ff; --indigo-100: #e0e7ff; --indigo-500: #6366f1;
-  --indigo-600: #4f46e5; --indigo-700: #4338ca; --indigo-300: #a5b4fc;
-  --emerald-50: #ecfdf5; --emerald-700: #047857;
-  --amber-50: #fffbeb;  --amber-700: #b45309;
-  --rose-50: #fff1f2;   --rose-600: #e11d48; --rose-700: #be123c;
-  --sky-50: #f0f9ff;    --sky-700: #0369a1;
+/*
+ * Design tokens: the ONLY file allowed to contain raw colour values.
+ * Light is the default. Dark applies when <html data-theme="dark"> (set by index.html + useTheme).
+ * Print is always light.
+ */
+:root,
+:root[data-theme="light"] {
+  color-scheme: light;
 
-  /* Semantic (light) */
-  --c-bg: #f6f7fb;
-  --c-surface: #ffffff;
-  --c-surface-2: #f1f3f9;
-  --c-border: #e3e7f0;
-  --c-border-strong: #cbd2e1;
-  --c-text: #172033;
-  --c-text-muted: #55607a;
-  --c-primary: var(--indigo-600);
-  --c-primary-hover: var(--indigo-700);
-  --c-primary-text: #4338ca;
-  --c-primary-tint: var(--indigo-50);
-  --c-on-primary: #ffffff;
-  --c-success: var(--emerald-700);  --c-success-tint: var(--emerald-50);
-  --c-warning: var(--amber-700);    --c-warning-tint: var(--amber-50);
-  --c-danger: var(--rose-700);      --c-danger-solid: var(--rose-600); --c-danger-tint: var(--rose-50);
-  --c-info: var(--sky-700);         --c-info-tint: var(--sky-50);
-  --c-focus: var(--indigo-500);
+  /* Surfaces */
+  --bg: #f7f8fb;
+  --surface-1: #ffffff;
+  --surface-2: #f9fafb;
+  --surface-3: #f1f3f7;
+  --overlay: rgba(15, 23, 42, .5);
+  --paper: #ffffff;
 
-  /* Spacing (4px scale) */
-  --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px; --sp-5: 20px;
-  --sp-6: 24px; --sp-8: 32px; --sp-10: 40px; --sp-12: 48px;
+  /* Text */
+  --text-1: #0f172a;
+  --text-2: #475569;
+  --text-3: #5b687c;
+  --text-on-accent: #ffffff;
 
-  /* Radii */
-  --r-sm: 8px; --r-md: 12px; --r-lg: 16px; --r-full: 999px;
+  /* Lines */
+  --border: #e5e7eb;
+  --border-strong: #cbd5e1;
+  --focus-ring: #4f46e5;
+
+  /* Accent + status (fg = text/icon, bg = tint, border = outline, solid = filled fill with white text) */
+  --accent: #4f46e5;
+  --accent-hover: #4338ca;
+  --accent-fg: #4338ca;
+  --accent-bg: #eef2ff;
+  --accent-border: #c7d2fe;
+  --success-fg: #047857;  --success-bg: #ecfdf5;  --success-border: #a7f3d0;  --solid-success: #047857;
+  --warning-fg: #b45309;  --warning-bg: #fffbeb;  --warning-border: #fde68a;  --solid-warning: #b45309;
+  --danger-fg: #be123c;   --danger-bg: #fff1f2;   --danger-border: #fecdd3;   --solid-danger: #e11d48;
+  --info-fg: #0369a1;     --info-bg: #f0f9ff;     --info-border: #bae6fd;     --solid-info: #4338ca;
+
+  /* Chart fills */
+  --chart-success: #10b981;
+  --chart-danger: #f43f5e;
+  --chart-accent: #4f46e5;
+  --chart-code: #0891b2;
+  --chart-practical: #d97706;
+
+  /* Glass */
+  --glass-bg: rgba(255, 255, 255, .55);
+  --glass-border: rgba(255, 255, 255, .75);
+  --glass-highlight: rgba(255, 255, 255, .95);
+  --glass-blur: 24px;
+  --glass-shadow: 0 30px 80px -24px rgba(79, 70, 229, .28), 0 8px 24px -12px rgba(15, 23, 42, .12);
+  --glass-sheen: rgba(255, 255, 255, .7);
+  --aurora-1: rgba(129, 140, 248, .55);
+  --aurora-2: rgba(192, 132, 252, .42);
+  --aurora-3: rgba(56, 189, 248, .42);
+  --aurora-4: rgba(45, 212, 191, .32);
+  --grid-line: rgba(79, 70, 229, .07);
 
   /* Shadows */
-  --sh-sm: 0 1px 2px rgba(23, 32, 51, .06);
-  --sh-md: 0 4px 12px -2px rgba(23, 32, 51, .08), 0 2px 4px rgba(23, 32, 51, .04);
-  --sh-lg: 0 20px 40px -12px rgba(23, 32, 51, .18);
+  --sh-sm: 0 1px 2px rgba(15, 23, 42, .06);
+  --sh-md: 0 4px 12px -2px rgba(15, 23, 42, .08), 0 2px 4px rgba(15, 23, 42, .04);
+  --sh-lg: 0 20px 40px -12px rgba(15, 23, 42, .2);
 
-  /* Z-index */
+  /* Code workspace + camera (dark panels by design, same in both themes) */
+  --code-bg: #0f172a;
+  --code-panel: #172036;
+  --code-line: #263149;
+  --code-term: #0a0f1c;
+  --code-text: #e2e8f0;
+  --code-muted: #94a3b8;
+  --code-gutter: #7e8aa0;
+  --code-accent: #7dd3fc;
+  --code-ok: #6ee7b7;
+  --code-ok-bg: rgba(16, 185, 129, .16);
+  --code-bad: #fda4af;
+  --code-bad-bg: rgba(244, 63, 94, .16);
+  --code-btn: #263149;
+  --code-btn-hover: #334155;
+  --code-run: #047857;
+  --code-run-hover: #065f46;
+  --code-split: #475569;
+  --code-split-hover: #38bdf8;
+  --cam-bg: #000000;
+  --cam-chip: rgba(15, 23, 42, .75);
+  --cam-dot: #f43f5e;
+  --preview-bar: #f1f5f9;
+  --preview-line: #cbd5e1;
+  --preview-text: #334155;
+
+  /* Spacing, radii, z-index, motion, type (no colours) */
+  --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px; --sp-5: 20px;
+  --sp-6: 24px; --sp-8: 32px; --sp-10: 40px; --sp-12: 48px;
+  --r-sm: 8px; --r-md: 12px; --r-lg: 16px; --r-xl: 24px; --r-full: 999px;
   --z-sticky: 20; --z-drawer: 40; --z-modal: 60; --z-toast: 80;
-
-  /* Motion */
   --dur-fast: 120ms; --dur-base: 200ms; --dur-panel: 280ms; --dur-page: 400ms;
   --ease: cubic-bezier(.2, .8, .2, 1);
-
-  /* Type */
   --font: 'Plus Jakarta Sans', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 
-  /* Legacy aliases: unmigrated screens inherit the new palette. */
-  --primary: var(--c-primary);
-  --primary-hover: var(--c-primary-hover);
-  --primary-light: var(--c-primary-tint);
-  --primary-border: var(--indigo-100);
-  --dark-blue: var(--c-text);
-  --navy: var(--indigo-700);
-  --success: var(--c-success);
-  --success-light: var(--c-success-tint);
-  --danger: var(--c-danger-solid);
-  --danger-hover: var(--c-danger);
-  --danger-light: var(--c-danger-tint);
-  --bg-main: var(--c-bg);
-  --bg-card: var(--c-surface);
-  --bg-input: var(--c-surface-2);
-  --text-main: var(--c-text);
-  --text-muted: var(--c-text-muted);
-  --border-color: var(--c-border);
-  --radius-sm: var(--r-sm);
-  --radius-md: var(--r-md);
-  --radius-lg: var(--r-lg);
-  --shadow-sm: var(--sh-sm);
-  --shadow-md: var(--sh-md);
-  --shadow-lg: var(--sh-lg);
+  /* Legacy aliases so existing stylesheets keep working */
+  --c-bg: var(--bg);
+  --c-surface: var(--surface-1);
+  --c-surface-2: var(--surface-3);
+  --c-border: var(--border);
+  --c-border-strong: var(--border-strong);
+  --c-text: var(--text-1);
+  --c-text-muted: var(--text-2);
+  --c-primary: var(--accent);
+  --c-primary-hover: var(--accent-hover);
+  --c-primary-text: var(--accent-fg);
+  --c-primary-tint: var(--accent-bg);
+  --c-on-primary: var(--text-on-accent);
+  --c-success: var(--success-fg);  --c-success-tint: var(--success-bg);
+  --c-warning: var(--warning-fg);  --c-warning-tint: var(--warning-bg);
+  --c-danger: var(--danger-fg);    --c-danger-solid: var(--solid-danger); --c-danger-tint: var(--danger-bg);
+  --c-info: var(--info-fg);        --c-info-tint: var(--info-bg);
+  --c-focus: var(--focus-ring);
+  --indigo-500: var(--accent);
 }
 
-/* Dark theme is scoped to an element carrying data-theme="dark" (see useTheme),
-   so screens that have not been migrated yet are never half-dark. */
-[data-theme="dark"] {
-  color-scheme: dark;
-  --c-bg: #0b1020;
-  --c-surface: #121a30;
-  --c-surface-2: #1a2440;
-  --c-border: #27324f;
-  --c-border-strong: #3a4769;
-  --c-text: #e8ebf5;
-  --c-text-muted: #9ba6c0;
-  --c-primary-text: #a5b4fc;
-  --c-primary-tint: rgba(99, 102, 241, .16);
-  --c-success: #6ee7b7;  --c-success-tint: rgba(16, 185, 129, .14);
-  --c-warning: #fcd34d;  --c-warning-tint: rgba(245, 158, 11, .14);
-  --c-danger: #fda4af;   --c-danger-solid: #f43f5e; --c-danger-tint: rgba(244, 63, 94, .14);
-  --c-info: #7dd3fc;     --c-info-tint: rgba(14, 165, 233, .14);
-  --sh-sm: 0 1px 2px rgba(0, 0, 0, .4);
-  --sh-md: 0 6px 16px -4px rgba(0, 0, 0, .5);
-  --sh-lg: 0 24px 48px -12px rgba(0, 0, 0, .6);
-  background: var(--c-bg);
-  color: var(--c-text);
+@media screen {
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+
+    --bg: #0b0d12;
+    --surface-1: #12151c;
+    --surface-2: #181c25;
+    --surface-3: #1f2430;
+    --overlay: rgba(2, 4, 10, .66);
+    --paper: #ffffff;
+
+    --text-1: #f1f5f9;
+    --text-2: #cbd5e1;
+    --text-3: #94a3b8;
+    --text-on-accent: #ffffff;
+
+    --border: #262c38;
+    --border-strong: #333a48;
+    --focus-ring: #a5b4fc;
+
+    --accent: #6366f1;
+    --accent-hover: #818cf8;
+    --accent-fg: #a5b4fc;
+    --accent-bg: rgba(129, 140, 248, .16);
+    --accent-border: rgba(129, 140, 248, .35);
+    --success-fg: #6ee7b7;  --success-bg: rgba(16, 185, 129, .14);  --success-border: rgba(16, 185, 129, .35);  --solid-success: #047857;
+    --warning-fg: #fcd34d;  --warning-bg: rgba(245, 158, 11, .14);  --warning-border: rgba(245, 158, 11, .35);  --solid-warning: #b45309;
+    --danger-fg: #fda4af;   --danger-bg: rgba(244, 63, 94, .14);    --danger-border: rgba(244, 63, 94, .35);    --solid-danger: #e11d48;
+    --info-fg: #7dd3fc;     --info-bg: rgba(14, 165, 233, .14);     --info-border: rgba(14, 165, 233, .35);     --solid-info: #4f46e5;
+
+    --chart-accent: #818cf8;
+
+    --glass-bg: rgba(18, 21, 28, .55);
+    --glass-border: rgba(255, 255, 255, .09);
+    --glass-highlight: rgba(255, 255, 255, .14);
+    --glass-shadow: 0 30px 80px -24px rgba(0, 0, 0, .75), 0 8px 24px -12px rgba(0, 0, 0, .5);
+    --glass-sheen: rgba(165, 180, 252, .16);
+    --aurora-1: rgba(99, 102, 241, .42);
+    --aurora-2: rgba(168, 85, 247, .3);
+    --aurora-3: rgba(14, 165, 233, .28);
+    --aurora-4: rgba(20, 184, 166, .2);
+    --grid-line: rgba(165, 180, 252, .06);
+
+    --sh-sm: 0 1px 2px rgba(0, 0, 0, .4);
+    --sh-md: 0 6px 16px -4px rgba(0, 0, 0, .5);
+    --sh-lg: 0 24px 48px -12px rgba(0, 0, 0, .6);
+
+    --code-bg: #0b0f1a;
+    --code-panel: #131a2b;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
