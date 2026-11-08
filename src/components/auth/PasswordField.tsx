@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Eye, EyeOff, TriangleAlert } from 'lucide-react';
+import { Eye, EyeOff, Lock, TriangleAlert } from 'lucide-react';
 
 interface Props {
   id: string;
@@ -22,7 +22,8 @@ export default function PasswordField({ id, label, value, onChange, onBlur, plac
     <div className="au-field">
       <label className="au-label" htmlFor={id}>{label}</label>
       <div className="au-input-wrap">
-        <input id={id} className={`au-input ${error || invalid ? 'is-invalid' : ''}`} type={show ? 'text' : 'password'} value={value} placeholder={placeholder}
+        <Lock size={18} strokeWidth={1.75} className="au-lead-icon" aria-hidden="true" />
+        <input id={id} className={`au-input has-icon has-pass ${error || invalid ? 'is-invalid' : ''}`} type={show ? 'text' : 'password'} value={value} placeholder={placeholder}
           autoComplete={autoComplete} autoFocus={autoFocus} aria-invalid={!!error || invalid} aria-describedby={error ? `${id}-err` : undefined}
           onChange={e => onChange(e.target.value)} onKeyDown={checkCaps} onKeyUp={checkCaps}
           onBlur={() => { setCaps(false); onBlur?.(); }} />

@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { getSettings } from '../utils/db';
 import { showToast } from '../utils/notifications';
 import { ShieldCheck, KeyRound, ArrowLeft, Loader2, TriangleAlert, UserCog } from 'lucide-react';
 import PasswordField from './auth/PasswordField';
+import { Aurora, useGlassSheen } from './auth/Aurora';
+import ThemeToggle from './ThemeToggle';
+import { useTheme } from '../utils/theme';
 import '../styles/auth.css';
 
 interface AdminLoginProps {
@@ -10,6 +13,9 @@ interface AdminLoginProps {
 }
 
 export default function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
+  const [theme, toggleTheme] = useTheme();
+  const cardRef = useRef<HTMLDivElement>(null);
+  useGlassSheen(cardRef);
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [shake, setShake] = useState(false);
@@ -39,9 +45,10 @@ export default function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
   };
 
   return (
-    <div className="au au-center" data-theme="dark">
-      <div className="au-mesh" aria-hidden="true" />
-      <div className={`au-card ${shake ? 'au-shake' : ''}`} onAnimationEnd={() => setShake(false)}>
+    <div className="au au-center">
+      <div className="au-theme"><ThemeToggle theme={theme} onToggle={toggleTheme} /></div>
+      <Aurora />
+      <div ref={cardRef} className={`au-glass ${shake ? 'au-shake' : ''}`} onAnimationEnd={() => setShake(false)}>
         <div className="au-top">
           <div className="au-logo"><ShieldCheck size={28} strokeWidth={1.75} /></div>
           <span className="ui-badge ui-badge--primary au-badge"><UserCog size={14} strokeWidth={1.75} /> Teacher access</span>

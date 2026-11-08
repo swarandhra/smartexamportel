@@ -1,8 +1,12 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { authenticateStudent, registerStudent } from '../utils/db';
 import { showToast } from '../utils/notifications';
-import { ShieldCheck, Video, Lock, Zap, BarChart3, LogIn, UserPlus, Loader2 } from 'lucide-react';
+import { ShieldCheck, Video, Lock, Zap, BarChart3, LogIn, UserPlus, Loader2, User, GraduationCap, IdCard } from 'lucide-react';
 import PasswordField from './auth/PasswordField';
+import TextField from './auth/TextField';
+import { Aurora, useGlassSheen } from './auth/Aurora';
+import ThemeToggle from './ThemeToggle';
+import { useTheme } from '../utils/theme';
 import '../styles/auth.css';
 
 interface AuthProps {
@@ -10,6 +14,9 @@ interface AuthProps {
 }
 
 export default function Auth({ onLoginSuccess }: AuthProps) {
+  const [theme, toggleTheme] = useTheme();
+  const cardRef = useRef<HTMLDivElement>(null);
+  useGlassSheen(cardRef);
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const [loading, setLoading] = useState(false);
   const [touched, setTouched] = useState<Record<string, boolean>>({});
@@ -91,9 +98,10 @@ export default function Auth({ onLoginSuccess }: AuthProps) {
   const confirmErr = touched.regConfirm && regConfirmPass.trim() && regConfirmPass.trim() !== regPass.trim() ? 'Passwords do not match.' : req('regConfirm', regConfirmPass);
 
   return (
-    <div className="au" data-theme="dark">
+    <div className="au">
+      <Aurora />
+      <div className="au-theme"><ThemeToggle theme={theme} onToggle={toggleTheme} /></div>
       <div className="au-hero">
-        <div className="au-mesh" aria-hidden="true" />
         <div className="au-hero__inner">
           <div className="au-brand">
             <div className="au-logo"><ShieldCheck size={26} strokeWidth={1.75} /></div>
@@ -115,7 +123,7 @@ export default function Auth({ onLoginSuccess }: AuthProps) {
       </div>
 
       <div className="au-panel">
-        <div className="au-card">
+        <div className="au-glass" ref={cardRef}>
           <h1 className="au-h1">{mode === 'login' ? 'Welcome back' : 'Create account'}</h1>
           <p className="au-lead">
             {mode === 'login'
@@ -131,13 +139,9 @@ export default function Auth({ onLoginSuccess }: AuthProps) {
 
           {mode === 'login' && (
             <form onSubmit={handleLogin} className="au-form" key="login">
-              <div className="au-field">
-                <label className="au-label" htmlFor="login-roll">Roll Number / Student ID</label>
-                <input id="login-roll" type="text" className={`au-input mono ${req('loginRoll', loginRoll) ? 'is-invalid' : ''}`} placeholder="e.g. 23A91A0501"
-                  value={loginRoll} onChange={e => setLoginRoll(e.target.value)} onBlur={() => touch('loginRoll')}
-                  autoComplete="username" autoFocus />
-                {req('loginRoll', loginRoll) && <p className="au-error" role="alert">Please enter your Roll Number.</p>}
-              </div>
+              <TextField id="login-roll" label="Roll Number / Student ID" placeholder="e.g. 23a91a0501" icon={IdCard} mono value={loginRoll}
+                onChange={setLoginRoll} onBlur={() => touch('loginRoll')} autoComplete="username" autoFocus
+                error={req('loginRoll', loginRoll) && 'Please enter your Roll Number.'} />
               <PasswordField id="login-pass" label="Access Password" placeholder="Your password" value={loginPass} onChange={setLoginPass}
                 onBlur={() => touch('loginPass')} autoComplete="current-password" error={req('loginPass', loginPass) && 'Please enter your Password.'} />
               <button type="submit" className="ui-btn ui-btn--primary au-submit" disabled={loading}>
@@ -151,27 +155,14 @@ export default function Auth({ onLoginSuccess }: AuthProps) {
           {mode === 'register' && (
             <form onSubmit={handleRegister} className="au-form" key="register">
               <div className="au-row">
-                <div className="au-field">
-                  <label className="au-label" htmlFor="reg-name">Full Name</label>
-                  <input id="reg-name" type="text" className={`au-input ${req('regName', regName) ? 'is-invalid' : ''}`} placeholder="Your full name"
-                    value={regName} onChange={e => setRegName(e.target.value)} onBlur={() => touch('regName')} autoComplete="name" autoFocus />
-                  {req('regName', regName) && <p className="au-error" role="alert">Required</p>}
-                </div>
-                <div className="au-field">
-                  <label className="au-label" htmlFor="reg-roll">Roll Number</label>
-                  <input id="reg-roll" type="text" className={`au-input mono ${req('regRoll', regRoll) ? 'is-invalid' : ''}`} placeholder="e.g. 23A91A0501"
-                    value={regRoll} onChange={e => setRegRoll(e.target.value)} onBlur={() => touch('regRoll')} />
-                  {req('regRoll', regRoll) && <p className="au-error" role="alert">Required</p>}
-                </div>
+                <TextField id="reg-name" label="Full Name" placeholder="Your full name" icon={User} value={regName} onChange={setRegName}
+                  onBlur={() => touch('regName')} autoComplete="name" autoFocus error={req('regName', regName)} />
+                <TextField id="reg-roll" label="Roll Number" placeholder="e.g. 23a91a0501" icon={IdCard} mono value={regRoll} onChange={setRegRoll}
+                  onBlur={() => touch('regRoll')} error={req('regRoll', regRoll)} />
               </div>
-              <div className="au-field">
-                <label className="au-label" htmlFor="reg-branch">College Branch / Department</label>
-                <input id="reg-branch" type="text" className={`au-input mono ${req('regBranch', regBranch) ? 'is-invalid' : ''}`} placeholder="e.g. CSE, ECE, IT"
-                  value={regBranch} onChange={e => setRegBranch(e.target.value)} onBlur={() => touch('regBranch')} />
-                {req('regBranch', regBranch)
-                  ? <p className="au-error" role="alert">Required</p>
-                  : <p className="au-hint">Type your branch abbreviation manually (e.g. CSE, ECE, IT)</p>}
-              </div>
+              <TextField id="reg-branch" label="College Branch / Department" placeholder="e.g. cse, ece, it" icon={GraduationCap} mono value={regBranch}
+                onChange={setRegBranch} onBlur={() => touch('regBranch')} error={req('regBranch', regBranch)}
+                hint="Type your branch abbreviation manually (e.g. CSE, ECE, IT)" />
               <PasswordField id="reg-pass" label="Create Password" placeholder="Min. 6 characters" value={regPass} onChange={setRegPass}
                 onBlur={() => touch('regPass')} autoComplete="new-password" error={passErr} />
               <PasswordField id="reg-confirm" label="Confirm Password" placeholder="Re-enter password" value={regConfirmPass} onChange={setRegConfirmPass}
