@@ -137,7 +137,7 @@ export function requestFullscreen(): void {
   if (!document.fullscreenElement) {
     docEl.requestFullscreen().catch(err => {
       console.warn('Failed to enter fullscreen mode:', err);
-      logViolation('Fullscreen Blocked', 'Browser blocked programatic fullscreen entry.');
+      logViolation('Fullscreen Blocked', 'Browser blocked programmatic fullscreen entry.');
     });
   }
 }

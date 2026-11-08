@@ -3,7 +3,6 @@ import { getExams, addExam, deleteExam, getResults, getSettings, saveSettings } 
 import type { Exam, Question, Result } from '../utils/db';
 import { downloadResultsCSV } from '../utils/helpers';
 import { showToast, showModal, showConfirm } from '../utils/notifications';
-import TodoPage from '../TodoPage'; 
 import { transpileJavaToJS, extractMethodName, runTestCase } from '../utils/javaTranspiler'; 
 
 function cleanSql(sql: string): string {
@@ -1596,9 +1595,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   </button>
                 </div>
 
-                <div style={{ padding: '24px', borderTop: '1px solid var(--border-color)' }}>
-                  <TodoPage />
-                </div>
+                {/* Supabase debug panel intentionally not rendered; client code kept. */}
               </div>
 
               <div className="dashboard-card">
@@ -1643,7 +1640,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                 <div className="modal-info-summary">
                   <div className="summary-item"><strong>Exam Name:</strong> {selectedResult.examName}</div>
                   <div className="summary-item"><strong>Completion Date:</strong> {selectedResult.date}</div>
-                  <div className="summary-item"><strong>Duration Ticked:</strong> {selectedResult.timeTaken}</div>
+                  <div className="summary-item"><strong>Time taken:</strong> {selectedResult.timeTaken}</div>
                   <div className="summary-item"><strong>Final Score:</strong> {selectedResult.marksObtained} / {selectedResult.totalMarks} ({selectedResult.percentage.toFixed(1)}%)</div>
                   <div className="summary-item"><strong>Status:</strong> {selectedResult.status}</div>
                   <div className="summary-item"><strong>Total Violations:</strong> {selectedResult.totalViolations}</div>
