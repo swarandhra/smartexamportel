@@ -1,7 +1,7 @@
 # Design system
 
-Status: foundation, student dashboard, guidelines, system check, warning overlay, result screen and exam screen are migrated.
-Pending: student auth, admin login, admin workspace.
+Status: all student screens and the exam are migrated; auth and admin login share the dark `au-*` shell.
+Pending: admin workspace.
 
 ## Tokens (`src/styles/tokens.css`)
 - Semantic colours `--c-*` (indigo primary, slate neutrals, emerald/amber/rose/sky status). Light by default; `[data-theme="dark"]` overrides.
