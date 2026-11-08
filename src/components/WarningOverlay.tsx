@@ -1,3 +1,6 @@
+import { ShieldAlert, Maximize } from 'lucide-react';
+import '../styles/warning.css';
+
 interface WarningOverlayProps {
   show: boolean;
   title: string;
@@ -11,25 +14,24 @@ export default function WarningOverlay({ show, title, message, count, maxCount =
   if (!show) return null;
 
   return (
-    <div className="security-warning-overlay">
-      <div className="warning-card animate-scale-up">
-        <div className="warning-icon">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth="2">
-            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
-            <line x1="12" y1="9" x2="12" y2="13"/>
-            <line x1="12" y1="17" x2="12.01" y2="17"/>
-          </svg>
+    <div className="security-warning-overlay wo-overlay" role="alertdialog" aria-modal="true" aria-labelledby="wo-title" aria-describedby="wo-msg">
+      <div className="wo-card">
+        <div className="wo-icon"><ShieldAlert size={32} strokeWidth={1.75} aria-hidden="true" /></div>
+        <h3 id="wo-title" className="wo-title">{title}</h3>
+        <p id="wo-msg" className="wo-msg">{message}</p>
+
+        <div className="wo-meter" role="img" aria-label={`Warning ${count} of ${maxCount}`}>
+          {Array.from({ length: maxCount }, (_, i) => (
+            <span key={i} className={i < count ? 'wo-seg wo-seg--on' : 'wo-seg'} />
+          ))}
         </div>
-        <h3>{title}</h3>
-        <p>{message}</p>
-        <div className="warning-count-display">
-          Violation <span>{count}</span> of {maxCount}
-        </div>
-        <div style={{ fontSize: '13px', color: '#94a3b8', marginBottom: '12px' }}>
+        <div className="wo-count">Warning <strong>{count}</strong> of {maxCount}</div>
+        <div className="wo-hint">
           {maxCount - count} more violation{maxCount - count === 1 ? '' : 's'} will auto-submit your exam.
         </div>
-        <button className="btn btn-danger" onClick={onResume}>
-          Resume Exam (Re-enter Fullscreen)
+
+        <button className="wo-btn" onClick={onResume}>
+          <Maximize size={18} strokeWidth={1.75} /> Return to exam (full screen)
         </button>
       </div>
     </div>

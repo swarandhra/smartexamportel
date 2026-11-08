@@ -1,0 +1,16 @@
+.wo-overlay { position: fixed; inset: 0; z-index: var(--z-modal); display: grid; place-items: center; padding: var(--sp-4);
+  background: rgba(15, 23, 42, .78); font-family: var(--font); }
+.wo-card { width: 100%; max-width: 460px; background: #fff; color: #172033; border-radius: var(--r-lg); padding: var(--sp-8);
+  text-align: center; box-shadow: var(--sh-lg); border-top: 4px solid #e11d48; display: grid; justify-items: center; gap: var(--sp-3); }
+.wo-icon { width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; background: #fff1f2; color: #be123c; }
+.wo-title { font-size: 20px; font-weight: 800; }
+.wo-msg { color: #55607a; line-height: 1.6; font-size: 15px; }
+.wo-meter { display: flex; gap: 6px; width: 100%; margin-top: var(--sp-2); }
+.wo-seg { flex: 1; height: 8px; border-radius: 4px; background: #e3e7f0; }
+.wo-seg--on { background: #e11d48; }
+.wo-count { font-size: 14px; color: #172033; }
+.wo-hint { font-size: 13px; color: #55607a; }
+.wo-btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--sp-2); width: 100%; min-height: 48px; margin-top: var(--sp-2);
+  border: 0; border-radius: var(--r-md); background: #be123c; color: #fff; font: 700 15px var(--font); cursor: pointer; }
+.wo-btn:hover { background: #9f1239; }
+.wo-btn:focus-visible { outline: 2px solid #4f46e5; outline-offset: 2px; }
