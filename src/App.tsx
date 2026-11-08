@@ -9,6 +9,7 @@ import OutcomeScreen from './components/OutcomeScreen';
 const AdminDashboard = lazy(() => import('./components/AdminDashboard'));
 import type { Exam, Result } from './utils/db';
 import { syncOfflineResults } from './utils/helpers';
+import { useHeartbeat } from './utils/activity';
 
 // Detect if current URL path is /admin
 const isAdminRoute = window.location.pathname === '/admin' || window.location.pathname === '/admin/';
@@ -66,6 +67,9 @@ export default function App() {
       window.removeEventListener('online', handleOnline);
     };
   }, []);
+
+  // Presence ping for the admin Overview (students only; never on /admin)
+  useHeartbeat(!isAdminRoute && role === 'student' ? studentSession?.rollNumber : null, examState === 'exam');
 
   const handleAdminLoginSuccess = () => {
     setRole('admin');

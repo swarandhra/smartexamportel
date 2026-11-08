@@ -8,9 +8,11 @@ import {
   LayoutGrid, SquarePlus, ClipboardList, BarChart3, Settings, LogOut, PanelLeftClose, PanelLeftOpen, Moon, Sun, Plus, Download, Search, Trash2,
   EllipsisVertical, Clock, HelpCircle, Trophy, Target, RotateCcw, CalendarRange, ChevronDown, ChevronRight, GripVertical, X, Upload, CheckCircle2,
   XCircle, ListChecks, Code2, Globe, FileCode2, ToggleLeft, TextCursorInput, AlignLeft, Printer, ShieldCheck, Users, Percent, TrendingUp,
-  AlertTriangle, FileQuestion, FileText, FileSearch, Save,
+  AlertTriangle, FileQuestion, FileText, FileSearch, Save, LayoutDashboard, GraduationCap,
 } from 'lucide-react';
 import { useTheme } from '../utils/theme';
+import OverviewTab from './admin/OverviewTab';
+import StudentsTab from './admin/StudentsTab';
 import '../styles/admin.css';
 
 // UI-only: derive validation hints from the pasted/uploaded JSON (never used to gate the import itself)
@@ -200,7 +202,7 @@ interface AdminDashboardProps {
 }
 
 export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
-  const [activeTab, setActiveTab] = useState<'exams' | 'create' | 'results' | 'analytics' | 'settings'>('exams');
+  const [activeTab, setActiveTab] = useState<'overview' | 'students' | 'exams' | 'create' | 'results' | 'analytics' | 'settings'>('overview');
   
   // Local Database states
   const [exams, setExams] = useState<Exam[]>([]);
@@ -833,6 +835,8 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
   }
 
   const titles: Record<typeof activeTab, [string, string]> = {
+    overview: ['Overview', 'Live student activity and a snapshot of your exams.'],
+    students: ['Students', 'Registered students, their status and last activity.'],
     exams: ['Manage exams', 'Create, update, and review exams available in the database.'],
     create: ['Create new exam', 'Build custom exams manually or perform a JSON bulk import.'],
     results: ['Student results', 'Review logs, marks, cheating violations, and download sheets.'],
@@ -840,6 +844,8 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
     settings: ['System settings', 'Manage Apps Script webhooks, credentials, and database integration status.'],
   };
   const navItems = [
+    { key: 'overview', label: 'Overview', icon: LayoutDashboard },
+    { key: 'students', label: 'Students', icon: GraduationCap },
     { key: 'exams', label: 'Manage Exams', icon: LayoutGrid },
     { key: 'create', label: 'Create Exam', icon: SquarePlus },
     { key: 'results', label: 'Student Results', icon: ClipboardList },
@@ -910,6 +916,9 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
         </header>
 
         <div className="ad-body" key={activeTab}>
+          {activeTab === 'overview' && <OverviewTab exams={exams} results={results} />}
+          {activeTab === 'students' && <StudentsTab />}
+
           {/* =================== EXAMS =================== */}
           {activeTab === 'exams' && (
             <div className="ad-exams ui-stagger">
