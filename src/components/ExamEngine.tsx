@@ -7,6 +7,12 @@ import { transpileJavaToJS, extractMethodName, runTestCase } from '../utils/java
 
 import { showModal, showConfirm, showToast } from '../utils/notifications';
 import WarningOverlay from './WarningOverlay';
+import { Clock, Menu, X, Flag, Eraser, ArrowLeft, ArrowRight, Send, Check, Play, Rocket, Globe, ShieldAlert, AlertTriangle } from 'lucide-react';
+import { Palette, SubmitModal, CodeEditor, SaveChip, ShortcutsPopover } from './exam/ExamParts';
+import type { SaveStatus, PaletteFilter } from './exam/ExamParts';
+import ThemeToggle from './ThemeToggle';
+import { useTheme } from '../utils/theme';
+import '../styles/exam.css';
 
 interface ExamEngineProps {
   exam: Exam;
@@ -171,6 +177,19 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
   // Active question instances
   const [questions, setQuestions] = useState<Question[]>([]);
   const [visitedQuestions, setVisitedQuestions] = useState<Record<string, boolean>>({});
+
+  // UI-only state (never sent to the API)
+  const [theme, toggleTheme] = useTheme();
+  const [saveStatus, setSaveStatus] = useState<SaveStatus>({ s: 'idle' });
+  const [navOpen, setNavOpen] = useState(false);
+  const [paletteFilter, setPaletteFilter] = useState<PaletteFilter>('all');
+  const [showSubmitModal, setShowSubmitModal] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [timerNotice, setTimerNotice] = useState('');
+  const reviewKey = `ui-review-marks-${exam.id}`;
+  const [marked, setMarked] = useState<Record<string, boolean>>(() => {
+    try { return JSON.parse(sessionStorage.getItem(reviewKey) || '{}'); } catch { return {}; }
+  });
   
 
 
@@ -410,7 +429,9 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
       // 2. Sync to Supabase
       const logs = getViolationLog();
       const snaps = getCameraCaptures();
-      await updateResultDraft(resultIdRef.current, answers, logs, snaps);
+      setSaveStatus({ s: 'saving' });
+      const ok = await updateResultDraft(resultIdRef.current, answers, logs, snaps);
+      setSaveStatus({ s: ok ? 'saved' : 'offline', at: Date.now() });
     };
 
     const interval = setInterval(saveStateAndSyncDraft, 10000);
@@ -842,171 +863,162 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
   };
 
   const handleManualSubmit = () => {
-    const unanswered = questions.length - Object.keys(answers).length;
-    let msg = 'Are you sure you want to submit your exam? This action cannot be undone.';
-    if (unanswered > 0) {
-      msg += `\n\nYou have left ${unanswered} question(s) unanswered.`;
-    }
-    showConfirm(
-      'Submit Exam?',
-      msg,
-      () => submitQuiz(),
-      undefined,
-      'Submit Now',
-      'Continue Exam'
-    );
+    setShowSubmitModal(true);
   };
 
+  const confirmSubmit = async () => {
+    setSubmitting(true);
+    await submitQuiz();
+  };
+
+  const toggleMark = (qId: string) => {
+    setMarked(prev => {
+      const next = { ...prev, [qId]: !prev[qId] };
+      try { sessionStorage.setItem(reviewKey, JSON.stringify(next)); } catch { /* ignore */ }
+      return next;
+    });
+  };
+
+  // One-time, non-blocking time notices (UI only; timer logic is untouched)
+  useEffect(() => {
+    const notices: Record<number, string> = { 600: '10 minutes remaining', 300: '5 minutes remaining', 60: '1 minute remaining' };
+    if (notices[secondsRemaining]) {
+      setTimerNotice(notices[secondsRemaining]);
+      showToast(notices[secondsRemaining], secondsRemaining === 60 ? 'error' : 'warning');
+    }
+  }, [secondsRemaining]);
+
+  // Shortcuts: bubble phase on document, so the proctoring capture handlers always run first.
+  const keyHandlerRef = useRef<(e: KeyboardEvent) => void>(() => {});
+  keyHandlerRef.current = (e: KeyboardEvent) => {
+    if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey || showSubmitModal || showWarning) return;
+    const t = e.target as HTMLElement | null;
+    const isRadio = t instanceof HTMLInputElement && t.type === 'radio';
+    if (t && !isRadio && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable)) return;
+    const q = questions[activeQuestionIdx];
+    if (!q) return;
+    const key = e.key.toLowerCase();
+    if (key === 'arrowright') { e.preventDefault(); handleNext(); return; }
+    if (key === 'arrowleft') { e.preventDefault(); handlePrev(); return; }
+    if (key === 'm') { toggleMark(q.id); return; }
+    if (q.type === 'mcq' && q.options) {
+      const idx = '1234'.includes(key) && key.length === 1 ? parseInt(key, 10) - 1 : 'abcd'.indexOf(key);
+      if (key.length === 1 && idx >= 0 && idx < q.options.length) handleSelectOption(q.id, String(idx));
+    } else if (q.type === 'tf') {
+      if (key === '1') handleSelectOption(q.id, 'true');
+      if (key === '2') handleSelectOption(q.id, 'false');
+    }
+  };
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => keyHandlerRef.current(e);
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, []);
+
   if (questions.length === 0) {
-    return <div className="loading-state">Configuring Exam Environment...</div>;
+    return (
+      <div className="ui-shell" data-theme={theme} style={{ display: 'grid', placeItems: 'center' }} role="status" aria-live="polite">
+        <div className="loading-state">Configuring exam environment…</div>
+      </div>
+    );
   }
 
   // Calculate Progress
   const totalQs = questions.length;
   const answeredCount = Object.keys(answers).filter(k => answers[k] !== undefined && answers[k].trim() !== '').length;
   const progressPercent = totalQs > 0 ? (answeredCount / totalQs) * 100 : 0;
+  const markedCount = questions.filter(q => marked[q.id]).length;
 
   // Format Timer
   const mins = Math.floor(secondsRemaining / 60);
   const secs = secondsRemaining % 60;
-  const isTimerLow = secondsRemaining < 60;
+  const timerClass = secondsRemaining < 60 ? 'is-crit' : secondsRemaining < 300 ? 'is-warn' : '';
+
+  const isCodeQ = activeQ.type === 'coding' || activeQ.type === 'practical-java' || activeQ.type === 'practical-html';
+  const isLast = activeQuestionIdx >= questions.length - 1;
+  const feedback = submissionFeedback[activeQ.id];
+  const selectQuestion = (idx: number) => { setActiveQuestionIdx(idx); setNavOpen(false); };
+
+  const feedbackBanner = feedback && (
+    <div className={`xm-feedback ${feedback.passed ? 'is-pass' : 'is-fail'}`} role="status">{feedback.message}</div>
+  );
+
+  const splitter = (
+    <div className="xm-ws__split" onMouseDown={handleSplitMouseDown} role="separator" aria-orientation="vertical" aria-label="Resize panels" />
+  );
 
   return (
-    <div className="exam-layout">
+    <div className={`xm ui-shell ${isCodeQ ? 'xm--code' : ''}`} data-theme={theme}>
       {/* Top Header */}
-      <div className="exam-topbar">
-        <div className="exam-title-section">
-          <h3>{exam.title}</h3>
-          <span className="student-meta">{student.name} ({student.rollNumber})</span>
-        </div>
-        
-        <div className="exam-progress-section">
-          <div className="progress-bar-container">
-            <div className="progress-bar-fill" style={{ width: `${progressPercent}%` }}></div>
-          </div>
-          <span className="progress-text">{progressPercent.toFixed(0)}% Complete</span>
+      <header className="xm-top">
+        <div className="xm-title">
+          <h1>{exam.title}</h1>
+          <span>{student.name} · <span className="ui-mono">{student.rollNumber}</span></span>
         </div>
 
-        <div className={`exam-timer-section ${isTimerLow ? 'timer-low' : ''}`} id="exam-timer-widget">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="12" cy="12" r="10"/>
-            <polyline points="12 6 12 12 16 14"/>
-          </svg>
-          <span>{mins.toString().padStart(2, '0')}:{secs.toString().padStart(2, '0')}</span>
-        </div>
-      </div>
-
-      <div className="exam-main" style={{ gridTemplateColumns: (activeQ.type === 'coding' || activeQ.type === 'practical-java' || activeQ.type === 'practical-html') ? '1fr' : '240px 1fr' }}>
-        {/* Webcam Widget */}
-        <div className="security-cam-widget" id="sec-cam-widget">
-          <video ref={videoRef} id="exam-camera-stream" autoPlay playsInline muted></video>
-          <div className="widget-overlay">REC</div>
-        </div>
-
-        {/* Side Question Navigator */}
-        {!(activeQ.type === 'coding' || activeQ.type === 'practical-java' || activeQ.type === 'practical-html') && (
-          <div className="question-nav-panel">
-          <h4>MCQ Questions</h4>
-          <div className="nav-grid" style={{ marginBottom: '16px' }}>
-            {questions.filter(q => q.type !== 'coding' && !q.type.startsWith('practical')).map((q, idx) => {
-              const answered = answers[q.id] !== undefined && String(answers[q.id]).trim() !== '';
-              const isVisited = visitedQuestions[q.id];
-              const isCurrent = questions.indexOf(q) === activeQuestionIdx;
-              
-              let btnClass = 'nav-item';
-              if (answered) {
-                btnClass += ' answered';
-              } else if (isVisited) {
-                btnClass += ' visited';
-              } else {
-                btnClass += ' not-visited';
-              }
-              if (isCurrent) btnClass += ' active';
-
-              return (
-                <button 
-                  key={q.id}
-                  className={btnClass}
-                  onClick={() => setActiveQuestionIdx(questions.indexOf(q))}
-                >
-                  {idx + 1}
-                </button>
-              );
-            })}
-          </div>
-
-          <h4>Coding & Practicals</h4>
-          <div className="nav-grid">
-            {questions.filter(q => q.type === 'coding' || q.type.startsWith('practical')).map((q, idx) => {
-              const answered = answers[q.id] !== undefined && String(answers[q.id]).trim() !== '';
-              const isVisited = visitedQuestions[q.id];
-              const isCurrent = questions.indexOf(q) === activeQuestionIdx;
-              
-              let btnClass = 'nav-item';
-              if (answered) {
-                btnClass += ' answered';
-              } else if (isVisited) {
-                btnClass += ' visited';
-              } else {
-                btnClass += ' not-visited';
-              }
-              if (isCurrent) btnClass += ' active';
-
-              let label = `P${idx + 1}`;
-              if (q.type === 'coding') label = `C${idx + 1}`;
-
-              return (
-                <button 
-                  key={q.id}
-                  className={btnClass}
-                  onClick={() => setActiveQuestionIdx(questions.indexOf(q))}
-                >
-                  {label}
-                </button>
-              );
-            })}
+        <div className="xm-prog">
+          <div className="xm-prog__text"><span>{answeredCount} / {totalQs} answered</span><span className="ui-mono">{progressPercent.toFixed(0)}%</span></div>
+          <div className="xm-prog__bar" role="progressbar" aria-valuemin={0} aria-valuemax={totalQs} aria-valuenow={answeredCount} aria-label="Questions answered">
+            <div className="xm-prog__fill" style={{ width: `${progressPercent}%` }}></div>
           </div>
         </div>
-        )}
+
+        <div className="xm-tools">
+          <SaveChip status={saveStatus} now={Date.now()} />
+          <ThemeToggle theme={theme} onToggle={toggleTheme} />
+          <ShortcutsPopover />
+          <button type="button" className="ui-btn ui-btn--secondary xm-navtoggle" onClick={() => setNavOpen(true)} aria-label="Open question palette">
+            <Menu size={18} strokeWidth={1.75} /> Questions
+          </button>
+          <div className={`xm-timer ${timerClass}`} id="exam-timer-widget" role="timer" aria-label="Time remaining">
+            <Clock size={18} strokeWidth={1.75} aria-hidden="true" />
+            <span>{mins.toString().padStart(2, '0')}:{secs.toString().padStart(2, '0')}</span>
+          </div>
+        </div>
+        <div className="sr-only" aria-live="polite">{timerNotice}</div>
+      </header>
+
+      <div className="xm-main">
+        {navOpen && <div className="xm-backdrop" onClick={() => setNavOpen(false)} />}
+        {/* Question navigator: docked, drawer or bottom sheet depending on viewport */}
+        <aside className={`xm-nav ${navOpen ? 'is-open' : ''}`} aria-label="Question palette">
+          <div className="xm-nav__head">
+            <h2>Question palette</h2>
+            <button type="button" className="ui-btn ui-btn--ghost ui-btn--icon xm-nav__close" onClick={() => setNavOpen(false)} aria-label="Close palette"><X size={18} strokeWidth={1.75} /></button>
+          </div>
+          <Palette questions={questions} activeIdx={activeQuestionIdx} answers={answers} visited={visitedQuestions} marked={marked}
+            filter={paletteFilter} onFilter={setPaletteFilter} onSelect={selectQuestion} />
+        </aside>
 
         {/* Question Panel */}
-        <div className="question-body-panel" style={{ 
-          padding: (activeQ.type === 'coding' || activeQ.type === 'practical-java' || activeQ.type === 'practical-html') ? '0' : '40px',
-          height: 'calc(100vh - 146px)',
-          overflow: (activeQ.type === 'coding' || activeQ.type === 'practical-java' || activeQ.type === 'practical-html') ? 'hidden' : 'auto'
-        }}>
-          <div className="question-container animate-fade-in" key={activeQ.id} style={{ 
-            maxWidth: (activeQ.type === 'coding' || activeQ.type === 'practical-java' || activeQ.type === 'practical-html') ? '100%' : '700px',
-            margin: (activeQ.type === 'coding' || activeQ.type === 'practical-java' || activeQ.type === 'practical-html') ? '0' : '0 auto',
-            height: '100%', 
-            display: 'flex', 
-            flexDirection: 'column' 
-          }}>
-            {!(activeQ.type === 'coding' || activeQ.type === 'practical-java' || activeQ.type === 'practical-html') && (
+        <main className="xm-body">
+          <div className="xm-q" key={activeQ.id}>
+            {!isCodeQ && (
               <>
-                <div className="question-header-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                  <span className="badge badge-primary">{activeQ.type.toUpperCase()}</span>
-                  <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Marks: {activeQ.marks}</span>
+                <div className="xm-q__meta">
+                  <span className="ui-badge ui-badge--primary">Question {activeQuestionIdx + 1}</span>
+                  <span className="ui-badge ui-badge--info">{activeQ.type.toUpperCase()}</span>
+                  <span className="ui-badge ui-badge--success">{activeQ.marks} {activeQ.marks === 1 ? 'mark' : 'marks'}</span>
                 </div>
-                <div className="question-text" style={{ fontSize: '16px', fontWeight: '600', marginBottom: '16px', whiteSpace: 'pre-line' }}>{activeQ.questionText}</div>
+                <div className="xm-q__text">{activeQ.questionText}</div>
               </>
             )}
-            
-            
+
             {/* MCQ TYPE */}
             {activeQ.type === 'mcq' && activeQ.options && (
-              <div className="options-container">
+              <div className="xm-opts" role="radiogroup" aria-label="Options">
                 {activeQ.options.map((opt, idx) => (
-                  <label key={idx} className={`option-card ${activeAnswer === String(idx) ? 'selected' : ''}`}>
-                    <input 
-                      type="radio" 
-                      name={`opt_${activeQ.id}`} 
+                  <label key={idx} className={`xm-opt ${activeAnswer === String(idx) ? 'is-selected' : ''}`}>
+                    <input
+                      type="radio"
+                      name={`opt_${activeQ.id}`}
                       value={idx}
                       checked={activeAnswer === String(idx)}
                       onChange={() => handleSelectOption(activeQ.id, String(idx))}
                     />
-                    <span className="option-letter">{String.fromCharCode(65 + idx)}</span>
-                    <span className="option-text">{opt}</span>
+                    <span className="xm-opt__letter">{String.fromCharCode(65 + idx)}</span>
+                    <span className="xm-opt__text">{opt}</span>
+                    <Check size={20} strokeWidth={2.25} className="xm-opt__check" aria-hidden="true" />
                   </label>
                 ))}
               </div>
@@ -1014,476 +1026,187 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
 
             {/* TRUE FALSE TYPE */}
             {activeQ.type === 'tf' && (
-              <div className="options-container tf-container">
-                <label className={`option-card ${activeAnswer === 'true' ? 'selected' : ''}`}>
-                  <input 
-                    type="radio" 
-                    name={`tf_${activeQ.id}`} 
-                    value="true" 
-                    checked={activeAnswer === 'true'}
-                    onChange={() => handleSelectOption(activeQ.id, 'true')}
-                  />
-                  <span className="option-text">True</span>
-                </label>
-                <label className={`option-card ${activeAnswer === 'false' ? 'selected' : ''}`}>
-                  <input 
-                    type="radio" 
-                    name={`tf_${activeQ.id}`} 
-                    value="false" 
-                    checked={activeAnswer === 'false'}
-                    onChange={() => handleSelectOption(activeQ.id, 'false')}
-                  />
-                  <span className="option-text">False</span>
-                </label>
+              <div className="xm-opts xm-tf" role="radiogroup" aria-label="True or false">
+                {(['true', 'false'] as const).map((v, i) => (
+                  <label key={v} className={`xm-opt ${activeAnswer === v ? 'is-selected' : ''}`}>
+                    <input
+                      type="radio"
+                      name={`tf_${activeQ.id}`}
+                      value={v}
+                      checked={activeAnswer === v}
+                      onChange={() => handleSelectOption(activeQ.id, v)}
+                    />
+                    <span className="xm-opt__letter">{i + 1}</span>
+                    <span className="xm-opt__text">{v === 'true' ? 'True' : 'False'}</span>
+                    <Check size={20} strokeWidth={2.25} className="xm-opt__check" aria-hidden="true" />
+                  </label>
+                ))}
               </div>
             )}
 
             {/* FILL IN THE BLANK TYPE */}
             {activeQ.type === 'fib' && (
-              <div className="text-answer-container">
-                <input 
-                  type="text" 
-                  className="form-control" 
-                  placeholder="Type your answer here..."
-                  value={activeAnswer}
-                  onChange={(e) => handleSelectOption(activeQ.id, e.target.value)}
-                  autoComplete="off"
-                />
-              </div>
+              <input
+                type="text"
+                className="xm-field"
+                placeholder="Type your answer here..."
+                aria-label="Your answer"
+                value={activeAnswer}
+                onChange={(e) => handleSelectOption(activeQ.id, e.target.value)}
+                autoComplete="off"
+              />
             )}
 
             {/* SHORT ANSWER or SQL JOIN TYPE */}
             {(activeQ.type === 'sa' || activeQ.type === 'sql-join') && (
-              <div className="text-answer-container">
-                <textarea 
-                  className="form-control text-area" 
-                  rows={6}
-                  placeholder={activeQ.type === 'sql-join' ? "Write your SQL query here using INNER JOIN..." : "Explain your answer in detail..."}
-                  value={activeAnswer}
-                  onChange={(e) => handleSelectOption(activeQ.id, e.target.value)}
-                  autoComplete="off"
-                ></textarea>
-              </div>
+              <textarea
+                className="xm-field"
+                rows={6}
+                aria-label="Your answer"
+                placeholder={activeQ.type === 'sql-join' ? "Write your SQL query here using INNER JOIN..." : "Explain your answer in detail..."}
+                value={activeAnswer}
+                onChange={(e) => handleSelectOption(activeQ.id, e.target.value)}
+                autoComplete="off"
+                style={activeQ.type === 'sql-join' ? { fontFamily: 'var(--font-mono)', fontSize: 14 } : undefined}
+              ></textarea>
+            )}
+
+            {!isCodeQ && activeAnswer.trim() !== '' && (
+              <button type="button" className="ui-btn ui-btn--ghost ui-btn--sm xm-clear" onClick={() => handleSelectOption(activeQ.id, '')}>
+                <Eraser size={16} strokeWidth={1.75} /> Clear response
+              </button>
             )}
 
             {/* PRACTICAL HTML TYPE (Split Screen Live Preview Codebox) */}
             {activeQ.type === 'practical-html' && (
-              <div className="html-split-layout" style={{ 
-                display: 'flex', 
-                gap: '0', 
-                height: 'calc(100vh - 146px)', 
-                width: '100%',
-                background: '#0f172a',
-                borderTop: '1px solid #1e293b'
-              }}>
-                {/* Left Panel: HTML Question & Editor */}
-                <div className="html-left-panel" style={{ 
-                  width: `${splitPercent}%`, 
-                  flexShrink: 0, 
-                  display: 'flex', 
-                  flexDirection: 'column', 
-                  background: '#0f172a', 
-                  borderRight: '1px solid #1e293b', 
-                  height: '100%', 
-                  boxSizing: 'border-box' 
-                }}>
-                  {/* Left Top: Question Statement */}
-                  <div className="html-question-statement" style={{ 
-                    padding: '20px', 
-                    background: '#1e293b', 
-                    borderBottom: '1px solid #334155',
-                    color: '#f8fafc',
-                    overflowY: 'auto',
-                    maxHeight: '180px',
-                    boxSizing: 'border-box'
-                  }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                      <span className="badge badge-primary" style={{ background: '#38bdf8', color: '#0f172a', fontWeight: 'bold', padding: '2px 8px', borderRadius: '4px', fontSize: '11px' }}>HTML TASK</span>
-                      <span style={{ fontSize: '12px', color: '#94a3b8' }}>Marks: {activeQ.marks}</span>
+              <div className="xm-ws">
+                <div className="xm-ws__left" style={{ width: `${splitPercent}%` }}>
+                  <div className="xm-html-q">
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                      <span className="ui-badge ui-badge--info">HTML TASK</span>
+                      <span style={{ fontSize: 12, color: 'var(--ws-muted)' }}>{activeQ.marks} marks</span>
                     </div>
-                    <div style={{ fontSize: '14px', fontWeight: '500', lineHeight: '1.5', whiteSpace: 'pre-wrap' }}>
-                      {activeQ.questionText}
+                    {activeQ.questionText}
+                  </div>
+                  <div className="xm-ws__bar">
+                    <span className="xm-ws__lang">index.html</span>
+                    <div className="xm-ws__btns">
+                      <button className="ui-btn ui-btn--secondary" onClick={handleRunHtmlCode}><Play size={15} strokeWidth={1.75} /> Run code</button>
+                      <button className="ui-btn ui-btn--ok" onClick={() => handleSubmitCode(activeQ)}><Rocket size={15} strokeWidth={1.75} /> Submit code</button>
                     </div>
                   </div>
-
-                  {/* Left Bottom: Code Editor Container */}
-                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
-                    {/* Tab Bar showing index.html */}
-                    <div style={{ 
-                      display: 'flex', 
-                      justifyContent: 'space-between', 
-                      alignItems: 'center', 
-                      background: '#1e293b', 
-                      padding: '0 20px', 
-                      borderBottom: '1px solid #334155',
-                      height: '46px',
-                      boxSizing: 'border-box'
-                    }}>
-                      <div style={{ display: 'flex', gap: '2px', height: '100%' }}>
-                        <div style={{ 
-                          background: '#0f172a', 
-                          color: '#38bdf8', 
-                          padding: '0 16px', 
-                          display: 'flex', 
-                          alignItems: 'center', 
-                          gap: '8px', 
-                          borderRight: '1px solid #1e293b', 
-                          borderTop: '2px solid #38bdf8',
-                          fontSize: '12px',
-                          fontWeight: '600'
-                        }}>
-                          <span style={{ color: '#e06c75' }}>&lt;&gt;</span> index.html
-                        </div>
-                      </div>
-                      <div style={{ display: 'flex', gap: '8px' }}>
-                        <button className="btn btn-secondary btn-sm" onClick={handleRunHtmlCode} style={{ padding: '4px 12px', fontSize: '12px', background: '#475569', color: '#fff', border: 'none', borderRadius: '4px' }}>
-                          ▶ Run Code
-                        </button>
-                        <button className="btn btn-primary btn-sm" onClick={() => handleSubmitCode(activeQ)} style={{ padding: '4px 12px', fontSize: '12px', background: '#22c55e', color: '#fff', border: 'none', borderRadius: '4px' }}>
-                          🚀 Submit Code
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Submission Feedback Overlay banner */}
-                    {submissionFeedback[activeQ.id] && (
-                      <div style={{
-                        padding: '12px 20px',
-                        fontSize: '13px',
-                        fontWeight: '600',
-                        background: submissionFeedback[activeQ.id].passed ? 'rgba(34, 197, 94, 0.15)' : 'rgba(239, 68, 68, 0.15)',
-                        color: submissionFeedback[activeQ.id].passed ? '#4ade80' : '#f87171',
-                        borderBottom: `1px solid ${submissionFeedback[activeQ.id].passed ? 'rgba(34, 197, 94, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`,
-                      }}>
-                        {submissionFeedback[activeQ.id].message}
-                      </div>
-                    )}
-
-                    {/* Textarea Editor */}
-                    <div style={{ flex: 1, display: 'flex', minHeight: 0 }}>
-                      <textarea
-                        name={activeQ.id}
-                        value={activeAnswer || activeQ.codeTemplate || ''}
-                        onChange={(e) => handleSelectOption(activeQ.id, e.target.value)}
-                        onKeyDown={handleKeyDownTextarea}
-                        placeholder="<!-- Write your HTML template code here -->"
-                        style={{
-                          width: '100%',
-                          height: '100%',
-                          padding: '20px',
-                          fontFamily: 'Consolas, Monaco, "Courier New", monospace',
-                          fontSize: '13.5px',
-                          background: '#0f172a',
-                          color: '#f8fafc',
-                          border: 'none',
-                          resize: 'none',
-                          outline: 'none',
-                          lineHeight: '1.6',
-                          boxSizing: 'border-box'
-                        }}
-                      ></textarea>
-                    </div>
-                  </div>
+                  {feedbackBanner}
+                  <CodeEditor
+                    name={activeQ.id}
+                    value={activeAnswer || activeQ.codeTemplate || ''}
+                    placeholder="<!-- Write your HTML template code here -->"
+                    onChange={(v) => handleSelectOption(activeQ.id, v)}
+                    onKeyDown={handleKeyDownTextarea}
+                  />
                 </div>
-
-                {/* Visual Draggable Splitter Handle */}
-                <div 
-                  className="html-splitter-bar"
-                  onMouseDown={handleSplitMouseDown}
-                  style={{
-                    width: '6px',
-                    cursor: 'col-resize',
-                    background: '#1e293b',
-                    alignSelf: 'stretch',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    transition: 'background 0.2s',
-                    position: 'relative',
-                    zIndex: 10
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.background = '#38bdf8'}
-                  onMouseLeave={(e) => e.currentTarget.style.background = '#1e293b'}
-                >
-                  <div style={{ width: '2px', height: '40px', background: '#334155', borderRadius: '1px' }}></div>
-                </div>
-
-                {/* Right Panel: Output Preview */}
-                <div className="html-right-panel" style={{ 
-                  flex: 1, 
-                  minWidth: 0, 
-                  display: 'flex', 
-                  flexDirection: 'column', 
-                  background: '#ffffff', 
-                  height: '100%', 
-                  boxSizing: 'border-box' 
-                }}>
-                  {/* Tab Bar showing Output Preview */}
-                  <div style={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    background: '#f1f5f9', 
-                    padding: '0 20px', 
-                    borderBottom: '1px solid #cbd5e1',
-                    height: '46px',
-                    boxSizing: 'border-box'
-                  }}>
-                    <div style={{ 
-                      background: '#ffffff', 
-                      color: '#1e293b', 
-                      padding: '0 16px', 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      gap: '6px', 
-                      height: '100%',
-                      borderRight: '1px solid #cbd5e1', 
-                      fontSize: '12px',
-                      fontWeight: '600'
-                    }}>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ color: '#64748b' }}>
-                        <circle cx="12" cy="12" r="10"/>
-                        <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-                      </svg>
-                      Live Preview Output
-                    </div>
-                  </div>
-
-                  {/* Iframe View */}
-                  <div style={{ flex: 1, minHeight: 0, background: '#ffffff' }}>
-                    <iframe
-                      ref={iframeRef}
-                      title="HTML form split preview"
-                      style={{ width: '100%', height: '100%', border: 'none', background: '#ffffff' }}
-                    ></iframe>
-                  </div>
+                {splitter}
+                <div className="xm-preview">
+                  <div className="xm-preview__bar"><Globe size={15} strokeWidth={1.75} /> Live preview</div>
+                  <iframe ref={iframeRef} title="HTML form split preview"></iframe>
                 </div>
               </div>
             )}
 
-            {/* CODING & PRACTICAL JAVA TYPES - LeetCode Split Layout */}
+            {/* CODING & PRACTICAL JAVA TYPES */}
             {(activeQ.type === 'coding' || activeQ.type === 'practical-java') && (
-              <div className="leetcode-split-layout" style={{ 
-                display: 'flex', 
-                gap: '0', 
-                height: 'calc(100vh - 146px)', 
-                width: '100%',
-                background: '#0f172a',
-                borderTop: '1px solid #1e293b'
-              }}>
-                {/* Left Panel: Description and Test Cases */}
-                <div className="leetcode-left-panel" style={{ 
-                  width: `${splitPercent}%`, 
-                  flexShrink: 0, 
-                  display: 'flex', 
-                  flexDirection: 'column', 
-                  gap: '16px', 
-                  background: '#0f172a', 
-                  color: '#cbd5e1', 
-                  padding: '24px', 
-                  borderRight: '1px solid #1e293b', 
-                  overflowY: 'auto', 
-                  height: '100%', 
-                  boxSizing: 'border-box' 
-                }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #1e293b', paddingBottom: '12px' }}>
-                    <h4 style={{ margin: 0, color: '#f8fafc', fontSize: '16px', fontWeight: '600' }}>Problem Description</h4>
-                    <span className="badge badge-secondary" style={{ background: '#1e293b', color: '#38bdf8', border: '1px solid #334155', padding: '4px 10px', borderRadius: '12px', fontSize: '11px' }}>
-                      {activeQ.marks} Marks
-                    </span>
+              <div className="xm-ws">
+                <div className="xm-ws__left xm-prob" style={{ width: `${splitPercent}%` }}>
+                  <div className="xm-prob__head">
+                    <h2>Problem description</h2>
+                    <span className="ui-badge ui-badge--info">{activeQ.marks} marks</span>
                   </div>
-                  
-                  <div className="problem-statement-text" style={{ fontSize: '14.5px', lineHeight: '1.7', color: '#e2e8f0', whiteSpace: 'pre-wrap', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
-                    {activeQ.questionText}
-                  </div>
-
-                  {/* Public Sample Test Cases */}
+                  <div className="xm-prob__text">{activeQ.questionText}</div>
                   {activeQ.testCases && activeQ.testCases.length > 0 && (
-                    <div style={{ marginTop: '24px' }}>
-                      <h5 style={{ borderBottom: '1px solid #1e293b', paddingBottom: '8px', marginBottom: '16px', fontSize: '13.5px', color: '#94a3b8', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Sample Test Cases</h5>
+                    <div style={{ display: 'grid', gap: 12 }}>
+                      <h3>Sample test cases</h3>
                       {activeQ.testCases.map((tc, idx) => (
-                        <div key={idx} style={{ background: '#1e293b', border: '1px solid #334155', padding: '12px 16px', borderRadius: '8px', fontSize: '13px', fontFamily: 'Consolas, Monaco, monospace', marginBottom: '12px', color: '#e2e8f0', whiteSpace: 'pre-wrap' }}>
-                          <div style={{ marginBottom: '4px' }}><strong style={{ color: '#64748b' }}>Input arguments:</strong> {tc.input}</div>
-                          <div><strong style={{ color: '#64748b' }}>Expected output:</strong> {tc.expected}</div>
+                        <div key={idx} className="xm-tc">
+                          <div><span>Input arguments:</span> {tc.input}</div>
+                          <div><span>Expected output:</span> {tc.expected}</div>
                         </div>
                       ))}
                     </div>
                   )}
                 </div>
-
-                {/* Visual Draggable Splitter Handle */}
-                <div 
-                  className="leetcode-splitter-bar"
-                  onMouseDown={handleSplitMouseDown}
-                  style={{
-                    width: '6px',
-                    cursor: 'col-resize',
-                    background: '#1e293b',
-                    alignSelf: 'stretch',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    transition: 'background 0.2s',
-                    position: 'relative',
-                    zIndex: 10
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.background = '#38bdf8'}
-                  onMouseLeave={(e) => e.currentTarget.style.background = '#1e293b'}
-                >
-                  <div style={{ width: '2px', height: '40px', background: '#334155', borderRadius: '1px' }}></div>
-                </div>
-
-                {/* Right Panel: Code Editor and Console */}
-                <div className="leetcode-right-panel" style={{ 
-                  flex: 1, 
-                  minWidth: 0, 
-                  display: 'flex', 
-                  flexDirection: 'column', 
-                  background: '#0f172a', 
-                  height: '100%', 
-                  boxSizing: 'border-box' 
-                }}>
-                  <div style={{ 
-                    display: 'flex', 
-                    justifyContent: 'space-between', 
-                    alignItems: 'center', 
-                    background: '#1e293b', 
-                    padding: '10px 20px', 
-                    borderBottom: '1px solid #334155',
-                    height: '46px',
-                    boxSizing: 'border-box'
-                  }}>
-                    <span style={{ fontSize: '13px', fontWeight: '600', color: '#38bdf8', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <span className="live-dot" style={{ display: 'inline-block', width: '8px', height: '8px', background: '#22c55e', borderRadius: '50%' }}></span>
-                      Language: Java (JDK 21)
-                    </span>
-                    <div style={{ display: 'flex', gap: '8px' }}>
-                      <button className="btn btn-secondary btn-sm" onClick={() => handleRunCode(activeQ)} style={{ padding: '4px 12px', fontSize: '12px', background: '#334155', color: '#f8fafc', border: 'none' }}>
-                        ▶ Run Code
-                      </button>
-                      <button className="btn btn-primary btn-sm" onClick={() => handleSubmitCode(activeQ)} style={{ padding: '4px 12px', fontSize: '12px', background: '#22c55e', color: '#fff', border: 'none' }}>
-                        🚀 Submit Code
-                      </button>
+                {splitter}
+                <div className="xm-ws__right">
+                  <div className="xm-ws__bar">
+                    <span className="xm-ws__lang">Java (JDK 21)</span>
+                    <div className="xm-ws__btns">
+                      <button className="ui-btn ui-btn--secondary" onClick={() => handleRunCode(activeQ)}><Play size={15} strokeWidth={1.75} /> Run code</button>
+                      <button className="ui-btn ui-btn--ok" onClick={() => handleSubmitCode(activeQ)}><Rocket size={15} strokeWidth={1.75} /> Submit code</button>
                     </div>
                   </div>
-
-                  {/* Submission Feedback Overlay banner */}
-                  {submissionFeedback[activeQ.id] && (
-                    <div style={{
-                      padding: '12px 20px',
-                      fontSize: '13px',
-                      fontWeight: '600',
-                      background: submissionFeedback[activeQ.id].passed ? 'rgba(34, 197, 94, 0.15)' : 'rgba(239, 68, 68, 0.15)',
-                      color: submissionFeedback[activeQ.id].passed ? '#4ade80' : '#f87171',
-                      borderBottom: `1px solid ${submissionFeedback[activeQ.id].passed ? 'rgba(34, 197, 94, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`,
-                    }}>
-                      {submissionFeedback[activeQ.id].message}
+                  {feedbackBanner}
+                  <CodeEditor
+                    name={activeQ.id}
+                    value={activeAnswer || activeQ.codeTemplate || ''}
+                    onChange={(v) => handleSelectOption(activeQ.id, v)}
+                    onKeyDown={handleKeyDownTextarea}
+                  />
+                  <div className="xm-term" aria-label="Sandbox execution output">
+                    <div className="xm-term__head">$ sandbox output</div>
+                    <div className="xm-term__body">
+                      {sandboxOutputs[activeQ.id] ? sandboxOutputs[activeQ.id].map((tc, idx) => (
+                        <div key={idx} className={`xm-case ${tc.passed ? 'is-pass' : ''}`}>
+                          <div>
+                            <div><span style={{ color: 'var(--ws-muted)' }}>Test case {idx + 1}:</span> input <code>{tc.input}</code></div>
+                            <div><span style={{ color: 'var(--ws-muted)' }}>Expected:</span> <code>{tc.expected}</code></div>
+                            <div><span style={{ color: 'var(--ws-muted)' }}>Returned:</span> <code style={{ color: tc.passed ? '#6ee7b7' : '#fda4af' }}>{tc.actual}</code></div>
+                          </div>
+                          <span className={`ui-badge ${tc.passed ? 'ui-badge--success' : 'ui-badge--danger'}`}>{tc.passed ? 'PASSED' : 'FAILED'}</span>
+                        </div>
+                      )) : (
+                        <div style={{ color: 'var(--ws-muted)' }}>Click “Run code” to execute your solution against the test cases.</div>
+                      )}
                     </div>
-                  )}
-
-                  <div className="editor-container" style={{ flex: 1, display: 'flex', minHeight: 0 }}>
-                    <textarea
-                      name={activeQ.id}
-                      value={activeAnswer || activeQ.codeTemplate || ''}
-                      onChange={(e) => handleSelectOption(activeQ.id, e.target.value)}
-                      onKeyDown={handleKeyDownTextarea}
-                      style={{
-                        width: '100%',
-                        height: '100%',
-                        padding: '20px',
-                        fontFamily: 'Consolas, Monaco, "Courier New", monospace',
-                        fontSize: '13.5px',
-                        background: '#0f172a',
-                        color: '#f8fafc',
-                        border: 'none',
-                        resize: 'none',
-                        outline: 'none',
-                        lineHeight: '1.6',
-                        boxSizing: 'border-box'
-                      }}
-                    ></textarea>
-                  </div>
-
-                  {/* Sandbox Console Output */}
-                  <div className="console-panel" style={{ 
-                    background: '#0b0f19', 
-                    color: '#38bdf8', 
-                    padding: '20px', 
-                    borderTop: '1px solid #1e293b', 
-                    fontFamily: 'monospace', 
-                    fontSize: '12.5px', 
-                    overflowY: 'auto', 
-                    maxHeight: '220px',
-                    boxSizing: 'border-box'
-                  }}>
-                    <h5 style={{ color: '#94a3b8', marginTop: 0, marginBottom: '12px', borderBottom: '1px solid #1e293b', paddingBottom: '6px', fontSize: '13px' }}>Sandbox Execution Output</h5>
-                    {sandboxOutputs[activeQ.id] ? (
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                        {sandboxOutputs[activeQ.id].map((tc, idx) => {
-                          const isPublic = true;
-                          return (
-                            <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#0f172a', border: '1px solid #1e293b', padding: '10px 14px', borderRadius: '6px', borderLeft: `3px solid ${tc.passed ? '#22c55e' : '#ef4444'}` }}>
-                              {isPublic ? (
-                                <div style={{ fontSize: '13px', background: 'rgba(0,0,0,0.2)', padding: '8px', borderRadius: '4px', marginTop: '6px', whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
-                                  <div><span style={{ color: '#64748b' }}>Test Case {idx + 1}:</span> Input: <code>{tc.input}</code></div>
-                                  <div><span style={{ color: '#64748b' }}>Expected:</span> <code>{tc.expected}</code></div>
-                                  <div><span style={{ color: '#64748b' }}>Returned:</span> <span style={{ color: tc.passed ? '#4ade80' : '#f87171' }}><code>{tc.actual}</code></span></div>
-                                </div>
-                              ) : (
-                                <div>
-                                  <div><strong>Test Case {idx + 1} (Locked 🔒)</strong></div>
-                                  <div style={{ fontSize: '11px', color: '#64748b' }}>Parameters and evaluation variables hidden for security guidelines.</div>
-                                </div>
-                              )}
-                              <div>
-                                <span style={{
-                                  background: tc.passed ? 'rgba(74, 222, 128, 0.15)' : 'rgba(248, 113, 113, 0.15)',
-                                  color: tc.passed ? '#4ade80' : '#f87171',
-                                  border: `1px solid ${tc.passed ? 'rgba(74, 222, 128, 0.3)' : 'rgba(248, 113, 113, 0.3)'}`,
-                                  padding: '3px 10px',
-                                  borderRadius: '4px',
-                                  fontWeight: 'bold',
-                                  fontSize: '11px'
-                                }}>
-                                  {tc.passed ? 'PASSED' : 'FAILED'}
-                                </span>
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    ) : (
-                      <div style={{ color: '#64748b' }}>Click "Run Code" to execute code parameters.</div>
-                    )}
                   </div>
                 </div>
               </div>
             )}
           </div>
-        </div>
+        </main>
+      </div>
+
+      {/* Webcam widget */}
+      <div className="xm-cam" id="sec-cam-widget">
+        <video ref={videoRef} id="exam-camera-stream" autoPlay playsInline muted></video>
+        <div className="xm-live">Live</div>
       </div>
 
       {/* Footer Controls */}
-      <div className="exam-footer">
-        <button className="btn btn-secondary" onClick={handlePrev} disabled={activeQuestionIdx === 0}>
-          Previous
+      <footer className="xm-foot">
+        <button className="ui-btn ui-btn--secondary" onClick={handlePrev} disabled={activeQuestionIdx === 0}>
+          <ArrowLeft size={18} strokeWidth={1.75} /> Previous
         </button>
-        <div>
-          <span className="question-counter">Question {activeQuestionIdx + 1} of {questions.length}</span>
-        </div>
-        
-        {activeQuestionIdx < questions.length - 1 ? (
-          <button className="btn btn-primary" onClick={handleNext}>
-            Next
+        <div className="xm-foot__mid">
+          <span className="xm-counter">Question {activeQuestionIdx + 1} of {questions.length}</span>
+          <button type="button" className={`ui-btn ui-btn--secondary ui-btn--sm xm-mark ${marked[activeQ.id] ? 'is-on' : ''}`} aria-pressed={!!marked[activeQ.id]} onClick={() => toggleMark(activeQ.id)}>
+            <Flag size={16} strokeWidth={1.75} /> {marked[activeQ.id] ? 'Marked for review' : 'Mark for review'}
           </button>
-        ) : (
-          <button className="btn btn-danger" onClick={handleManualSubmit}>
-            Submit Exam
+        </div>
+        {!isLast && (
+          <button className="ui-btn ui-btn--primary" onClick={handleNext}>
+            Save &amp; next <ArrowRight size={18} strokeWidth={1.75} />
           </button>
         )}
-      </div>
+        <button className="ui-btn ui-btn--danger-outline xm-submit" onClick={handleManualSubmit}>
+          <Send size={18} strokeWidth={1.75} /> Submit exam
+        </button>
+      </footer>
+
+      {showSubmitModal && (
+        <SubmitModal answered={answeredCount} unanswered={totalQs - answeredCount} marked={markedCount} busy={submitting}
+          onConfirm={confirmSubmit} onCancel={() => setShowSubmitModal(false)} />
+      )}
 
       {/* Warning Alert Modal */}
-      <WarningOverlay 
+      <WarningOverlay
         show={showWarning}
         title={warningTitle}
         message={warningMsg}
@@ -1491,109 +1214,33 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
         onResume={handleResumeFullscreen}
       />
 
-      {/* ── Security Violation Banner (Non-blocking Left Popup) ── */}
+      {/* Security violation notice (non-blocking, left) */}
       {showViolationBanner && (
-        <div style={{
-          position: 'fixed',
-          top: '150px',
-          left: '24px',
-          zIndex: 99999,
-          background: 'rgba(30, 41, 59, 0.97)',
-          border: '1px solid #ef4444',
-          borderRadius: '14px',
-          padding: '16px 20px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '14px',
-          boxShadow: '0 8px 32px rgba(239, 68, 68, 0.25), 0 2px 8px rgba(0,0,0,0.4)',
-          backdropFilter: 'blur(12px)',
-          animation: 'toast-slide-in-left 0.3s ease-out',
-          maxWidth: '320px',
-          color: '#f8fafc',
-          fontFamily: 'system-ui, -apple-system, sans-serif'
-        }}>
-          <div style={{
-            width: '42px', height: '42px',
-            background: 'rgba(239, 68, 68, 0.15)',
-            border: '2px solid #ef4444',
-            borderRadius: '50%',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            flexShrink: 0,
-            fontSize: '20px'
-          }}>
-            ⚠️
-          </div>
+        <div className="xm-alert" style={{ top: 150 }} role="alert">
+          <ShieldAlert size={22} strokeWidth={1.75} aria-hidden="true" />
           <div>
-            <div style={{ fontWeight: '700', fontSize: '13.5px', color: '#f87171', marginBottom: '3px' }}>
-              Security Violation ({violationBannerCount}/{MAX_VIOLATIONS})
-            </div>
-            <div style={{ fontSize: '12px', color: '#94a3b8', lineHeight: '1.4' }}>
+            <b>Security violation ({violationBannerCount}/{MAX_VIOLATIONS})</b>
+            <span>
               {violationBannerCount < MAX_VIOLATIONS
                 ? `${MAX_VIOLATIONS - violationBannerCount} more violation${MAX_VIOLATIONS - violationBannerCount === 1 ? '' : 's'} will auto-submit.`
                 : 'Auto-submitting now...'}
-            </div>
+            </span>
           </div>
-          <button
-            onClick={() => setShowViolationBanner(false)}
-            style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', fontSize: '18px', lineHeight: 1, padding: '0 4px', flexShrink: 0 }}
-          >×</button>
+          <button type="button" className="ui-btn ui-btn--ghost ui-btn--sm ui-btn--icon" style={{ width: 36 }} onClick={() => setShowViolationBanner(false)} aria-label="Dismiss"><X size={16} /></button>
         </div>
       )}
 
-      {/* Unfocus warning banner on left side */}
+      {/* Unfocus notice (non-blocking, left) */}
       {showUnfocusPopup && (
-        <div style={{
-          position: 'fixed',
-          top: '250px',
-          left: '24px',
-          zIndex: 99999,
-          background: 'rgba(30, 41, 59, 0.97)',
-          border: '1px solid #f59e0b',
-          borderRadius: '14px',
-          padding: '16px 20px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '14px',
-          boxShadow: '0 8px 32px rgba(245, 158, 11, 0.25), 0 2px 8px rgba(0,0,0,0.4)',
-          backdropFilter: 'blur(12px)',
-          animation: 'toast-slide-in-left 0.3s ease-out',
-          maxWidth: '320px',
-          color: '#f8fafc',
-          fontFamily: 'system-ui, -apple-system, sans-serif'
-        }}>
-          <div style={{
-            width: '42px', height: '42px',
-            background: 'rgba(245, 158, 11, 0.15)',
-            border: '2px solid #f59e0b',
-            borderRadius: '50%',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            flexShrink: 0,
-            fontSize: '20px'
-          }}>
-            ⚠️
-          </div>
+        <div className="xm-alert xm-alert--warn" style={{ top: 250 }} role="alert">
+          <AlertTriangle size={22} strokeWidth={1.75} aria-hidden="true" />
           <div>
-            <div style={{ fontWeight: '700', fontSize: '13.5px', color: '#fbbf24', marginBottom: '3px' }}>
-              Window Unfocused!
-            </div>
-            <div style={{ fontSize: '12px', color: '#94a3b8', lineHeight: '1.4' }}>
-              Please focus back on the exam window. Continued shifting may flag your test.
-            </div>
+            <b>Window unfocused</b>
+            <span>Please focus back on the exam window. Continued shifting may flag your test.</span>
           </div>
-          <button
-            onClick={() => setShowUnfocusPopup(false)}
-            style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', fontSize: '18px', lineHeight: 1, padding: '0 4px', flexShrink: 0 }}
-          >×</button>
+          <button type="button" className="ui-btn ui-btn--ghost ui-btn--sm ui-btn--icon" style={{ width: 36 }} onClick={() => setShowUnfocusPopup(false)} aria-label="Dismiss"><X size={16} /></button>
         </div>
       )}
-
-      {/* Add CSS animations */}
-      <style>{`
-        @keyframes modal-scale-in {
-          from { transform: translate(-50%, -50%) scale(0.9); opacity: 0; }
-          to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-        }
-      `}</style>
     </div>
   );
 }

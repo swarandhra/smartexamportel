@@ -1,7 +1,7 @@
 # Design system
 
-Status: foundation + student dashboard, guidelines, system check, warning overlay and result screen are migrated.
-Pending: student auth, admin login, exam engine, admin workspace.
+Status: foundation, student dashboard, guidelines, system check, warning overlay, result screen and exam screen are migrated.
+Pending: student auth, admin login, admin workspace.
 
 ## Tokens (`src/styles/tokens.css`)
 - Semantic colours `--c-*` (indigo primary, slate neutrals, emerald/amber/rose/sky status). Light by default; `[data-theme="dark"]` overrides.
@@ -17,3 +17,9 @@ Dark is applied by putting `data-theme` on a migrated screen's root, so unmigrat
 
 ## Motion
 120/200/280/400ms with `cubic-bezier(.2,.8,.2,1)`; only `transform` and `opacity`. Page enter `ui-page`, lists `ui-stagger` (40ms step). `prefers-reduced-motion` collapses durations.
+
+## Exam screen (`ExamEngine.tsx`, `components/exam/ExamParts.tsx`, `styles/exam.css`)
+- UI-only state: palette filter, drawer, mark-for-review (sessionStorage `ui-review-marks-<examId>`), save status (from the existing `updateResultDraft` boolean), timer notices at 10/5/1 min.
+- Palette is docked >=1100px for non-code questions, a drawer otherwise, a bottom sheet <=640px.
+- Shortcuts (1-4/A-D, arrows, M) are bubble-phase listeners that skip `defaultPrevented` events and any Alt/Ctrl/Meta/Shift combo, so the proctoring capture handlers always run first.
+- Code workspace is always dark; editor is a plain textarea with a synced line-number gutter.
