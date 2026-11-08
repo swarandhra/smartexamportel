@@ -220,6 +220,15 @@ export async function getResults(): Promise<Result[]> {
   }
 }
 
+// Lightweight per-student results for the dashboard (falls back to the full list if the endpoint is unavailable).
+export async function getMyResults(rollNumber: string): Promise<Result[]> {
+  try {
+    const res = await apiFetch(`/api/students/my-results?rollNumber=${encodeURIComponent(rollNumber)}`);
+    if (res && res.success && Array.isArray(res.data)) return res.data as Result[];
+  } catch { /* fall through to the full list */ }
+  return (await getResults()).filter(r => r.rollNumber === rollNumber);
+}
+
 export async function checkActiveDraft(rollNumber: string, examId: string): Promise<Result | null> {
   try {
     const res = await apiFetch(`/api/results/draft?rollNumber=${encodeURIComponent(rollNumber)}&examId=${encodeURIComponent(examId)}`);

@@ -152,6 +152,7 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
   
   // Create a persistent ID for this result log (resumes draft or creates a new one)
   const resultIdRef = useRef(activeDraft ? activeDraft.id : 'result_' + Date.now());
+  const lastSavedRef = useRef<{ fingerprint: string; at: number }>({ fingerprint: '', at: 0 });
 
   // Navigation & States
   const [activeQuestionIdx, setActiveQuestionIdx] = useState(0);
@@ -429,8 +430,15 @@ export default function ExamEngine({ exam, student, activeDraft, onFinished }: E
       // 2. Sync to Supabase
       const logs = getViolationLog();
       const snaps = getCameraCaptures();
+
+      // Lighter on the database: skip the network save when nothing changed since the last successful one
+      // (still sent at least once a minute). The local backup above always runs.
+      const fingerprint = JSON.stringify(answers) + '|' + logs.length + '|' + snaps.length;
+      if (fingerprint === lastSavedRef.current.fingerprint && Date.now() - lastSavedRef.current.at < 60000) return;
+
       setSaveStatus({ s: 'saving' });
       const ok = await updateResultDraft(resultIdRef.current, answers, logs, snaps);
+      if (ok) lastSavedRef.current = { fingerprint, at: Date.now() };
       setSaveStatus({ s: ok ? 'saved' : 'offline', at: Date.now() });
     };
 

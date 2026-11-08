@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { getExams, getResults, checkActiveDraft } from '../utils/db';
+import { getExams, getMyResults, checkActiveDraft } from '../utils/db';
 import type { Exam, Result } from '../utils/db';
 import { showToast } from '../utils/notifications';
 import { Clock, HelpCircle, Target, Trophy, LogOut, CheckCircle2, Play, Inbox, Loader2 } from 'lucide-react';
@@ -24,7 +24,7 @@ export default function StudentDashboard({ student, onStartExam, onLogout }: Stu
     async function loadDashboardData() {
       try {
         const fetchedExams = await getExams();
-        const fetchedResults = await getResults();
+        const fetchedResults = await getMyResults(student.rollNumber);
         setExams(fetchedExams);
 
         // Filter result records for this specific student
