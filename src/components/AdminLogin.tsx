@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { getSettings } from '../utils/db';
 import { showToast } from '../utils/notifications';
+import { setAdminToken } from '../utils/adminApi';
 import { ShieldCheck, KeyRound, ArrowLeft, Loader2, TriangleAlert, UserCog } from 'lucide-react';
 import PasswordField from './auth/PasswordField';
 import { Aurora, useGlassSheen } from './auth/Aurora';
@@ -34,6 +35,7 @@ export default function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
       const envPass = import.meta.env.VITE_ADMIN_PASSWORD || 'Venky@80744';
       if (pass === settings.adminPassword || pass === envPass) {
         localStorage.setItem('active_role', 'admin');
+        setAdminToken(pass); // lets the Overview call the admin API without a second prompt
         localStorage.removeItem('active_student');
         onLoginSuccess();
       } else {
