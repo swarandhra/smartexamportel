@@ -1,0 +1,109 @@
+/* Design tokens — single source of truth. See DESIGN.md. */
+:root {
+  /* Palette */
+  --indigo-50: #eef2ff; --indigo-100: #e0e7ff; --indigo-500: #6366f1;
+  --indigo-600: #4f46e5; --indigo-700: #4338ca; --indigo-300: #a5b4fc;
+  --emerald-50: #ecfdf5; --emerald-700: #047857;
+  --amber-50: #fffbeb;  --amber-700: #b45309;
+  --rose-50: #fff1f2;   --rose-600: #e11d48; --rose-700: #be123c;
+  --sky-50: #f0f9ff;    --sky-700: #0369a1;
+
+  /* Semantic (light) */
+  --c-bg: #f6f7fb;
+  --c-surface: #ffffff;
+  --c-surface-2: #f1f3f9;
+  --c-border: #e3e7f0;
+  --c-border-strong: #cbd2e1;
+  --c-text: #172033;
+  --c-text-muted: #55607a;
+  --c-primary: var(--indigo-600);
+  --c-primary-hover: var(--indigo-700);
+  --c-primary-text: #4338ca;
+  --c-primary-tint: var(--indigo-50);
+  --c-on-primary: #ffffff;
+  --c-success: var(--emerald-700);  --c-success-tint: var(--emerald-50);
+  --c-warning: var(--amber-700);    --c-warning-tint: var(--amber-50);
+  --c-danger: var(--rose-700);      --c-danger-solid: var(--rose-600); --c-danger-tint: var(--rose-50);
+  --c-info: var(--sky-700);         --c-info-tint: var(--sky-50);
+  --c-focus: var(--indigo-500);
+
+  /* Spacing (4px scale) */
+  --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px; --sp-5: 20px;
+  --sp-6: 24px; --sp-8: 32px; --sp-10: 40px; --sp-12: 48px;
+
+  /* Radii */
+  --r-sm: 8px; --r-md: 12px; --r-lg: 16px; --r-full: 999px;
+
+  /* Shadows */
+  --sh-sm: 0 1px 2px rgba(23, 32, 51, .06);
+  --sh-md: 0 4px 12px -2px rgba(23, 32, 51, .08), 0 2px 4px rgba(23, 32, 51, .04);
+  --sh-lg: 0 20px 40px -12px rgba(23, 32, 51, .18);
+
+  /* Z-index */
+  --z-sticky: 20; --z-drawer: 40; --z-modal: 60; --z-toast: 80;
+
+  /* Motion */
+  --dur-fast: 120ms; --dur-base: 200ms; --dur-panel: 280ms; --dur-page: 400ms;
+  --ease: cubic-bezier(.2, .8, .2, 1);
+
+  /* Type */
+  --font: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* Legacy aliases: unmigrated screens inherit the new palette. */
+  --primary: var(--c-primary);
+  --primary-hover: var(--c-primary-hover);
+  --primary-light: var(--c-primary-tint);
+  --primary-border: var(--indigo-100);
+  --dark-blue: var(--c-text);
+  --navy: var(--indigo-700);
+  --success: var(--c-success);
+  --success-light: var(--c-success-tint);
+  --danger: var(--c-danger-solid);
+  --danger-hover: var(--c-danger);
+  --danger-light: var(--c-danger-tint);
+  --bg-main: var(--c-bg);
+  --bg-card: var(--c-surface);
+  --bg-input: var(--c-surface-2);
+  --text-main: var(--c-text);
+  --text-muted: var(--c-text-muted);
+  --border-color: var(--c-border);
+  --radius-sm: var(--r-sm);
+  --radius-md: var(--r-md);
+  --radius-lg: var(--r-lg);
+  --shadow-sm: var(--sh-sm);
+  --shadow-md: var(--sh-md);
+  --shadow-lg: var(--sh-lg);
+}
+
+/* Dark theme is scoped to an element carrying data-theme="dark" (see useTheme),
+   so screens that have not been migrated yet are never half-dark. */
+[data-theme="dark"] {
+  color-scheme: dark;
+  --c-bg: #0b1020;
+  --c-surface: #121a30;
+  --c-surface-2: #1a2440;
+  --c-border: #27324f;
+  --c-border-strong: #3a4769;
+  --c-text: #e8ebf5;
+  --c-text-muted: #9ba6c0;
+  --c-primary-text: #a5b4fc;
+  --c-primary-tint: rgba(99, 102, 241, .16);
+  --c-success: #6ee7b7;  --c-success-tint: rgba(16, 185, 129, .14);
+  --c-warning: #fcd34d;  --c-warning-tint: rgba(245, 158, 11, .14);
+  --c-danger: #fda4af;   --c-danger-solid: #f43f5e; --c-danger-tint: rgba(244, 63, 94, .14);
+  --c-info: #7dd3fc;     --c-info-tint: rgba(14, 165, 233, .14);
+  --sh-sm: 0 1px 2px rgba(0, 0, 0, .4);
+  --sh-md: 0 6px 16px -4px rgba(0, 0, 0, .5);
+  --sh-lg: 0 24px 48px -12px rgba(0, 0, 0, .6);
+  background: var(--c-bg);
+  color: var(--c-text);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+  }
+}
