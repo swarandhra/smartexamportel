@@ -670,12 +670,13 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
   const avgPercentage = totalSubmissions > 0 ? totalPercentSum / totalSubmissions : 0;
   const totalViolationsCount = results.reduce((acc, r) => acc + r.totalViolations, 0);
 
-  let camCount = 0, micCount = 0, fsCount = 0, tabCount = 0;
+  let camCount = 0, micCount = 0, fsCount = 0, tabCount = 0, faceCount = 0;
   results.forEach(r => {
     camCount += r.cameraViolations || 0;
     micCount += r.microphoneViolations || 0;
     fsCount += r.fullscreenViolations || 0;
     tabCount += r.tabSwitchingCount || 0;
+    faceCount += (r.violationLog || []).filter(v => v.type === 'Face Not Visible' || v.type === 'Looking Away' || v.type === 'Multiple Faces Detected').length;
   });
 
   const pieRadius = 50;
@@ -1291,7 +1292,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                 <section className="ad-card">
                   <div className="ad-card__head"><h2>Integrity violation breakdown</h2></div>
                   <div className="ad-card__body ad-hbar">
-                    {[['Tab switches', tabCount], ['Fullscreen exit', fsCount], ['Mic activity', micCount], ['Cam disabled', camCount]].map(([label, n]) => (
+                    {[['Tab switches', tabCount], ['Fullscreen exit', fsCount], ['Mic activity', micCount], ['Cam disabled', camCount], ['Face / looking away', faceCount]].map(([label, n]) => (
                       <div key={label as string} className="ad-hbar__row">
                         <span>{label}</span>
                         <div className="ad-hbar__track"><div className="ad-hbar__fill" style={{ width: `${totalViolationsCount > 0 ? ((n as number) / totalViolationsCount) * 100 : 0}%` }}></div></div>

@@ -1,6 +1,7 @@
 // security.ts - Proctoring and Anti-Cheating Control Engine
 
 import type { Violation, CameraCapture } from './db';
+import { startFaceMonitor, stopFaceMonitor } from './faceMonitor';
 
 let cameraStream: MediaStream | null = null;
 let cameraInterval: any = null;
@@ -51,6 +52,11 @@ export async function startSecuritySystem(config: Partial<SecurityConfig>): Prom
   // Start devices
   const cameraOk = await initCameraMonitoring();
 
+  // Log-only face / head-turn monitoring (never warns or auto-submits; silent if it cannot load)
+  if (cameraOk && activeConfig.videoElement) {
+    startFaceMonitor(activeConfig.videoElement, (type, details) => logViolation(type, details));
+  }
+
   // Try initiating Full Screen mode
   requestFullscreen();
 
@@ -59,6 +65,7 @@ export async function startSecuritySystem(config: Partial<SecurityConfig>): Prom
 
 // Stop all security listeners and release device locks
 export function stopSecuritySystem(): void {
+  stopFaceMonitor();
   toggleEventBlockers(false);
   toggleWindowFocusListeners(false);
 
