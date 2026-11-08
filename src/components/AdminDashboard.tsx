@@ -1461,7 +1461,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                     <div className="violations-table-mini ad-vlog">
                       <div className="v-header"><span>Time</span><span>Violation type</span><span>Warning #</span></div>
                       {selectedResult.violationLog.map((v, index) => (
-                        <div key={index} className="v-row"><span>{v.time}</span><span className="vt v-type">{v.type}</span><span>{v.warningNumber || '-'}</span></div>
+                        <div key={index} className="v-row"><span>{v.time}</span><span className="v-type"><span className="ui-badge ui-badge--danger">{v.type}</span></span><span>{v.warningNumber || '-'}</span></div>
                       ))}
                     </div>
                   )}
@@ -1470,11 +1470,11 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                 {selectedResult.cameraCaptures && selectedResult.cameraCaptures.length > 0 && (
                   <div className="report-section ad-sec">
                     <h4>Webcam audits ({selectedResult.cameraCaptures.length})</h4>
-                    <div className="scrolling-captures" style={{ display: 'flex', gap: 12, overflowX: 'auto' }}>
+                    <div className="scrolling-captures ad-caps">
                       {selectedResult.cameraCaptures.map((snap, idx) => (
-                        <div key={idx} className="capture-card" style={{ flexShrink: 0 }}>
-                          <img src={snap.image} alt={`Cap @ ${snap.timestamp}`} style={{ borderRadius: 6 }} />
-                          <span style={{ fontSize: 10, textAlign: 'center', color: 'var(--c-text-muted)' }}>{snap.timestamp}</span>
+                        <div key={idx} className="capture-card">
+                          <img src={snap.image} alt={`Cap @ ${snap.timestamp}`} />
+                          <span>{snap.timestamp}</span>
                         </div>
                       ))}
                     </div>

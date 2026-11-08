@@ -179,21 +179,24 @@
 .ad-dialog__actions { display: flex; justify-content: flex-end; gap: var(--sp-2); margin-top: var(--sp-2); }
 .ui-btn--danger { background: var(--c-danger-solid); color: var(--text-on-accent); } .ui-btn--danger:hover:not(:disabled) { filter: brightness(.92); }
 .ad-sum { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-3); margin-bottom: var(--sp-5); }
-.ad-sum div { padding: var(--sp-3); background: var(--c-surface-2); border-radius: var(--r-md); font-size: 13px; color: var(--c-text-muted); }
-.ad-sum b { display: block; color: var(--c-text); font-size: 14px; margin-top: 2px; }
-.ad-sec { margin-bottom: var(--sp-5); }
-.ad-sec h4 { font-size: 14px; font-weight: 700; margin-bottom: var(--sp-3); }
+.ad-sum div { padding: var(--sp-3) var(--sp-4); background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--r-md); font-size: 12.5px; font-weight: 600; color: var(--text-2); }
+.ad-sum b { display: block; color: var(--text-1); font-size: 15px; font-weight: 700; margin-top: 4px; }
+.ad-sec { margin-bottom: var(--sp-4); padding: var(--sp-4); background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--r-lg); }
+.ad-sec h4 { display: flex; align-items: center; gap: var(--sp-2); font-size: 12px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--text-2); margin-bottom: var(--sp-3); border: 0; padding: 0; }
+.ad-sec h4::before { content: ''; width: 3px; height: 14px; border-radius: 2px; background: var(--accent); }
 .ad-grade { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-3); }
-.ad-grade div { padding: var(--sp-3); border: 1px solid var(--c-border); border-radius: var(--r-md); font-size: 13px; line-height: 1.4; }
-.ad-grade b { display: block; margin-top: 4px; color: var(--c-primary-text); font-family: var(--font-mono); font-size: 15px; }
-.ad-vlog { border: 1px solid var(--c-border); border-radius: var(--r-md); overflow: hidden; font-size: 13px; }
-.ad-vlog > div { display: grid; grid-template-columns: 100px 1fr 70px; gap: var(--sp-3); padding: 8px var(--sp-3); border-bottom: 1px solid var(--c-border); }
-.ad-vlog > div:first-child { background: var(--c-surface-2); font-weight: 700; color: var(--c-text-muted); font-size: 12px; }
+.ad-grade div { padding: var(--sp-3); background: var(--surface-3); border: 1px solid var(--border); border-radius: var(--r-md); font-size: 12.5px; font-weight: 600; line-height: 1.4; color: var(--text-2); }
+.ad-grade b { display: block; margin-top: 4px; color: var(--text-1); font-family: var(--font-mono); font-size: 16px; }
+.ad-vlog { border: 1px solid var(--border); border-radius: var(--r-md); overflow: hidden; font-size: 13px; background: var(--surface-3); }
+.ad-vlog > div { display: grid; grid-template-columns: 90px 1fr 80px; gap: var(--sp-3); align-items: center; padding: 10px var(--sp-3); border-bottom: 1px solid var(--border); color: var(--text-1); }
+.ad-vlog > div:first-child { background: var(--surface-3); font-weight: 700; color: var(--text-2); font-size: 12px; }
 .ad-vlog > div:last-child { border-bottom: 0; }
-.ad-vlog .vt { color: var(--c-danger); font-weight: 600; }
-.ad-clean { display: flex; gap: 8px; align-items: center; padding: var(--sp-3); border-radius: var(--r-md); background: var(--c-success-tint); color: var(--c-success); font-size: 13.5px; font-weight: 600; }
-.ad-ans { padding: var(--sp-3); border: 1px solid var(--c-border); border-radius: var(--r-md); background: var(--c-surface-2); }
-.ad-ans small { display: block; color: var(--c-text-muted); font-size: 12px; margin-bottom: 4px; }
+.ad-vlog .v-type { font-weight: 600; }
+.ad-clean { display: flex; gap: 8px; align-items: center; padding: var(--sp-3); border-radius: var(--r-md); background: var(--success-bg); border: 1px solid var(--success-border); color: var(--success-fg); font-size: 13.5px; font-weight: 600; }
+.ad .ad-caps.scrolling-captures { display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: var(--sp-3); overflow: visible; }
+.ad .ad-caps .capture-card, .ad .ad-caps .capture-card img { width: 100%; }
+.ad-ans { padding: var(--sp-3); border: 1px solid var(--border); border-radius: var(--r-md); background: var(--surface-3); color: var(--text-1); }
+.ad-ans small { display: block; color: var(--text-2); font-size: 12px; margin-bottom: 4px; }
 .ad-ans pre { margin: 0; padding: 8px; background: var(--code-bg); color: var(--code-text); border-radius: 6px; font: 11.5px/1.5 var(--font-mono); overflow-x: auto; }
 
 @media print {
